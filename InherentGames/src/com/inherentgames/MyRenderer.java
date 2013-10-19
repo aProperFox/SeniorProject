@@ -48,7 +48,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		fb = new FrameBuffer(gl, w, h);
 
 
-			world = new World();
+			world = new Room(0);
 			world.setAmbientLight(20, 20, 20);
 
 			sun = new Light(world);
