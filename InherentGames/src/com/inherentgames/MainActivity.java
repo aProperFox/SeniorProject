@@ -51,7 +51,9 @@ public class MainActivity extends Activity {
 		});
 		
 		renderer = new MyRenderer(this);
+		//mGLView.setRenderMode(RENDERMODE_WHEN_DIRTY);
 		mGLView.setRenderer(renderer);
+		
 		setContentView(mGLView);
 	}
 	

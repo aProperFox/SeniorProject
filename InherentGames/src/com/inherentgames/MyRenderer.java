@@ -22,12 +22,14 @@ import com.threed.jpct.util.MemoryHelper;
 
 class MyRenderer implements GLSurfaceView.Renderer {
 	private FrameBuffer fb = null;
-	private World world = null;
+	private Room world = null;
 	private RGBColor back = new RGBColor(50,50,100);
 	
 	private float touchTurn = 0;
 	private float touchTurnUp = 0;
 	
+	
+	private Camera cam;
 	
 	private Object3D cube = null;
 	private int fps = 0;
@@ -54,7 +56,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			sun = new Light(world);
 			sun.setIntensity(250, 250, 250);
 
-			// Create a texture out of the icon...:-)
+			/*
 			Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
 			TextureManager.getInstance().addTexture("texture", texture);
 			cube = Primitives.getBox(10, 2);
@@ -65,16 +67,18 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			cube.build();
 
 			world.addObject(cube);
-
-			Camera cam = world.getCamera();
-			cam.moveCamera(Camera.CAMERA_MOVEOUT, 50);
-			cam.lookAt(cube.getTransformedCenter());
+			*/
+			world.buildAllObjects();
+			cam = world.getCamera();
+			cam.setPosition(new SimpleVector(0,0,0));
+			
+			/*cam.lookAt(room.getTransformedCenter());
 
 			SimpleVector sv = new SimpleVector();
 			sv.set(cube.getTransformedCenter());
 			sv.y -= 100;
 			sv.z -= 100;
-			sun.setPosition(sv);
+			sun.setPosition(sv);*/
 			MemoryHelper.compact();
 
 		}
@@ -84,12 +88,12 @@ class MyRenderer implements GLSurfaceView.Renderer {
 
 	public void onDrawFrame(GL10 gl) {
 		if (touchTurn != 0) {
-			cube.rotateY(touchTurn);
+			cam.rotateY(touchTurn);
 			touchTurn = 0;
 		}
 
 		if (touchTurnUp != 0) {
-			cube.rotateX(touchTurnUp);
+			cam.rotateX(touchTurnUp);
 			touchTurnUp = 0;
 		}
 
