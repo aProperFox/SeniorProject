@@ -37,7 +37,7 @@ public class Room extends World{
 			return new SimpleVector(0,-20,0);
 		}
 		//default light location
-		return new SimpleVector(0,-50,0);
+		return new SimpleVector(0,-20,0);
 	}
 	
 	public void setSurfaces(int room){
@@ -67,7 +67,7 @@ public class Room extends World{
 			//Wall class and floor class to be changed to extend surface class
 			floor = new Floor(new SimpleVector(100,25,150),0);
 			addObject(floor.getFloor());
-			ceiling = new Floor(new SimpleVector(100,-35,150),0);
+			ceiling = new Floor(new SimpleVector(100,-25,150),0);
 			addObject(ceiling.getFloor());
 			break;
 		case 1:
