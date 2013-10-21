@@ -5,19 +5,15 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Texture;
-import com.threed.jpct.TextureManager;
-import com.threed.jpct.World;
-import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
 class MyRenderer implements GLSurfaceView.Renderer {
@@ -50,45 +46,31 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		fb = new FrameBuffer(gl, w, h);
 
 
-			world = new Room(0);
-			world.setAmbientLight(20, 20, 20);
+		world = new Room(0);
+		world.setAmbientLight(20, 20, 20);
 
-			sun = new Light(world);
-			sun.setIntensity(250, 250, 250);
+		sun = new Light(world);
+		sun.setPosition(world.getLightLocation(0));
+		sun.setIntensity(250, 250, 250);
 
-			/*
-			Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
-			TextureManager.getInstance().addTexture("texture", texture);
-			cube = Primitives.getBox(10, 2);
-			
-			cube.calcTextureWrapSpherical();
-			cube.setTexture("texture");
-			cube.strip();
-			cube.build();
+		/*
+		Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
+		TextureManager.getInstance().addTexture("texture", texture);
+		*/
+		world.buildAllObjects();
+		cam = world.getCamera();
+		cam.setPosition(new SimpleVector(0,0,0));
+		
+		MemoryHelper.compact();
 
-			world.addObject(cube);
-			*/
-			world.buildAllObjects();
-			cam = world.getCamera();
-			cam.setPosition(new SimpleVector(0,0,0));
-			
-			/*cam.lookAt(room.getTransformedCenter());
-
-			SimpleVector sv = new SimpleVector();
-			sv.set(cube.getTransformedCenter());
-			sv.y -= 100;
-			sv.z -= 100;
-			sun.setPosition(sv);*/
-			MemoryHelper.compact();
-
-		}
+	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 	}
 
 	public void onDrawFrame(GL10 gl) {
 		if (touchTurn != 0) {
-			cam.rotateY(touchTurn);
+			cam.rotateCameraAxis(new SimpleVector(0,1,0),touchTurn);
 			touchTurn = 0;
 		}
 
