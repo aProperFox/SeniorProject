@@ -1,10 +1,13 @@
 package com.inherentgames;
 
-import android.util.Log;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
+import com.threed.jpct.TextureManager;
 
 public class Wall extends Surface{
 	
@@ -15,11 +18,11 @@ public class Wall extends Surface{
 	private float width;
 	private float height;
 	private Object3D wall = new Object3D(2);
+	
+	Context context;
 
-	public Wall(SimpleVector origin, float width, float height, int textureId){
-		super(origin, width, height, textureId);
-		//Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
-		//TextureManager.getInstance().addTexture("texture", texture);
+	public Wall(SimpleVector origin, float width, float height, String textureName){
+		super(origin, width, height, 0);
 		this.width = width;
 		this.height = height;
 		this.origin = origin;
@@ -29,9 +32,8 @@ public class Wall extends Surface{
 		wall.setAdditionalColor(100, 100, 100);
 		//uvs represent texture locations
 		//uvs[0] = xMin, uvs[1] = yMin, uvs[2] = xMax, uvs[3] =  yMax
-		wall.addTriangle(coordinates[1],1,1,coordinates[0],0,1,coordinates[2],1,0,textureId);
-		wall.addTriangle(coordinates[0],0,1,coordinates[3],0,0,coordinates[2],1,0,textureId);
-		
+		wall.addTriangle(coordinates[1],1,1,coordinates[0],0,1,coordinates[2],1,0);
+		wall.addTriangle(coordinates[0],0,1,coordinates[3],0,0,coordinates[2],1,0);
 	}
 	
 	public Object3D getWall(){
