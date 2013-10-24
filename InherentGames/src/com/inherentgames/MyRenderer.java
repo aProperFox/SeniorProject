@@ -27,7 +27,6 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	
 	private Camera cam;
 	
-	private Object3D cube = null;
 	private int fps = 0;
 	
 	private Light sun = null;
@@ -46,9 +45,9 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		fb = new FrameBuffer(gl, w, h);
 
 
-		world = new Room(0);
+		world = new Room(0, context);
 		world.setAmbientLight(20, 20, 20);
-
+		
 		sun = new Light(world);
 		sun.setPosition(world.getLightLocation(0));
 		sun.setIntensity(250, 250, 250);
@@ -83,7 +82,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		world.renderScene(fb);
 		world.draw(fb);
 		fb.display();
-
+		/*SimpleVector camVec = cam.getDirection();
+		camVec.scalarMul(2);
+		sun.setPosition(camVec);*/
+		
 		if (System.currentTimeMillis() - time >= 1000) {
 			Logger.log(fps + "fps");
 			fps = 0;
