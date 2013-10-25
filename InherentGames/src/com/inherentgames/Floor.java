@@ -7,6 +7,7 @@ public class Floor{
 	SimpleVector[] coordinates = new SimpleVector[4];
 	String type = "";
 	
+	// This is an object
 	Object3D floor = new Object3D(2);
 	
 	public Floor(SimpleVector size, int textureId){
