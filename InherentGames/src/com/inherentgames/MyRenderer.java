@@ -21,7 +21,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private float touchTurn = 0;
 	private float touchTurnUp = 0;
 	
-	private SimpleVector V, U;
+	private SimpleVector V;
 	
 	
 	private Camera cam;
@@ -36,7 +36,6 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	public MyRenderer(Context c) {
 		context = c;
 		V = new SimpleVector(0, 0, 1);
-		U = new SimpleVector(0, -1, 0);
 	}
 
 	public void onSurfaceChanged(GL10 gl, int w, int h) {
@@ -75,10 +74,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			V.set(cam.getDirection());
 			V.rotateY(touchTurn);
 			V.rotateX(touchTurnUp);
-			U.set(cam.getUpVector());
-			U.rotateX(touchTurnUp);
 			V.normalize(V);
-			U.normalize(U);
 			cam.lookAt(V);
 			
 			touchTurn = 0;
