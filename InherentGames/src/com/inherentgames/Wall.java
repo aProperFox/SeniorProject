@@ -1,19 +1,13 @@
 package com.inherentgames;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Texture;
-import com.threed.jpct.TextureManager;
 
 public class Wall extends Surface{
 	
 	
 	private SimpleVector[] coordinates = new SimpleVector[4];
-	private Texture textures[];
 	private SimpleVector origin;
 	private float width;
 	private float height;

@@ -1,16 +1,12 @@
 package com.inherentgames;
 
-import android.util.Log;
-
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Texture;
 
 public class Surface{
 	
 	
 	private SimpleVector[] coordinates = new SimpleVector[4];
-	private Texture textures[];
 	private SimpleVector origin;
 	private float width;
 	private float height;
