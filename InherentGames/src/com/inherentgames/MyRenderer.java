@@ -60,12 +60,19 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		cam = world.getCamera();
 		cam.setPosition(new SimpleVector(0,0,0));
 		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
-		
 		MemoryHelper.compact();
 
 	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+	}
+	
+	public void setLighting(){
+		if(sun.isEnabled()){
+			sun.disable();
+		}
+		else
+			sun.enable();
 	}
 
 	public void onDrawFrame(GL10 gl) {
@@ -73,7 +80,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		if ( touchTurn != 0 || touchTurnUp != 0 ) {
 			V.set(cam.getDirection());
 			V.rotateY(touchTurn);
-			V.rotateX(touchTurnUp);
+			if(cam.getDirection().z < 0)
+				V.rotateX(-touchTurnUp);
+			else
+				V.rotateX(touchTurnUp);
 			V.normalize(V);
 			cam.lookAt(V);
 			

@@ -1,5 +1,5 @@
 <resources>
 
     <string name="app_name">InherentGames</string>
-
+	<string name="change_lighting">Enable/Disable Lighting</string>
 </resources>

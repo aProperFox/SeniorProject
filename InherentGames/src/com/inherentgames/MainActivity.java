@@ -8,6 +8,9 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 
@@ -58,6 +61,13 @@ public class MainActivity extends Activity {
 		mGLView.setRenderer(renderer);
 		
 		setContentView(mGLView);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, menu);
+	    return true;
 	}
 	
 	/*@Override
@@ -125,6 +135,16 @@ public class MainActivity extends Activity {
 		}
 		return super.onTouchEvent(me);
 	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.lighting:
+        	renderer.setLighting();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 	
 	protected boolean isFullscreenOpaque() {
 		return true;
