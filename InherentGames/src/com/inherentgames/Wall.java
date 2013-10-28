@@ -1,47 +1,64 @@
 package com.inherentgames;
 
 import android.content.Context;
-import android.util.Log;
-
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Texture;
 
-public class Wall extends Object3D{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class Wall extends Surface{
 	
+	
+	private SimpleVector[] coordinates = new SimpleVector[4];
+	private SimpleVector origin;
+	private float width;
+	private float height;
+	private Object3D wall = new Object3D(2);
 	
 	Context context;
-	
-	SimpleVector[] coordinates = new SimpleVector[4];
-	float scale;
-	Texture textures[];
 
-	public Wall(SimpleVector[] coordinates, float[] uvs, float scale, int textureId){
-		super(textureId);
+	public Wall(SimpleVector origin, float width, float height, String textureName){
+		super(origin, width, height, 0);
+		this.width = width;
+		this.height = height;
+		this.origin = origin;
 		
-		//Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
-		//TextureManager.getInstance().addTexture("texture", texture);
+		setCoordinates();
 		
-		for (int i = 0;i < 4; i++){
-			coordinates[i].scalarMul(scale);
-		}
-		this.coordinates = coordinates;
-		this.scale = scale;
-		
-		Log.i("uvs value: ", Float.toString(coordinates[3].x) + Float.toString(coordinates[3].y) + Float.toString(coordinates[3].z));
-		
+		wall.setAdditionalColor(100, 100, 100);
 		//uvs represent texture locations
 		//uvs[0] = xMin, uvs[1] = yMin, uvs[2] = xMax, uvs[3] =  yMax
-		addTriangle(coordinates[0],uvs[0],uvs[3],coordinates[1],uvs[2],uvs[3],coordinates[2],uvs[2],uvs[1],textureId);
-		addTriangle(coordinates[0],uvs[0],uvs[3],coordinates[3],uvs[0],uvs[1],coordinates[3],uvs[2],uvs[1],textureId);
-		
+		wall.addTriangle(coordinates[1],1,1,coordinates[0],0,1,coordinates[2],1,0);
+		wall.addTriangle(coordinates[0],0,1,coordinates[3],0,0,coordinates[2],1,0);
 	}
 	
-
-
+	public Object3D getWall(){
+		return wall;
+	}
+	
+	private void setCoordinates(){
+		if(origin.x == 0 && origin.z > 0){
+			coordinates[0] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
+			coordinates[1] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
+			coordinates[2] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
+			coordinates[3] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
+		}
+		else if(origin.x > 0 && origin.z == 0){
+			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
+			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
+			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z-(width/2));
+			coordinates[3] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));
+		}
+		if(origin.x == 0 && origin.z < 0){
+			coordinates[0] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
+			coordinates[1] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
+			coordinates[2] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
+			coordinates[3] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
+		}
+		if(origin.x < 0 && origin.z == 0){
+			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
+			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
+			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));
+			coordinates[3] = new SimpleVector(origin.x,origin.y+(height/2),origin.z-(width/2));
+		}
+	}
 
 }
