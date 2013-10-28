@@ -14,12 +14,15 @@ import com.threed.jpct.util.BitmapHelper;
 
 
 public class Room extends World{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9088044018714661773L;
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
 	Context context;
 	public Wall wall;
 	public Floor floor;
 	public Floor ceiling;
-	private int wallNum = 0;
 	
 	public Room(int roomId, Context context) {
 		this.context = context;

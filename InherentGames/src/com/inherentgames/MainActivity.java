@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.Window;
 
 import com.threed.jpct.Logger;
 
@@ -19,8 +20,6 @@ public class MainActivity extends Activity {
 	private GLSurfaceView mGLView;
 	private MyRenderer renderer = null;
 	
-	private float touchTurn = 0;
-	private float touchTurnUp = 0;
 	
 	private float xpos = -1;
 	private float ypos = -1;
@@ -34,6 +33,10 @@ public class MainActivity extends Activity {
 		}
 		
 		super.onCreate(savedInstanceState);
+		
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		mGLView = new GLSurfaceView(getApplication());
 		
 		mGLView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
@@ -57,7 +60,7 @@ public class MainActivity extends Activity {
 		setContentView(mGLView);
 	}
 	
-	@Override
+	/*@Override
 	protected void onPause() {
 		super.onPause();
 		mGLView.onPause();
@@ -72,7 +75,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStop(){
 		super.onStop();
-	}
+	}*/
 	
 	private void copy(Object src){
 		try{
