@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 	    return true;
 	}
 	
-	/*@Override
+	@Override
 	protected void onPause() {
 		super.onPause();
 		mGLView.onPause();
@@ -85,7 +85,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStop(){
 		super.onStop();
-	}*/
+	}
 	
 	private void copy(Object src){
 		try{
@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.lighting:
-        	renderer.setLighting();
+        	renderer.cycleLighting();
             return true;
         }
         return super.onOptionsItemSelected(item);

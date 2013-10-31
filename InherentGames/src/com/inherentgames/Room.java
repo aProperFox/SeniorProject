@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
+import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
 import com.threed.jpct.TextureManager;
@@ -32,25 +33,16 @@ public class Room extends World{
 	private Object3D[] chairs =  new Object3D[6];
 	
 	private Object3D pencil;
+	private Object3D bubble;
 	
 	public Room(int roomId, Context context) {
-		this.context = context;
+		this.context = context.getApplicationContext();
 		//Adds walls to list 'walls' based on room Id, also sets wallNum variable
 		setSurfaces(roomId);
 		for(int i = 0; i < walls.size(); i++)
 		{
 			//Adds all walls to world
 			addObject(walls.get(i));
-		}
-		String[] that;
-		try {
-			that = context.getResources().getAssets().list("raw");
-			for(int i = 0; i < that.length; i++){
-				Log.i("!!!!!!!!!!!!!!!!!!!", that[i]);
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		
 		try{
@@ -105,9 +97,10 @@ public class Room extends World{
 			}
 			backpack[0].setOrigin(new SimpleVector(-15,15,45));
 			backpack[0].rotateY(1.2f*(float)Math.PI/2);
+			backpack[0].setTransparency(5);
 			backpack[1].setOrigin(new SimpleVector(35,5,40));
 			backpack[1].rotateY((float)Math.PI);
-			backpack[2].setOrigin(new SimpleVector(-30,-5,10));
+			backpack[2].setOrigin(new SimpleVector(-30,-3,1));
 			backpack[2].rotateY((float)Math.PI/2);
 			backpack[2].rotateZ(-(float)Math.PI/2);
 			backpack[3].setOrigin(new SimpleVector(17,15,-25));
@@ -117,7 +110,7 @@ public class Room extends World{
 			for(int i = 0; i < 4; i++){
 				addObject(backpack[i]);
 			}
-			
+		
 			chalkboard = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"), context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f));
 			chalkboard.rotateX((float)Math.PI);
 			chalkboard.setOrigin(new SimpleVector(0,0,65));
@@ -126,7 +119,15 @@ public class Room extends World{
 			pencil = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/pencil.obj"), null, 50.0f));
 			pencil.setOrigin(new SimpleVector(-19,5,6));
 			addObject(pencil);
-		
+			
+			
+			bubble = Primitives.getSphere(10f);
+			bubble.setOrigin(new SimpleVector(-30,0,0));
+			bubble.setAdditionalColor(255,255,255);
+			bubble.setTransparency(5);
+			bubble.enableCollisionListeners();
+			
+			addObject(bubble);
 		
 		} catch (IOException e){
 			Log.i("ERROR: ", e.toString());
@@ -149,30 +150,11 @@ public class Room extends World{
 		if(getWallNumByRoom(room) == -1){
 			Log.i("Room", "Invalid room number");
 		}
-		//texture array for walls
-		Texture textures[]; 
 		
 		//get walls by room number
 		switch(room){
 		case 0:		
-			textures = new Texture[6];
-			//set textures
-				//Walls
-			textures[0] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall0)), 1024, 1024));
-			/*textures[1] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall1)), 1024, 1024));
-			textures[2] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall2)), 1024, 1024));
-			textures[3] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall3)), 1024, 1024));*/
-				//Floor
-			textures[1] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0floor)), 1024, 1024));
-				//Ceiling
-			textures[2] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024));
-			
-			TextureManager.getInstance().addTexture("Room0Wall0", textures[0]);
-			/*TextureManager.getInstance().addTexture("Room0Wall1", textures[1]);
-			TextureManager.getInstance().addTexture("Room0Wall2", textures[2]);
-			TextureManager.getInstance().addTexture("Room0Wall3", textures[3]);*/
-			TextureManager.getInstance().addTexture("Room0Floor", textures[1]);
-			TextureManager.getInstance().addTexture("Room0Ceiling", textures[2]);
+
 			
 			//First wall
 			walls.add(new Wall(new SimpleVector(0,0,75), 130, 50,"Room0Wall0").getWall());
