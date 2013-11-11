@@ -142,6 +142,9 @@ public class MainActivity extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
+        case R.id.physics:
+        	renderer.cyclePhysics();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

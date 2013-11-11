@@ -3,17 +3,20 @@ package com.inherentgames;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.vecmath.Vector3f;
+
 import android.content.Context;
 import android.util.Log;
 
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Texture;
-import com.threed.jpct.TextureManager;
 import com.threed.jpct.World;
-import com.threed.jpct.util.BitmapHelper;
 
 
 public class Room extends World{
@@ -32,11 +35,22 @@ public class Room extends World{
 	private Object3D[] book =  new Object3D[2];
 	private Object3D[] chairs =  new Object3D[6];
 	
+	private RigidBody[] bodies = new RigidBody[3];
+	
+	private int numObjects;
+	
 	private Object3D pencil;
 	private Object3D bubble;
 	
+	private WordObject[] wordObjects;
+	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
+		numObjects = getNumObjectsByRoomId(roomId);
+		wordObjects = new WordObject[numObjects];
+		
+
+		
 		//Adds walls to list 'walls' based on room Id, also sets wallNum variable
 		setSurfaces(roomId);
 		for(int i = 0; i < walls.size(); i++)
@@ -44,9 +58,10 @@ public class Room extends World{
 			//Adds all walls to world
 			addObject(walls.get(i));
 		}
+
 		
 		try{
-			
+			/*
 			for(int i = 0; i < 6; i++){
 				desks[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"), null, 1.5f));
 				desks[i].rotateX((float)Math.PI);
@@ -56,9 +71,9 @@ public class Room extends World{
 				chairs[i].rotateY((float)Math.PI/2);
 			}
 			
-			for(int i = 0; i < 2; i++){
-				book[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/book.obj"), null, 1.0f));
-			}
+			/////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+			/////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			
 			desks[0].setOrigin(new SimpleVector(-35,-5,45));
@@ -76,11 +91,6 @@ public class Room extends World{
 			chairs[4].setOrigin(new SimpleVector( 35,5,-5));
 			chairs[5].setOrigin(new SimpleVector( 35,5,-40));
 			
-			book[0].setOrigin(new SimpleVector(-23,5,35));
-			book[0].rotateZ((float)Math.PI/2);
-			book[0].rotateY((float)Math.PI/2);
-			book[1].setOrigin(new SimpleVector(19,7,6));
-			book[1].rotateY(-0.9f*(float)Math.PI/2);
 			
 			
 			for(int i = 0; i < 6; i++){
@@ -88,13 +98,11 @@ public class Room extends World{
 				addObject(chairs[i]);
 			}
 			
-			for(int i = 0; i < 2; i++){
-				addObject(book[i]);
-			}
-			
 			for(int i = 0; i < 4; i++){
 				backpack[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"), context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f));
 			}
+			
+			
 			backpack[0].setOrigin(new SimpleVector(-15,15,45));
 			backpack[0].rotateY(1.2f*(float)Math.PI/2);
 			backpack[0].setTransparency(5);
@@ -127,7 +135,33 @@ public class Room extends World{
 			bubble.setTransparency(5);
 			bubble.enableCollisionListeners();
 			
-			addObject(bubble);
+			addObject(bubble);*/
+				
+			wordObjects[0] = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/book.obj"),
+						null, 0.3f)),new SimpleVector(0,0,0), new SimpleVector(0,(float)Math.PI,(float)Math.PI/2));
+			
+			Object3D boxgfx = new Object3D(wordObjects[0].getObject3D());
+			boxgfx.translate(1,-5,25);
+			boxgfx.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+			boxgfx.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+			boxgfx.build();
+			addObject(boxgfx);
+			
+			BoxShape shape = new BoxShape(new Vector3f(0.2f,1.3f,0.5f));
+			Vector3f localInertia = new Vector3f(0, 0, 0);
+			shape.calculateLocalInertia(12, localInertia);
+			
+			JPCTBulletMotionState ms = new JPCTBulletMotionState(boxgfx);
+			
+			RigidBodyConstructionInfo rbInfo =  new RigidBodyConstructionInfo(12, ms, shape, localInertia);
+			RigidBody body =  new RigidBody(rbInfo);
+			body.setRestitution(0.1f);
+			body.setFriction(0.50f);
+			body.setDamping(0f, 0f);
+			
+			body.setUserPointer(boxgfx);
+			boxgfx.setUserObject(body);
+			bodies[2] = body;
 		
 		} catch (IOException e){
 			Log.i("ERROR: ", e.toString());
@@ -145,17 +179,20 @@ public class Room extends World{
 		return new SimpleVector(0,-20,0);
 	}
 	
+	public RigidBody getBody(int id){
+		return bodies[id];
+	}
+	
 	public void setSurfaces(int room){
 		//If room id is not defined in getWallNumByRoom, returns an error
-		if(getWallNumByRoom(room) == -1){
+		if(getWallNumByRoomId(room) == -1){
 			Log.i("Room", "Invalid room number");
 		}
 		
-		//get walls by room number
+		//set walls by room number
 		switch(room){
 		case 0:		
 
-			
 			//First wall
 			walls.add(new Wall(new SimpleVector(0,0,75), 130, 50,"Room0Wall0").getWall());
 			walls.get(0).setTexture("Room0Wall0");
@@ -171,10 +208,12 @@ public class Room extends World{
 			
 			//Wall class and floor class to be changed to extend surface class
 			floor = new Floor(new SimpleVector(130,25,150),0);
-			floor.floor.setTexture("Room0Floor");
+			floor.setTexture("Room0Floor");
+			bodies[0] = floor.getBody();
 			addObject(floor.getFloor());
 			ceiling = new Floor(new SimpleVector(130,-25,150),0);
-			ceiling.floor.setTexture("Room0Ceiling");
+			ceiling.setTexture("Room0Ceiling");
+			bodies[1] = ceiling.getBody();
 			addObject(ceiling.getFloor());
 			
 			break;
@@ -185,16 +224,29 @@ public class Room extends World{
 		
 	}
 	
+	/*public DiscreteDynamicsWorld getDynamicWorld(){
+		return dynamicWorld;
+	}*/
 	
-	public int getWallNumByRoom(int room){
+	public int getNumObjectsByRoomId(int room){
+		int num = 0;
 		switch(room){
 		case 0:
-			return 4;
-		case 1:
-			return 4;
+			num = 19;
+			break;
 		}
-		//error
-		return -1;
+		return num;
+	}
+	
+	
+	public int getWallNumByRoomId(int room){
+		int num = -1;
+		switch(room){
+		case 0:
+			num = 4;
+		}
+		
+		return num;
 	}
 
 }
