@@ -4,17 +4,23 @@ import java.lang.reflect.Field;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
+import javax.vecmath.Vector3f;
 
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 
+import com.bulletphysics.dynamics.RigidBody;
+import com.threed.jpct.Camera;
+import com.threed.jpct.Interact2D;
 import com.threed.jpct.Logger;
+import com.threed.jpct.SimpleVector;
 
 
 public class MainActivity extends Activity {
@@ -26,6 +32,8 @@ public class MainActivity extends Activity {
 	
 	private float xpos = -1;
 	private float ypos = -1;
+	private float firstX;
+	private float firstY;
 	
 	
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +113,8 @@ public class MainActivity extends Activity {
 		if (me.getAction() == MotionEvent.ACTION_DOWN){
 			xpos = me.getX();
 			ypos = me.getY();
+			firstX = xpos;
+			firstY = ypos;
 			return true;
 		}
 		
@@ -113,7 +123,20 @@ public class MainActivity extends Activity {
 			ypos = -1;
 			renderer.setTouchTurn(0);
 			renderer.setTouchTurnUp(0);
+			if (me.getAction() == MotionEvent.ACTION_UP) {
+				float xd = me.getX() - firstX;
+				float yd = me.getY() - firstY;
+				if (xd < 5 && xd > -5 && yd < 5 && yd > -5) {
+					Camera cam = renderer.getCam();
+					SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), (int) me.getX(), (int) me.getY());
+					dir.scalarMul(-70);
+					RigidBody body = renderer.shoot(cam.getPosition());
+					Vector3f force = new Vector3f(-dir.x, dir.y, dir.z);
+					body.activate(true);
+					body.setLinearVelocity(force);
+				}
 			return true;
+			}
 		}
 		
 		if(me.getAction() == MotionEvent.ACTION_MOVE){
@@ -142,12 +165,20 @@ public class MainActivity extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
-        case R.id.physics:
-        	renderer.cyclePhysics();
-            return true;
+//
         }
         return super.onOptionsItemSelected(item);
     }
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent msg) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			int pid = android.os.Process.myPid();
+			android.os.Process.killProcess(pid);
+			return true;
+		}
+		return super.onKeyDown(keyCode, msg);
+	}
 	
 	protected boolean isFullscreenOpaque() {
 		return true;

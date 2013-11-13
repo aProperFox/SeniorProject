@@ -1,9 +1,5 @@
 package com.inherentgames;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
@@ -14,28 +10,22 @@ import android.util.Log;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.Clock;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.util.ObjectArrayList;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
-import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
 import com.threed.jpct.TextureManager;
-import com.threed.jpct.World;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
@@ -67,6 +57,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private Object3D object;
 	
 	private long time = System.currentTimeMillis();
+	
+	private boolean isBubbleHolding = false;
 
 	public MyRenderer(Context c) {
 		context = c.getApplicationContext();
@@ -127,14 +119,15 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		dynamicWorld.setGravity(new Vector3f(0,-10,0));
 		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
 	
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < world.getNumBodies(); i++){
 			dynamicWorld.addCollisionObject(world.getBody(i));
 		}
 	
 		dynamicWorld.clearForces();
 
-		
-		dynamicWorld.addRigidBody(world.getBody(2));
+		for(int i = 5; i < world.getNumBodies(); i++){
+			dynamicWorld.addRigidBody(world.getBody(i));
+		}
 	
 	}
 
@@ -170,21 +163,16 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		if ( touchTurn != 0 || touchTurnUp != 0 ) {
 			V.set(cam.getDirection());
 			V.rotateY(touchTurn);
-			if(cam.getDirection().z < 0)
-				V.rotateX(-touchTurnUp);
-			else
-				V.rotateX(touchTurnUp);
-			V.normalize(V);
 			cam.lookAt(V);
-			
+			cam.rotateCameraX(-touchTurnUp/1.5f);
 			touchTurn = 0;
 			touchTurnUp = 0;
 		}
-		if(isPhysics){
-			float ms = clock.getTimeMicroseconds();
-			clock.reset();
-			dynamicWorld.stepSimulation(ms / 1000000f);
-		}
+		
+		checkBubble();
+		float ms = clock.getTimeMicroseconds();
+		clock.reset();
+		dynamicWorld.stepSimulation(ms / 1000000f);
 		fb.clear(back);
 		
 		
@@ -204,8 +192,47 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		touchTurnUp = value;
 	}
 	
+	public Room getWorld(){
+		return world;
+	}
+	
+	public FrameBuffer getFrameBuffer(){
+		return fb;
+	}
+	
 	public void setTouchTurn(float value){
 		touchTurn = value;
+	}
+	
+	public RigidBody shoot(SimpleVector position){
+		RigidBody body = world.addBubble(position);
+		dynamicWorld.addRigidBody(body);
+		int size = dynamicWorld.getCollisionObjectArray().size();
+		ObjectArrayList<CollisionObject> array = dynamicWorld.getCollisionObjectArray();
+		body = (RigidBody) array.get(size-1);
+		body.setGravity(new Vector3f(0,0,0));
+		return body;
+	}
+	
+	public void checkBubble(){
+		for(int i = 1; i < world.getBubbleCounter()+1; i++){
+			String name = "Bubble" + i;
+			Object3D obj = world.getObjectByName(name);
+			if(obj != null){
+				RigidBody tempBody = (RigidBody)obj.getUserObject();
+				//Log.i("TRANSPARENCY!!!!!!!!!!", "" + tempBody.getLinearVelocity());
+				Vector3f linearVelocity = new Vector3f(0,0,0);
+				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
+				Log.i("LINEAR VELOCITY", "" + linearVelocity);
+				SimpleVector motion = new SimpleVector(linearVelocity.x,linearVelocity.y,linearVelocity.z);
+				int id = obj.checkForCollision(motion, 10);
+				if(id != Object3D.NO_OBJECT){
+					int temp = world.getObject(id).getTransparency();
+					world.getObject(id).setTransparency(temp + 1);
+					world.removeObject(obj);
+				}
+			}
+		}
 	}
 	
 	public void cyclePhysics(){
@@ -214,4 +241,9 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		else
 			isPhysics = true;
 	}
+	
+	public Camera getCam(){
+		return cam;
+	}
+	
 }
