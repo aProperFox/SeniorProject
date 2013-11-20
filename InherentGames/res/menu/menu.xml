@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/lighting"
           android:title="@string/change_lighting" />
-    <item android:id="@+id/physics"
-        android:title="@string/change_physics"/>
+    <item android:id="@+id/kill"
+        android:title="@string/kill_bubbles"/>
 </menu>

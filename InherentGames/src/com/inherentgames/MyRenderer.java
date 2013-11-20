@@ -22,6 +22,7 @@ import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
+import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
@@ -59,7 +60,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private long time = System.currentTimeMillis();
 	
 	private boolean isBubbleHolding = false;
-
+	private int heldBubbleObjectId = -1;
+	private int holdingBubbleId = -1;
+	private float timeToPop = 10000;
+	
 	public MyRenderer(Context c) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
@@ -170,6 +174,17 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		
 		checkBubble();
+		if(isBubbleHolding){
+			Object3D collisionObject = world.getObject(heldBubbleObjectId);
+			collisionObject.setOrigin(world.getObject(holdingBubbleId).getTranslation().calcSub(collisionObject.getCenter()));
+			if(clock.getTimeMilliseconds() >= timeToPop){
+				world.removeObject(heldBubbleObjectId);
+				world.removeObject(world.getObject(holdingBubbleId));
+				isBubbleHolding = false;
+				world.decrementBubbleCounter();
+			}
+			
+		}
 		float ms = clock.getTimeMicroseconds();
 		clock.reset();
 		dynamicWorld.stepSimulation(ms / 1000000f);
@@ -205,31 +220,40 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	public RigidBody shoot(SimpleVector position){
-		RigidBody body = world.addBubble(position);
-		dynamicWorld.addRigidBody(body);
-		int size = dynamicWorld.getCollisionObjectArray().size();
-		ObjectArrayList<CollisionObject> array = dynamicWorld.getCollisionObjectArray();
-		body = (RigidBody) array.get(size-1);
-		body.setGravity(new Vector3f(0,0,0));
-		return body;
+		if(world.getBubbleCounter() == 0){
+			RigidBody body = world.addBubble(position);
+			dynamicWorld.addRigidBody(body);
+			int size = dynamicWorld.getCollisionObjectArray().size();
+			ObjectArrayList<CollisionObject> array = dynamicWorld.getCollisionObjectArray();
+			body = (RigidBody) array.get(size-1);
+			body.setGravity(new Vector3f(0,0,0));
+			return body;
+		}
+		return null;
 	}
 	
 	public void checkBubble(){
-		for(int i = 1; i < world.getBubbleCounter()+1; i++){
-			String name = "Bubble" + i;
-			Object3D obj = world.getObjectByName(name);
-			if(obj != null){
-				RigidBody tempBody = (RigidBody)obj.getUserObject();
-				//Log.i("TRANSPARENCY!!!!!!!!!!", "" + tempBody.getLinearVelocity());
-				Vector3f linearVelocity = new Vector3f(0,0,0);
-				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
-				Log.i("LINEAR VELOCITY", "" + linearVelocity);
-				SimpleVector motion = new SimpleVector(linearVelocity.x,linearVelocity.y,linearVelocity.z);
-				int id = obj.checkForCollision(motion, 10);
-				if(id != Object3D.NO_OBJECT){
-					int temp = world.getObject(id).getTransparency();
-					world.getObject(id).setTransparency(temp + 1);
-					world.removeObject(obj);
+		if(!isBubbleHolding){
+			for(int i = 1; i < world.getBubbleCounter()+1; i++){
+				String name = "Bubble" + i;
+				Object3D obj = world.getObjectByName(name);
+				if(obj != null){
+					RigidBody tempBody = (RigidBody)obj.getUserObject();
+
+					Vector3f linearVelocity = new Vector3f(0,0,0);
+					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
+					SimpleVector motion = new SimpleVector(linearVelocity.x,linearVelocity.y,linearVelocity.z);
+					int id = obj.checkForCollision(motion, 10);
+					
+					if(id != Object3D.NO_OBJECT){
+						Object3D collisionObject = world.getObject(id); 
+						//float objectSize = getMaxDimension(getDimensions(collisionObject));
+						//collisionObject.scale(10/objectSize/2.0f);
+						heldBubbleObjectId = id;
+						isBubbleHolding = true;
+						holdingBubbleId = obj.getID();
+						timeToPop = clock.getTimeMilliseconds() + 10;
+					}
 				}
 			}
 		}
@@ -246,4 +270,46 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		return cam;
 	}
 	
+	public void deleteActiveBubble(){
+		if(world.getBubbleCounter() != 0){
+			world.removeObject(heldBubbleObjectId);
+			world.removeObject(world.getObject(holdingBubbleId));
+			isBubbleHolding = false;
+			world.decrementBubbleCounter();
+		}
+	}
+	
+	public Vector3f getDimensions(Object3D obj){
+		PolygonManager polyMan = obj.getPolygonManager();
+		int polygons = polyMan.getMaxPolygonID();
+		Vector3f minVerts = new Vector3f(1000,1000,1000);
+		Vector3f maxVerts = new Vector3f(-1000,-1000,-1000);
+		for(int i = 0; i < polygons; i++){
+			for(int j = 0; j < 3; j++){
+				if(minVerts.x > polyMan.getTransformedVertex(i, j).x)
+					minVerts.x = polyMan.getTransformedVertex(i,j).x;
+				if(maxVerts.x < polyMan.getTransformedVertex(i, j).x)
+					maxVerts.x = polyMan.getTransformedVertex(i, j).x;
+				if(minVerts.y > polyMan.getTransformedVertex(i, j).y)
+					minVerts.y = polyMan.getTransformedVertex(i,j).y;
+				if(maxVerts.y < polyMan.getTransformedVertex(i, j).y)
+					maxVerts.y = polyMan.getTransformedVertex(i, j).y;
+				if(minVerts.z > polyMan.getTransformedVertex(i, j).z)
+					minVerts.z = polyMan.getTransformedVertex(i,j).z;
+				if(maxVerts.z < polyMan.getTransformedVertex(i, j).z)
+					maxVerts.z = polyMan.getTransformedVertex(i, j).z;
+			}
+		}
+		return new Vector3f(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
+	}
+	
+	public Vector3f toVector3f(SimpleVector vector){
+		return new Vector3f(vector.x,vector.y,vector.z);
+	}
+	
+	public SimpleVector toSimpleVector(Vector3f vector){
+		return new SimpleVector(vector.x,vector.y,vector.z);
+	}
+	
 }
+

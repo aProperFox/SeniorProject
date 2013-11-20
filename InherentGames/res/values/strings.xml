@@ -2,5 +2,6 @@
 
     <string name="app_name">Time P.I.</string>
 	<string name="change_lighting">Cycle Lighting</string>
-	<string name="change_physics">Cycle Physics</string>
+	<string name="kill_bubbles">Kill bubbles</string>
+
 </resources>

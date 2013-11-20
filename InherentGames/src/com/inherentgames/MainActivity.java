@@ -131,9 +131,11 @@ public class MainActivity extends Activity {
 					SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), (int) me.getX(), (int) me.getY());
 					dir.scalarMul(-70);
 					RigidBody body = renderer.shoot(cam.getPosition());
-					Vector3f force = new Vector3f(-dir.x, dir.y, dir.z);
-					body.activate(true);
-					body.setLinearVelocity(force);
+					if(body != null){
+						Vector3f force = new Vector3f(-dir.x, dir.y, dir.z);
+						body.activate(true);
+						body.setLinearVelocity(force);
+					}
 				}
 			return true;
 			}
@@ -165,6 +167,9 @@ public class MainActivity extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
+        case R.id.kill:
+        	renderer.deleteActiveBubble();
+        	return true;
 //
         }
         return super.onOptionsItemSelected(item);

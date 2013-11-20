@@ -117,13 +117,7 @@ public class Room extends World{
 			addObject(pencil);
 			
 			
-			bubble = Primitives.getSphere(10f);
-			bubble.setOrigin(new SimpleVector(-30,0,0));
-			bubble.setAdditionalColor(255,255,255);
-			bubble.setTransparency(5);
-			bubble.enableCollisionListeners();
-			
-			addObject(bubble);*/
+			*/
 				
 			deskObj = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f));
 			addDesk(-35,-6,45);
@@ -299,8 +293,7 @@ public class Room extends World{
 	}
 	
 	public RigidBody addBubble(SimpleVector position) {
-		Log.i("BUBBLE TIMEEEEEEEEEEE", "" + position.toString());
-		SphereShape shape = new SphereShape(1.5f);
+		SphereShape shape = new SphereShape(5.0f);
 		float mass = 12;
 		Vector3f localInertia = new Vector3f(0, 0, 0);
 		shape.calculateLocalInertia(mass, localInertia);
@@ -350,6 +343,51 @@ public class Room extends World{
 		return bubbleCounter;
 	}
 	
+	
+	public Vector3f toVector3f(SimpleVector vector){
+		return new Vector3f(vector.x,vector.y,vector.z);
+	}
+	
+	public SimpleVector toSimpleVector(Vector3f vector){
+		return new SimpleVector(vector.x,vector.y,vector.z);
+	}
+	
+	public int getWallNumByRoomId(int room){
+		int num = -1;
+		switch(room){
+		case 0:
+			num = 4;
+		}
+		
+		return num;
+	}
+	
+}
+
+class DimensionObject{
+	float maxDimension;
+	Object3D object;
+	int id;
+	
+	public DimensionObject(Object3D obj){
+		this.object = obj;
+		this.id = object.getID();
+		maxDimension = getMaxDimension(getDimensions(obj));
+	}
+	
+	public float getMaxDimension(Vector3f dim){
+		if(dim.x > dim.z &&dim.x > dim.y)
+			return dim.x;
+		else if(dim.z > dim.x && dim.z > dim.y)
+			return dim.z;
+		else
+			return dim.y;
+	}
+	
+	public Object3D getObject(){
+		return object;
+	}
+	
 	public Vector3f getDimensions(Object3D obj){
 		PolygonManager polyMan = obj.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
@@ -373,16 +411,4 @@ public class Room extends World{
 		}
 		return new Vector3f(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
 	}
-	
-	
-	public int getWallNumByRoomId(int room){
-		int num = -1;
-		switch(room){
-		case 0:
-			num = 4;
-		}
-		
-		return num;
-	}
-	
 }
