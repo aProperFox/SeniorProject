@@ -33,7 +33,7 @@ public class Room extends World{
 	public Floor floor;
 	public Floor ceiling;
 	private Object3D[] backpack =  new Object3D[4];
-	private Object3D chalkboard;
+	private WordObject chalkboard;
 	private Object3D[] book =  new Object3D[2];
 
 	private int bubbleCounter = 0;
@@ -41,18 +41,22 @@ public class Room extends World{
 	private ArrayList<RigidBody> bodies = new ArrayList<RigidBody>();
 	private ArrayList<RigidBody> bubbles = new ArrayList<RigidBody>();
 	
+	private ArrayList<WordObject> wordObjects;
 	
 	private Object3D pencil;
 	private Object3D bubble;
 	
-	private Object3D deskObj;
-	private Object3D chairObj;
+	private WordObject deskObj;
+	private WordObject chairObj;
 	
 	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
 		
-
+		wordObjects = new ArrayList<WordObject>();
+		for(int i = 0; i < 50; i++){
+			wordObjects.add(null);
+		}
 		
 		//Adds walls to list 'walls' based on room Id, also sets wallNum variable
 		setSurfaces(roomId);
@@ -65,31 +69,8 @@ public class Room extends World{
 		
 		try{
 			/*
-			for(int i = 0; i < 6; i++){
-				chairs[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"), null, 3.0f));
-				chairs[i].rotateX((float)Math.PI);
-				chairs[i].rotateY((float)Math.PI/2);
-			}
-			
-			
-			chairs[0].setOrigin(new SimpleVector());
-			chairs[1].setOrigin(new SimpleVector());
-			chairs[2].setOrigin(new SimpleVector());
-			chairs[3].setOrigin(new SimpleVector());
-			chairs[4].setOrigin(new SimpleVector( ));
-			chairs[5].setOrigin(new SimpleVector( ));
-			
-			
-			
-			for(int i = 0; i < 6; i++){
-				addObject(desks[i]);
-				addObject(chairs[i]);
-			}
-			
-			for(int i = 0; i < 4; i++){
-				backpack[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"), context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f));
-			}
-			
+
+			backpack[i] = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"), context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f));
 			
 			backpack[0].setOrigin(new SimpleVector(-15,15,45));
 			backpack[0].rotateY(1.2f*(float)Math.PI/2);
@@ -119,7 +100,7 @@ public class Room extends World{
 			
 			*/
 				
-			deskObj = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f));
+			deskObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f)),new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Desk","La");
 			addDesk(-35,-6,45);
 			addDesk(-35,-6,10);
 			addDesk(-35,-6,-25);
@@ -127,24 +108,22 @@ public class Room extends World{
 			addDesk(35,-6,10);
 			addDesk(35,-6,-25);
 			
-			chairObj = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f));
-			addChair(-35,2,18);
-			addChair(-35,2,-17);
-			addChair(-35,2,-52);
-			addChair(35,2,18);
-			addChair(35,2,-17);
-			addChair(35,2,-52);
+			chairObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair","La");
+			addChair(-35,2,25);
+			addChair(-35,2,-10);
+			addChair(-35,2,-45);
+			addChair(35,2,25);
+			addChair(35,2,-10);
+			addChair(35,2,-45);
 			
-			bubble = Primitives.getSphere(5.0f);
-			bubble.setSpecularLighting(Object3D.SPECULAR_ENABLED);
-			bubble.setTransparency(1);
-			
-			chalkboard = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"), context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f));
-			chalkboard.rotateX((float)Math.PI);
+			chalkboard = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
+					context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,0),"Chalkboard","El");
 			chalkboard.setOrigin(new SimpleVector(0,0,65));
 			chalkboard.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 			chalkboard.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-			addObject(chalkboard);
+			int id = addObject(chalkboard);
+			Log.i("INITIAL CHALKBOARD ID", "It's this: " + id);
+			getObject(id).setName("Chalkboard");
 			
 			
 		} catch (IOException e){
@@ -227,78 +206,35 @@ public class Room extends World{
 	}
 	
 	private void addDesk(float x, float y, float z){
-		Object3D boxgfx = new Object3D(deskObj);
-		boxgfx.setOrigin(new SimpleVector(x,y,z));
-		boxgfx.rotateX((float)Math.PI);
-		boxgfx.rotateY(3*(float)Math.PI/2);
-		boxgfx.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-		boxgfx.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		boxgfx.build();
-		addObject(boxgfx);/*
-		Vector3f dimensions = getDimensions(deskObj);
-		dimensions.scale(0.6f);
-		BoxShape shape = new BoxShape(dimensions);
-		Vector3f localInertia = new Vector3f(0, 0, 0);
-		shape.calculateLocalInertia(12, localInertia);
-		
-		JPCTBulletMotionState ms = new JPCTBulletMotionState(boxgfx);
-		
-		Transform tr = new Transform();
-		
-		tr.setRotation(new Quat4f(0,(float)Math.PI,0,(float)Math.PI));
-		RigidBodyConstructionInfo rbInfo =  new RigidBodyConstructionInfo(12, ms, shape, localInertia);
-		RigidBody body =  new RigidBody(rbInfo);
-		body.setRestitution(0.1f);
-		body.setFriction(0.50f);
-		body.setDamping(0f, 0f);
-		body.setCenterOfMassTransform(tr);
-		body.translate(new Vector3f(boxgfx.getOrigin().x + boxgfx.getCenter().x,-boxgfx.getOrigin().y - boxgfx.getCenter().y,-boxgfx.getOrigin().z + boxgfx.getCenter().z));
-		body.setUserPointer(boxgfx);
-		boxgfx.setUserObject(body);
-		bodies.add(body);*/
+		//Creates a new desk WordObject from the generic Object3D 'deskObj'
+		//and adds it to the Room and WwordObjects ArrayList
+		WordObject desk = new WordObject(deskObj, this.getSize());
+		desk.setOrigin(new SimpleVector(x,y,z));
+		desk.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+		desk.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+		desk.build();
+		addObject(desk);
 	}
 	
 	private void addChair(float x, float y, float z){
-		Object3D boxgfx = new Object3D(chairObj);
-		boxgfx.setOrigin(new SimpleVector(x,y,z));
-		boxgfx.rotateX((float)Math.PI);
-		boxgfx.rotateY((float)Math.PI/2);
-		boxgfx.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-		boxgfx.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		boxgfx.build();
-		addObject(boxgfx);/*
-		Vector3f dimensions = getDimensions(chairObj);
-		dimensions.scale(0.6f);
-		dimensions.x *= 0.5f;
-		dimensions.z *= 0.5f;
-		BoxShape shape = new BoxShape(dimensions);
-		Vector3f localInertia = new Vector3f(0, 0, 0);
-		shape.calculateLocalInertia(12, localInertia);
-		
-		JPCTBulletMotionState ms = new JPCTBulletMotionState(boxgfx);
-		
-		Transform tr = new Transform();
-		
-		tr.setRotation(new Quat4f(0,(float)Math.PI,0,-(float)Math.PI));
-		RigidBodyConstructionInfo rbInfo =  new RigidBodyConstructionInfo(12, ms, shape, localInertia);
-		RigidBody body =  new RigidBody(rbInfo);
-		body.setRestitution(0.1f);
-		body.setFriction(0.50f);
-		body.setDamping(0f, 0f);
-		body.setCenterOfMassTransform(tr);
-		body.translate(new Vector3f(boxgfx.getOrigin().x + boxgfx.getCenter().x,-boxgfx.getOrigin().y - boxgfx.getCenter().y,-boxgfx.getOrigin().z - boxgfx.getCenter().z));
-		body.setUserPointer(boxgfx);
-		boxgfx.setUserObject(body);
-		bodies.add(body);*/
+		//Creates a new chair WordObject from the generic Object3D 'chairObj'
+		//and adds it to the Room and wordObjects ArrayList
+		WordObject chair = new WordObject(chairObj, this.getSize());
+		chair.setOrigin(new SimpleVector(x,y,z));
+		chair.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+		chair.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+		chair.build();
+		addObject(chair);
 	}
 	
 	public RigidBody addBubble(SimpleVector position) {
+		//Creates a new bubble Object and adds it to the room
 		SphereShape shape = new SphereShape(5.0f);
 		float mass = 12;
 		Vector3f localInertia = new Vector3f(0, 0, 0);
 		shape.calculateLocalInertia(mass, localInertia);
 
-		Object3D spheregfx = new Object3D(bubble);
+		Bubble spheregfx = new Bubble();
 
 		spheregfx.translate(position);
 		spheregfx.build();
@@ -311,6 +247,7 @@ public class Room extends World{
 		tempBubble.setName(name);
 		JPCTBulletMotionState ms = new JPCTBulletMotionState(spheregfx);
 
+		//Creates a RigidBody and adds it to the DynamicWorld
 		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, ms, shape, localInertia);
 		RigidBody body = new RigidBody(rbInfo);
 		body.setRestitution(0.1f);
@@ -326,6 +263,7 @@ public class Room extends World{
 	}
 	
 	public int getNumObjectsByRoomId(int room){
+		//Returns the number of WordObjects per room
 		int num = 0;
 		switch(room){
 		case 0:
@@ -336,6 +274,7 @@ public class Room extends World{
 	}
 	
 	public void decrementBubbleCounter(){
+		//Called whenever a bubble pops
 		bubbleCounter -= 1;
 	}
 	
@@ -343,26 +282,58 @@ public class Room extends World{
 		return bubbleCounter;
 	}
 	
+	@Override
+	public WordObject getObject(int id){
+		//Overrides the World function 'getObject' by returning a WordObject
+		//rather than an Object3D
+		
+		//Object3D object = super.getObject(id);
+		return wordObjects.get(id);
+	}
+	
+	public int addObject(WordObject wordObject){
+		//Extra function for adding an object to the Room class that also adds
+		//information for the WordObject in the wordObjects ArrayList
+		int objectId = super.addObject((Object3D)wordObject);
+		wordObject.setId(objectId);
+		wordObjects.add(objectId,wordObject);
+		Log.i("THE ID IS CRAZZYY!!!!!!!!!", ""+ objectId);
+		return objectId;
+	}
+	
 	
 	public Vector3f toVector3f(SimpleVector vector){
+		//Converts a SimpleVector to a Vector3f
 		return new Vector3f(vector.x,vector.y,vector.z);
 	}
 	
 	public SimpleVector toSimpleVector(Vector3f vector){
+		//Converts a Vector3f to a SimpleVector
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
 	
 	public int getWallNumByRoomId(int room){
+		//Returns the number of walls defined per room (Currently only
+		//implementable with 4)
 		int num = -1;
 		switch(room){
-		case 0:
+		default:
 			num = 4;
 		}
 		
 		return num;
 	}
 	
+	public int getObjectsSize(){
+		int num = 0;
+		for(int i = 0; i < 50; i++){
+			if(this.getObject(i) != null)
+				num = i;
+		}
+		return num;
+	}
 }
+
 
 class DimensionObject{
 	float maxDimension;

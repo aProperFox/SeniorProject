@@ -70,7 +70,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		
 		Texture[] textures = new Texture[6];
 		//set textures
-			//Walls
+		//Walls
 		textures[0] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall0)), 1024, 1024));
 		/*textures[1] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall1)), 1024, 1024));
 		textures[2] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall2)), 1024, 1024));
@@ -233,6 +233,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	public void checkBubble(){
+		//Checks bubble collision and if a collision occurs, it shrinks the object down
+		//and sets it in the state to stay inside the bubble object
 		if(!isBubbleHolding){
 			for(int i = 1; i < world.getBubbleCounter()+1; i++){
 				String name = "Bubble" + i;
@@ -242,7 +244,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 
 					Vector3f linearVelocity = new Vector3f(0,0,0);
 					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
-					SimpleVector motion = new SimpleVector(linearVelocity.x,linearVelocity.y,linearVelocity.z);
+					SimpleVector motion = toSimpleVector(linearVelocity);
 					int id = obj.checkForCollision(motion, 10);
 					
 					if(id != Object3D.NO_OBJECT){
@@ -259,13 +261,6 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 	}
 	
-	public void cyclePhysics(){
-		if(isPhysics)
-			isPhysics = false;
-		else
-			isPhysics = true;
-	}
-	
 	public Camera getCam(){
 		return cam;
 	}
@@ -274,6 +269,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		if(world.getBubbleCounter() != 0){
 			world.removeObject(heldBubbleObjectId);
 			world.removeObject(world.getObject(holdingBubbleId));
+			int id = world.getObjectByName("Chalkboard").getID();
+			Log.i("NEW CHALKBOARD ID", "IT'S THIS:" + id);
 			isBubbleHolding = false;
 			world.decrementBubbleCounter();
 		}

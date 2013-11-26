@@ -16,22 +16,33 @@ public class WordObject extends Object3D{
 	
 	private boolean isStatic;
 	private SimpleVector centerTranslate;
-	private SimpleVector dimensions;
-	
+	private float maxDimension;
+	private int id;
 	private Transform startTransform;
 	private JPCTBulletMotionState ms;
 	private RigidBodyConstructionInfo rbInfo;
 	
+	private String word;
+	private String article;
 	
 	private RigidBody body;
 	//private BvhTriangleMeshShape shape;
 	
-	public WordObject(Object3D obj, SimpleVector toCenter, SimpleVector rotationAxis){
+	public WordObject(WordObject obj, int id){
+		super(obj.toObject3D());
+		this.maxDimension = obj.getMaxDimension();
+		this.word = obj.getWord();
+		this.article = obj.getArticle();
+		this.id = id;
+	}
+	
+	public WordObject(Object3D obj, SimpleVector rotationAxis, String word, String article){
 		super(obj);
 		isStatic = true;
-		centerTranslate = toCenter;
-		setDimensions();
+		this.word = word;
+		this.article = article;
 		rotateBy(rotationAxis);
+		setMaxDimension();
 	}
 	
 	public boolean getStaticState(){
@@ -42,7 +53,7 @@ public class WordObject extends Object3D{
 		isStatic = state;
 	}
 	
-	public void setDimensions(){
+	public void setMaxDimension(){
 		PolygonManager polyMan = this.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
 		SimpleVector minVerts = new SimpleVector(1000,1000,1000);
@@ -63,13 +74,34 @@ public class WordObject extends Object3D{
 					maxVerts.z = polyMan.getTransformedVertex(i, j).z;
 			}
 		}
-		dimensions = new SimpleVector(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
+		SimpleVector dimensions = new SimpleVector(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
+		if(dimensions.x > dimensions.z &&dimensions.x > dimensions.y)
+			maxDimension = dimensions.x;
+		else if(dimensions.z > dimensions.x && dimensions.z > dimensions.y)
+			maxDimension = dimensions.z;
+		else
+			maxDimension = dimensions.y;
 	}
 	
-	public SimpleVector getDimensions(){
-		return dimensions;
+	public float getMaxDimension(){
+		return maxDimension;
 	}
 	
+	public void setId(int id){
+		this.id = id;
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
+	public String getWord(){
+		return word;
+	}
+	
+	public String getArticle(){
+		return article;
+	}
 	
 	public void rotateBy(SimpleVector axes){
 		this.rotateX(axes.x);
@@ -77,8 +109,8 @@ public class WordObject extends Object3D{
 		this.rotateZ(axes.z);
 	}
 	
-	public RigidBody getBody(){
-		return body;
+	public Object3D toObject3D(){
+		return (Object3D)this;
 	}
 	
 }
