@@ -48,21 +48,15 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private Light sun = null;
 	Context context;
 	
-	private boolean isPhysics = false;
-	
 	private DiscreteDynamicsWorld dynamicWorld;
 	private DefaultCollisionConfiguration collisionConfiguration;
 	private CollisionDispatcher dispatcher;
 	private Clock clock;
+
 	
-	private Object3D object;
 	
 	private long time = System.currentTimeMillis();
-	
-	private boolean isBubbleHolding = false;
-	private int heldBubbleObjectId = -1;
-	private int holdingBubbleId = -1;
-	private float timeToPop = 10000;
+	private long lastShot = System.currentTimeMillis();
 	
 	public MyRenderer(Context c) {
 		context = c.getApplicationContext();
@@ -174,16 +168,11 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		
 		checkBubble();
-		if(isBubbleHolding){
-			Object3D collisionObject = world.getObject(heldBubbleObjectId);
-			collisionObject.setOrigin(world.getObject(holdingBubbleId).getTranslation().calcSub(collisionObject.getCenter()));
-			if(clock.getTimeMilliseconds() >= timeToPop){
-				world.removeObject(heldBubbleObjectId);
-				world.removeObject(world.getObject(holdingBubbleId));
-				isBubbleHolding = false;
-				world.decrementBubbleCounter();
+		for(Bubble bubble : world.getBubbleObjects()){
+			if(bubble.isHolding()){
+				Object3D obj = world.getObject(bubble.getHeldObjectId());
+				obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
 			}
-			
 		}
 		float ms = clock.getTimeMicroseconds();
 		clock.reset();
@@ -220,13 +209,14 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	public RigidBody shoot(SimpleVector position){
-		if(world.getBubbleCounter() == 0){
+		if ((System.currentTimeMillis()-lastShot) > 1000){
 			RigidBody body = world.addBubble(position);
 			dynamicWorld.addRigidBody(body);
 			int size = dynamicWorld.getCollisionObjectArray().size();
-			ObjectArrayList<CollisionObject> array = dynamicWorld.getCollisionObjectArray();
-			body = (RigidBody) array.get(size-1);
+			body = (RigidBody) dynamicWorld.getCollisionObjectArray().get(size-1);
 			body.setGravity(new Vector3f(0,0,0));
+			world.getLastBubble().setBodyIndex(size-1);
+			lastShot = System.currentTimeMillis();
 			return body;
 		}
 		return null;
@@ -235,27 +225,18 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	public void checkBubble(){
 		//Checks bubble collision and if a collision occurs, it shrinks the object down
 		//and sets it in the state to stay inside the bubble object
-		if(!isBubbleHolding){
-			for(int i = 1; i < world.getBubbleCounter()+1; i++){
-				String name = "Bubble" + i;
-				Object3D obj = world.getObjectByName(name);
-				if(obj != null){
-					RigidBody tempBody = (RigidBody)obj.getUserObject();
-
-					Vector3f linearVelocity = new Vector3f(0,0,0);
-					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
-					SimpleVector motion = toSimpleVector(linearVelocity);
-					int id = obj.checkForCollision(motion, 10);
-					
-					if(id != Object3D.NO_OBJECT){
-						Object3D collisionObject = world.getObject(id); 
-						//float objectSize = getMaxDimension(getDimensions(collisionObject));
-						//collisionObject.scale(10/objectSize/2.0f);
-						heldBubbleObjectId = id;
-						isBubbleHolding = true;
-						holdingBubbleId = obj.getID();
-						timeToPop = clock.getTimeMilliseconds() + 10;
-					}
+		for(int i = 0; i < world.getNumBubbles(); i++){
+			Bubble bubble = world.getBubble(i);
+			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1){
+				RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
+				Vector3f linearVelocity = new Vector3f(0,0,0);
+				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
+				SimpleVector motion = toSimpleVector(linearVelocity);
+				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
+				WordObject collisionObject;
+				if((collisionObject = world.getWordObject(id)) != null){
+					collisionObject.scale(5.0f);
+					bubble.setHeldObjectId(id);
 				}
 			}
 		}
@@ -267,13 +248,16 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	
 	public void deleteActiveBubble(){
 		if(world.getBubbleCounter() != 0){
-			world.removeObject(heldBubbleObjectId);
+			/*world.removeObject(heldBubbleObjectId);
 			world.removeObject(world.getObject(holdingBubbleId));
 			int id = world.getObjectByName("Chalkboard").getID();
-			Log.i("NEW CHALKBOARD ID", "IT'S THIS:" + id);
-			isBubbleHolding = false;
-			world.decrementBubbleCounter();
+			Log.i("NEW CHALKBOARD ID", "IT'S THIS:" + id);*/
 		}
+	}
+	
+	public void loadBubble(int state){
+		//Put 2D bubble image on screen with 2D renderer
+		world.setBubbleColor(state);
 	}
 	
 	public Vector3f getDimensions(Object3D obj){

@@ -3,21 +3,17 @@ package com.inherentgames;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.PolygonManager;
-import com.threed.jpct.Primitives;
+import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
 
@@ -33,14 +29,11 @@ public class Room extends World{
 	public Floor floor;
 	public Floor ceiling;
 	private Object3D[] backpack =  new Object3D[4];
-	private WordObject chalkboard;
 	private Object3D[] book =  new Object3D[2];
 
-	private int bubbleCounter = 0;
-	
 	private ArrayList<RigidBody> bodies = new ArrayList<RigidBody>();
 	private ArrayList<RigidBody> bubbles = new ArrayList<RigidBody>();
-	
+	private ArrayList<Bubble> bubbleObjects;
 	private ArrayList<WordObject> wordObjects;
 	
 	private Object3D pencil;
@@ -48,16 +41,15 @@ public class Room extends World{
 	
 	private WordObject deskObj;
 	private WordObject chairObj;
-	
+	private WordObject chalkboardObj;
+
+	private RGBColor bubbleColor = RGBColor.BLUE;
 	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
 		
 		wordObjects = new ArrayList<WordObject>();
-		for(int i = 0; i < 50; i++){
-			wordObjects.add(null);
-		}
-		
+		bubbleObjects = new ArrayList<Bubble>();
 		//Adds walls to list 'walls' based on room Id, also sets wallNum variable
 		setSurfaces(roomId);
 		for(int i = 0; i < walls.size(); i++)
@@ -101,29 +93,24 @@ public class Room extends World{
 			*/
 				
 			deskObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f)),new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Desk","La");
-			addDesk(-35,-6,45);
-			addDesk(-35,-6,10);
-			addDesk(-35,-6,-25);
-			addDesk(35,-6,45);
-			addDesk(35,-6,10);
-			addDesk(35,-6,-25);
+			addWordObject(-35,-6,45, deskObj);
+			addWordObject(-35,-6,10, deskObj);
+			addWordObject(-35,-6,-25, deskObj);
+			addWordObject(35,-6,45, deskObj);
+			addWordObject(35,-6,10, deskObj);
+			addWordObject(35,-6,-25, deskObj);
 			
 			chairObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair","La");
-			addChair(-35,2,25);
-			addChair(-35,2,-10);
-			addChair(-35,2,-45);
-			addChair(35,2,25);
-			addChair(35,2,-10);
-			addChair(35,2,-45);
+			addWordObject(-35,2,25, chairObj);
+			addWordObject(-35,2,-10, chairObj);
+			addWordObject(-35,2,-45, chairObj);
+			addWordObject(35,2,25, chairObj);
+			addWordObject(35,2,-10, chairObj);
+			addWordObject(35,2,-45, chairObj);
 			
-			chalkboard = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
-					context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,0),"Chalkboard","El");
-			chalkboard.setOrigin(new SimpleVector(0,0,65));
-			chalkboard.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-			chalkboard.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-			int id = addObject(chalkboard);
-			Log.i("INITIAL CHALKBOARD ID", "It's this: " + id);
-			getObject(id).setName("Chalkboard");
+			chalkboardObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
+					context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard","El");
+			addWordObject(0,0,65,chalkboardObj);
 			
 			
 		} catch (IOException e){
@@ -205,27 +192,17 @@ public class Room extends World{
 		
 	}
 	
-	private void addDesk(float x, float y, float z){
+	private void addWordObject(float x, float y, float z, WordObject wordObject){
 		//Creates a new desk WordObject from the generic Object3D 'deskObj'
 		//and adds it to the Room and WwordObjects ArrayList
-		WordObject desk = new WordObject(deskObj, this.getSize());
-		desk.setOrigin(new SimpleVector(x,y,z));
-		desk.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-		desk.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		desk.build();
-		addObject(desk);
+		WordObject object = new WordObject(wordObject);
+		object.setOrigin(new SimpleVector(x,y,z));
+		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+		object.build();
+		addObject(object);
 	}
 	
-	private void addChair(float x, float y, float z){
-		//Creates a new chair WordObject from the generic Object3D 'chairObj'
-		//and adds it to the Room and wordObjects ArrayList
-		WordObject chair = new WordObject(chairObj, this.getSize());
-		chair.setOrigin(new SimpleVector(x,y,z));
-		chair.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-		chair.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		chair.build();
-		addObject(chair);
-	}
 	
 	public RigidBody addBubble(SimpleVector position) {
 		//Creates a new bubble Object and adds it to the room
@@ -234,18 +211,12 @@ public class Room extends World{
 		Vector3f localInertia = new Vector3f(0, 0, 0);
 		shape.calculateLocalInertia(mass, localInertia);
 
-		Bubble spheregfx = new Bubble();
-
-		spheregfx.translate(position);
-		spheregfx.build();
-		spheregfx.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
-		spheregfx.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		int id = addObject(spheregfx);
-		Object3D tempBubble = getObject(id);
-		bubbleCounter += 1;
-		String name = "Bubble" + bubbleCounter;
-		tempBubble.setName(name);
-		JPCTBulletMotionState ms = new JPCTBulletMotionState(spheregfx);
+		Bubble bubble = new Bubble(position);
+		bubble.setAdditionalColor(bubbleColor);
+		int objectId = addObject(bubble);
+		bubble.setObjectId(objectId);
+		bubbleObjects.add(bubble);
+		JPCTBulletMotionState ms = new JPCTBulletMotionState(bubble);
 
 		//Creates a RigidBody and adds it to the DynamicWorld
 		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, ms, shape, localInertia);
@@ -254,12 +225,29 @@ public class Room extends World{
 		body.setFriction(0.01f);
 		body.setDamping(0f, 1.0f);
 		body.setGravity(new Vector3f(0,0,0));
-		body.setUserPointer(tempBubble);
-		
-		tempBubble.setUserObject(body);
+		body.setUserPointer(getObject(bubble.getObjectId()));
+		getObject(bubble.getObjectId()).setUserObject(body);
 		bubbles.add(body);
 
+
 		return body;
+	}
+	
+	public void setBubbleColor(int state){
+		if(state == Bubble.MASCULINE){
+			bubbleColor = RGBColor.BLUE;
+		}
+		else if(state == Bubble.FEMININE){
+			bubbleColor = RGBColor.RED;
+		}
+	}
+	
+	public Bubble getBubble(int index){
+		return bubbleObjects.get(index);
+	}
+	
+	public ArrayList<Bubble> getBubbleObjects(){
+		return bubbleObjects;
 	}
 	
 	public int getNumObjectsByRoomId(int room){
@@ -273,34 +261,38 @@ public class Room extends World{
 		return num;
 	}
 	
-	public void decrementBubbleCounter(){
-		//Called whenever a bubble pops
-		bubbleCounter -= 1;
-	}
-	
 	public int getBubbleCounter(){
-		return bubbleCounter;
+		return bubbles.size();
 	}
 	
-	@Override
+	/*@Override
 	public WordObject getObject(int id){
 		//Overrides the World function 'getObject' by returning a WordObject
 		//rather than an Object3D
-		
-		//Object3D object = super.getObject(id);
+		Object3D object = super.getObject(id);
 		return wordObjects.get(id);
-	}
+	}*/
 	
 	public int addObject(WordObject wordObject){
 		//Extra function for adding an object to the Room class that also adds
 		//information for the WordObject in the wordObjects ArrayList
-		int objectId = super.addObject((Object3D)wordObject);
-		wordObject.setId(objectId);
-		wordObjects.add(objectId,wordObject);
-		Log.i("THE ID IS CRAZZYY!!!!!!!!!", ""+ objectId);
+		int objectId = super.addObject((Object3D) wordObject);
+		wordObject.setObjectId(objectId);
+		wordObjects.add(wordObject);
 		return objectId;
 	}
 	
+	public WordObject getWordObject(int id){
+		for(WordObject wordObject : wordObjects){
+			if(wordObject.getObjectId() == id)
+				return wordObject;
+		}
+		return null;
+	}
+	
+	public Bubble getLastBubble(){
+		return bubbleObjects.get(bubbleObjects.size()-1);
+	}
 	
 	public Vector3f toVector3f(SimpleVector vector){
 		//Converts a SimpleVector to a Vector3f
@@ -334,52 +326,3 @@ public class Room extends World{
 	}
 }
 
-
-class DimensionObject{
-	float maxDimension;
-	Object3D object;
-	int id;
-	
-	public DimensionObject(Object3D obj){
-		this.object = obj;
-		this.id = object.getID();
-		maxDimension = getMaxDimension(getDimensions(obj));
-	}
-	
-	public float getMaxDimension(Vector3f dim){
-		if(dim.x > dim.z &&dim.x > dim.y)
-			return dim.x;
-		else if(dim.z > dim.x && dim.z > dim.y)
-			return dim.z;
-		else
-			return dim.y;
-	}
-	
-	public Object3D getObject(){
-		return object;
-	}
-	
-	public Vector3f getDimensions(Object3D obj){
-		PolygonManager polyMan = obj.getPolygonManager();
-		int polygons = polyMan.getMaxPolygonID();
-		Vector3f minVerts = new Vector3f(1000,1000,1000);
-		Vector3f maxVerts = new Vector3f(-1000,-1000,-1000);
-		for(int i = 0; i < polygons; i++){
-			for(int j = 0; j < 3; j++){
-				if(minVerts.x > polyMan.getTransformedVertex(i, j).x)
-					minVerts.x = polyMan.getTransformedVertex(i,j).x;
-				if(maxVerts.x < polyMan.getTransformedVertex(i, j).x)
-					maxVerts.x = polyMan.getTransformedVertex(i, j).x;
-				if(minVerts.y > polyMan.getTransformedVertex(i, j).y)
-					minVerts.y = polyMan.getTransformedVertex(i,j).y;
-				if(maxVerts.y < polyMan.getTransformedVertex(i, j).y)
-					maxVerts.y = polyMan.getTransformedVertex(i, j).y;
-				if(minVerts.z > polyMan.getTransformedVertex(i, j).z)
-					minVerts.z = polyMan.getTransformedVertex(i,j).z;
-				if(maxVerts.z < polyMan.getTransformedVertex(i, j).z)
-					maxVerts.z = polyMan.getTransformedVertex(i, j).z;
-			}
-		}
-		return new Vector3f(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
-	}
-}

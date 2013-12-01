@@ -35,6 +35,9 @@ public class MainActivity extends Activity {
 	private float firstX;
 	private float firstY;
 	
+	private boolean isShootMode = false;
+	
+	private int numFingers = 0;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log("onCreate");
@@ -110,6 +113,11 @@ public class MainActivity extends Activity {
 	}
 	
 	public boolean onTouchEvent(MotionEvent me){
+		if (me.getPointerCount() > 1)
+			isShootMode = false;
+		else
+			isShootMode = true;
+		
 		if (me.getAction() == MotionEvent.ACTION_DOWN){
 			xpos = me.getX();
 			ypos = me.getY();
@@ -123,7 +131,7 @@ public class MainActivity extends Activity {
 			ypos = -1;
 			renderer.setTouchTurn(0);
 			renderer.setTouchTurnUp(0);
-			if (me.getAction() == MotionEvent.ACTION_UP) {
+			if (isShootMode) {
 				float xd = me.getX() - firstX;
 				float yd = me.getY() - firstY;
 				if (xd < 5 && xd > -5 && yd < 5 && yd > -5) {
@@ -137,19 +145,26 @@ public class MainActivity extends Activity {
 						body.setLinearVelocity(force);
 					}
 				}
-			return true;
+				if(xd < 0){
+					renderer.loadBubble(Bubble.FEMININE);
+				}
+				else{
+					renderer.loadBubble(Bubble.MASCULINE);
+				}
 			}
+			return true;
 		}
 		
 		if(me.getAction() == MotionEvent.ACTION_MOVE){
 			float xd = me.getX() - xpos;
 			float yd = me.getY() - ypos;
 			
+			if(!isShootMode){
+				renderer.setTouchTurn(xd / -100.0f);
+				renderer.setTouchTurnUp(yd / -100.0f);
+			}
 			xpos = me.getX();
 			ypos = me.getY();
-			
-			renderer.setTouchTurn(xd / -100.0f);
-			renderer.setTouchTurnUp(yd / -100.0f);
 			return true;
 		}
 		

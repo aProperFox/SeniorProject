@@ -17,23 +17,17 @@ public class WordObject extends Object3D{
 	private boolean isStatic;
 	private SimpleVector centerTranslate;
 	private float maxDimension;
-	private int id;
+	private int objectId = -1;
 	private Transform startTransform;
-	private JPCTBulletMotionState ms;
-	private RigidBodyConstructionInfo rbInfo;
 	
 	private String word;
 	private String article;
 	
-	private RigidBody body;
-	//private BvhTriangleMeshShape shape;
-	
-	public WordObject(WordObject obj, int id){
+	public WordObject(WordObject obj){
 		super(obj.toObject3D());
 		this.maxDimension = obj.getMaxDimension();
 		this.word = obj.getWord();
 		this.article = obj.getArticle();
-		this.id = id;
 	}
 	
 	public WordObject(Object3D obj, SimpleVector rotationAxis, String word, String article){
@@ -87,12 +81,12 @@ public class WordObject extends Object3D{
 		return maxDimension;
 	}
 	
-	public void setId(int id){
-		this.id = id;
+	public void setObjectId(int id){
+		this.objectId = id;
 	}
 	
-	public int getId(){
-		return id;
+	public int getObjectId(){
+		return objectId;
 	}
 	
 	public String getWord(){
@@ -101,6 +95,15 @@ public class WordObject extends Object3D{
 	
 	public String getArticle(){
 		return article;
+	}
+	
+	@Override
+	public void scale(float scaleTo){
+		super.scale(scaleTo/maxDimension);
+	}
+	
+	public void removeObject(Room room){
+		room.removeObject(objectId);
 	}
 	
 	public void rotateBy(SimpleVector axes){
