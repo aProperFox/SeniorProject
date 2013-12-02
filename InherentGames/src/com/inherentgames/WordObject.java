@@ -13,6 +13,8 @@ import com.threed.jpct.PolygonManager;
 import com.threed.jpct.SimpleVector;
 
 public class WordObject extends Object3D{
+	public static int MASCULINE = 0;
+	public static int FEMININE = 1;
 	
 	private boolean isStatic;
 	private SimpleVector centerTranslate;
@@ -21,7 +23,7 @@ public class WordObject extends Object3D{
 	private Transform startTransform;
 	
 	private String word;
-	private String article;
+	private int article;
 	
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
@@ -30,7 +32,7 @@ public class WordObject extends Object3D{
 		this.article = obj.getArticle();
 	}
 	
-	public WordObject(Object3D obj, SimpleVector rotationAxis, String word, String article){
+	public WordObject(Object3D obj, SimpleVector rotationAxis, String word, int article){
 		super(obj);
 		isStatic = true;
 		this.word = word;
@@ -93,7 +95,7 @@ public class WordObject extends Object3D{
 		return word;
 	}
 	
-	public String getArticle(){
+	public int getArticle(){
 		return article;
 	}
 	

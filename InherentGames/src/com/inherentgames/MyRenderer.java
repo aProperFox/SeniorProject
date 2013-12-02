@@ -235,8 +235,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
 				WordObject collisionObject;
 				if((collisionObject = world.getWordObject(id)) != null){
-					collisionObject.scale(5.0f);
-					bubble.setHeldObjectId(id);
+					if(collisionObject.getArticle() == bubble.getArticle()){
+						collisionObject.scale(5.0f);
+						bubble.setHeldObjectId(id);
+					}
 				}
 			}
 		}

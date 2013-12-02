@@ -92,7 +92,7 @@ public class Room extends World{
 			
 			*/
 				
-			deskObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f)),new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Desk","La");
+			deskObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f)),new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Desk",WordObject.MASCULINE);
 			addWordObject(-35,-6,45, deskObj);
 			addWordObject(-35,-6,10, deskObj);
 			addWordObject(-35,-6,-25, deskObj);
@@ -100,7 +100,7 @@ public class Room extends World{
 			addWordObject(35,-6,10, deskObj);
 			addWordObject(35,-6,-25, deskObj);
 			
-			chairObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair","La");
+			chairObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair",WordObject.FEMININE);
 			addWordObject(-35,2,25, chairObj);
 			addWordObject(-35,2,-10, chairObj);
 			addWordObject(-35,2,-45, chairObj);
@@ -109,7 +109,7 @@ public class Room extends World{
 			addWordObject(35,2,-45, chairObj);
 			
 			chalkboardObj = new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
-					context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard","El");
+					context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.MASCULINE);
 			addWordObject(0,0,65,chalkboardObj);
 			
 			
@@ -210,8 +210,14 @@ public class Room extends World{
 		float mass = 12;
 		Vector3f localInertia = new Vector3f(0, 0, 0);
 		shape.calculateLocalInertia(mass, localInertia);
-
-		Bubble bubble = new Bubble(position);
+		int article = 0;
+		if(bubbleColor == RGBColor.RED){
+			article = WordObject.FEMININE;
+		}
+		else if(bubbleColor == RGBColor.BLUE){
+			article = WordObject.MASCULINE;
+		}
+		Bubble bubble = new Bubble(position, article);
 		bubble.setAdditionalColor(bubbleColor);
 		int objectId = addObject(bubble);
 		bubble.setObjectId(objectId);

@@ -9,6 +9,8 @@ import javax.vecmath.Vector3f;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +41,9 @@ public class MainActivity extends Activity {
 	
 	private int numFingers = 0;
 	
+	private int width;
+	private int height;
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log("onCreate");
 		
@@ -47,6 +52,10 @@ public class MainActivity extends Activity {
 		}
 		
 		super.onCreate(savedInstanceState);
+		
+		Display display = getWindowManager().getDefaultDisplay(); 
+		width = display.getWidth();  // deprecated
+		height = display.getHeight();  // deprecated
 		
 		//Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -134,9 +143,11 @@ public class MainActivity extends Activity {
 			if (isShootMode) {
 				float xd = me.getX() - firstX;
 				float yd = me.getY() - firstY;
-				if (xd < 5 && xd > -5 && yd < 5 && yd > -5) {
+				Log.i("XD and YD VALUES", " " + xd +" "+ yd);
+				Log.i("WIDTH AND HEIGHT: ", "" + width + " " + height);
+				if (yd < (-height/5)) {
 					Camera cam = renderer.getCam();
-					SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), (int) me.getX(), (int) me.getY());
+					SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), width/2, height/2);
 					dir.scalarMul(-70);
 					RigidBody body = renderer.shoot(cam.getPosition());
 					if(body != null){
@@ -145,10 +156,10 @@ public class MainActivity extends Activity {
 						body.setLinearVelocity(force);
 					}
 				}
-				if(xd < 0){
+				else if(xd < -(width/10)){
 					renderer.loadBubble(Bubble.FEMININE);
 				}
-				else{
+				else if (xd > (width/10)){
 					renderer.loadBubble(Bubble.MASCULINE);
 				}
 			}
