@@ -239,6 +239,9 @@ class MyRenderer implements GLSurfaceView.Renderer {
 						collisionObject.scale(5.0f);
 						bubble.setHeldObjectId(id);
 					}
+					else{
+						deleteBubble(bubble);
+					}
 				}
 			}
 		}
@@ -248,13 +251,9 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		return cam;
 	}
 	
-	public void deleteActiveBubble(){
-		if(world.getBubbleCounter() != 0){
-			/*world.removeObject(heldBubbleObjectId);
-			world.removeObject(world.getObject(holdingBubbleId));
-			int id = world.getObjectByName("Chalkboard").getID();
-			Log.i("NEW CHALKBOARD ID", "IT'S THIS:" + id);*/
-		}
+	public void deleteBubble(Bubble bubble){
+		dynamicWorld.removeRigidBody((RigidBody)dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex()));
+		world.removeBubble(bubble);
 	}
 	
 	public void loadBubble(int state){

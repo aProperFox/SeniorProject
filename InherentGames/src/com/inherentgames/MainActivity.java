@@ -37,9 +37,7 @@ public class MainActivity extends Activity {
 	private float firstX;
 	private float firstY;
 	
-	private boolean isShootMode = false;
-	
-	private int numFingers = 0;
+	private boolean isShootMode = true;
 	
 	private int width;
 	private int height;
@@ -124,8 +122,6 @@ public class MainActivity extends Activity {
 	public boolean onTouchEvent(MotionEvent me){
 		if (me.getPointerCount() > 1)
 			isShootMode = false;
-		else
-			isShootMode = true;
 		
 		if (me.getAction() == MotionEvent.ACTION_DOWN){
 			xpos = me.getX();
@@ -157,12 +153,14 @@ public class MainActivity extends Activity {
 					}
 				}
 				else if(xd < -(width/10)){
-					renderer.loadBubble(Bubble.FEMININE);
+					renderer.loadBubble(WordObject.FEMININE);
 				}
 				else if (xd > (width/10)){
-					renderer.loadBubble(Bubble.MASCULINE);
+					renderer.loadBubble(WordObject.MASCULINE);
 				}
 			}
+			if(me.getPointerCount() <= 1)
+				isShootMode = true;
 			return true;
 		}
 		
@@ -193,9 +191,6 @@ public class MainActivity extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
-        case R.id.kill:
-        	renderer.deleteActiveBubble();
-        	return true;
 //
         }
         return super.onOptionsItemSelected(item);
