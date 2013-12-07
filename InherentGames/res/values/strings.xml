@@ -1,5 +1,7 @@
 <resources>
 
-    <string name="app_name">InherentGames</string>
+    <string name="app_name">Time P.I.</string>
+	<string name="change_lighting">Cycle Lighting</string>
+	<string name="kill_bubbles">Kill bubbles</string>
 
 </resources>
