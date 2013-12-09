@@ -11,6 +11,7 @@ public class Bubble extends WordObject{
 	private int heldObjectId;
 	private int objectId= -1;
 	private int bodyIndex = -1;
+	private int localBodyIndex = -1;
 	private int article;
 	
 	public Bubble(SimpleVector translation, int article){
@@ -37,6 +38,14 @@ public class Bubble extends WordObject{
 	
 	public int getHeldObjectId(){
 		return heldObjectId;
+	}
+	
+	public void setLocalBodyIndex(int index){
+		localBodyIndex = index;
+	}
+	
+	public int getLocalBodyIndex(){
+		return localBodyIndex;
 	}
 	
 	public int getArticle(){

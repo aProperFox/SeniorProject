@@ -2,6 +2,9 @@
 
     <string name="app_name">Time P.I.</string>
 	<string name="change_lighting">Cycle Lighting</string>
-	<string name="kill_bubbles">Kill bubbles</string>
+	<string name="btn_newgame">New Game</string>
+    <string name="btn_exit">Exit</string>
+    <string name="btn_tutorial">Tutorial</string>
+    <string name="btn_settings">Settings</string>
 
 </resources>

@@ -6,17 +6,14 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.Clock;
-import com.bulletphysics.util.ObjectArrayList;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
@@ -48,19 +45,36 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private Light sun = null;
 	Context context;
 	
+	private Renderer2D renderer2D;
+	
 	private DiscreteDynamicsWorld dynamicWorld;
 	private DefaultCollisionConfiguration collisionConfiguration;
 	private CollisionDispatcher dispatcher;
 	private Clock clock;
 
+	private int width = 0;
+	private int height = 0;
 	
+	private String bubbleTexture = "bubbleBlue";
+	
+	private int score = 0;
 	
 	private long time = System.currentTimeMillis();
 	private long lastShot = System.currentTimeMillis();
 	
-	public MyRenderer(Context c) {
+	public MyRenderer(Context c, int w, int h) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
+		
+		width = w;
+		height = h;
+		Texture text = new Texture(context.getResources().openRawResource(R.raw.font));
+		text.setFiltering(false);
+		TextureManager.getInstance().addTexture("gui_font", text);
+		Texture bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 512, 512));
+		TextureManager.getInstance().addTexture("bubbleRed", bubble);
+		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
+		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
 		
 		Texture[] textures = new Texture[6];
 		//set textures
@@ -90,6 +104,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		fb = new FrameBuffer(gl, w, h);
 
+		renderer2D = new Renderer2D(fb);
 		clock = new Clock();
 		
 		world = new Room(0, context);
@@ -182,6 +197,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		
 		world.renderScene(fb);
 		world.draw(fb);
+		renderer2D.blitCrosshair(fb, width, height);
+		renderer2D.blitImage(fb, bubbleTexture, width/2, height, width/3, width/3, 5);
+		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
+		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
 		fb.display();
 		
 		if (System.currentTimeMillis() - time >= 1000) {
@@ -222,7 +241,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		return null;
 	}
 	
-	public void checkBubble(){
+	public int checkBubble(){
 		//Checks bubble collision and if a collision occurs, it shrinks the object down
 		//and sets it in the state to stay inside the bubble object
 		for(int i = 0; i < world.getNumBubbles(); i++){
@@ -239,27 +258,32 @@ class MyRenderer implements GLSurfaceView.Renderer {
 						collisionObject.scale(5.0f);
 						bubble.setHeldObjectId(id);
 					}
+					else{
+						deleteBubble(bubble);
+						return 0;
+					}
 				}
 			}
 		}
+		return 0;
 	}
 	
 	public Camera getCam(){
 		return cam;
 	}
 	
-	public void deleteActiveBubble(){
-		if(world.getBubbleCounter() != 0){
-			/*world.removeObject(heldBubbleObjectId);
-			world.removeObject(world.getObject(holdingBubbleId));
-			int id = world.getObjectByName("Chalkboard").getID();
-			Log.i("NEW CHALKBOARD ID", "IT'S THIS:" + id);*/
-		}
+	public void deleteBubble(Bubble bubble){
+		dynamicWorld.removeRigidBody((RigidBody)dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex()));
+		world.removeBubble(bubble);
 	}
 	
 	public void loadBubble(int state){
 		//Put 2D bubble image on screen with 2D renderer
 		world.setBubbleColor(state);
+		if(state == WordObject.FEMININE)
+			bubbleTexture = "bubbleRed";
+		else
+			bubbleTexture = "bubbleBlue";
 	}
 	
 	public Vector3f getDimensions(Object3D obj){
