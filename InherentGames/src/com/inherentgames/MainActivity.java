@@ -31,13 +31,13 @@ public class MainActivity extends Activity {
 	private GLSurfaceView mGLView;
 	private MyRenderer renderer = null;
 	
-	
 	private float xpos = -1;
 	private float ypos = -1;
 	private float firstX;
 	private float firstY;
 	
 	private boolean isShootMode = true;
+	private boolean isViewMode = false;
 	
 	private int width;
 	private int height;
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		renderer = new MyRenderer(this);
+		renderer = new MyRenderer(this, width, height);
 		//mGLView.setRenderMode(RENDERMODE_WHEN_DIRTY);
 		mGLView.setRenderer(renderer);
 		
@@ -120,8 +120,12 @@ public class MainActivity extends Activity {
 	}
 	
 	public boolean onTouchEvent(MotionEvent me){
-		if (me.getPointerCount() > 1)
+		if (me.getPointerCount() > 1){
 			isShootMode = false;
+			isViewMode = true;
+		}
+		else
+			isViewMode = false;
 		
 		if (me.getAction() == MotionEvent.ACTION_DOWN){
 			xpos = me.getX();
@@ -159,8 +163,10 @@ public class MainActivity extends Activity {
 					renderer.loadBubble(WordObject.MASCULINE);
 				}
 			}
-			if(me.getPointerCount() <= 1)
+			if(me.getPointerCount() <= 1){
 				isShootMode = true;
+				isViewMode = false;
+			}
 			return true;
 		}
 		
@@ -168,7 +174,7 @@ public class MainActivity extends Activity {
 			float xd = me.getX() - xpos;
 			float yd = me.getY() - ypos;
 			
-			if(!isShootMode){
+			if(isViewMode){
 				renderer.setTouchTurn(xd / -100.0f);
 				renderer.setTouchTurnUp(yd / -100.0f);
 			}

@@ -22,8 +22,28 @@ public class MainScreen extends Activity implements OnClickListener{
         public void onClick(View v) {
                 switch(v.getId()){
                 case R.id.start:
-                        Intent i = new Intent(this, MainActivity.class);
-                        startActivity(i);
+                        final Intent i = new Intent(this, MainActivity.class);
+                    	setContentView(R.layout.splash);
+                    	
+                        Thread welcomeThread = new Thread() {
+
+                            int wait = 0;
+
+                            @Override
+                            public void run() {
+                                try {
+                                    super.run();
+                                    sleep(2000);  //Delay of 10 seconds
+                                } catch (Exception e) {
+
+                                } finally {
+
+                                	startActivity(i);
+                                    finish();
+                                }
+                            }
+                        };
+                        welcomeThread.start();
                         break;
                 case R.id.exit:
                         finish();
