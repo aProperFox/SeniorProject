@@ -9,8 +9,8 @@ public class WordObject extends Object3D {
 	 * 
 	 */
 	private static final long serialVersionUID = -4088731260124106298L;
-	public static int MASCULINE = 0;
-	public static int FEMININE = 1;
+	public static final int MASCULINE = 0;
+	public static final int FEMININE = 1;
 	
 	private boolean isStatic;
 	private float maxDimension;
@@ -110,5 +110,5 @@ public class WordObject extends Object3D {
 	public Object3D toObject3D(){
 		return (Object3D)this;
 	}
-	
+
 }
