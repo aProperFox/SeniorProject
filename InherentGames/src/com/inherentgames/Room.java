@@ -18,7 +18,7 @@ import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
 
 
-public class Room extends World{
+public class Room extends World {
 	/**
 	 * 
 	 */
@@ -28,16 +28,10 @@ public class Room extends World{
 	public Wall wall;
 	public Floor floor;
 	public Floor ceiling;
-	private Object3D[] backpack =  new Object3D[4];
-	private Object3D[] book =  new Object3D[2];
-
 	private ArrayList<RigidBody> bodies = new ArrayList<RigidBody>();
 	private ArrayList<RigidBody> bubbles = new ArrayList<RigidBody>();
 	private ArrayList<Bubble> bubbleObjects;
 	private ArrayList<WordObject> wordObjects;
-	
-	private Object3D pencil;
-	private Object3D bubble;
 	
 	private ArrayList<WordObject> roomObjects;
 
