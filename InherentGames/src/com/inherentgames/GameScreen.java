@@ -104,6 +104,7 @@ public class GameScreen extends Activity {
 		renderer = new MyRenderer(this, width, height);
 		//mGLView.setRenderMode(RENDERMODE_WHEN_DIRTY);
 		mGLView.setRenderer(renderer);
+		mGLView.setKeepScreenOn(true);
 		
 		setContentView(mGLView);
 	}

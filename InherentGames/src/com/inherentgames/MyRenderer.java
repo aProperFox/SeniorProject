@@ -6,7 +6,7 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-
+import android.util.Log;
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
@@ -16,6 +16,7 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
+import com.threed.jpct.IPaintListener;
 import com.threed.jpct.Light;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
@@ -27,7 +28,11 @@ import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-class MyRenderer implements GLSurfaceView.Renderer {
+class MyRenderer implements GLSurfaceView.Renderer, IPaintListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2307853721109701043L;
 	private FrameBuffer fb = null;
 	private Room world = null;
 	private RGBColor back = new RGBColor(50,50,100);
@@ -36,7 +41,6 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private float touchTurnUp = 0;
 	
 	private SimpleVector V;
-	
 	
 	private Camera cam;
 	
@@ -145,6 +149,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+		Log.e("MyRenderer", "Surface created.");
 	}
 	
 	public void cycleLighting(){
@@ -317,6 +322,17 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	public SimpleVector toSimpleVector(Vector3f vector){
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
-	
+
+	@Override
+	public void finishedPainting() {
+		// TODO Auto-generated method stub
+		Log.e("MyRenderer", "Objects have loaded.");
+	}
+
+	@Override
+	public void startPainting() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
