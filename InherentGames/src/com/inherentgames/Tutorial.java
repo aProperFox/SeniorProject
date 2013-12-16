@@ -1,5 +1,5 @@
 package com.inherentgames;
 
-public class tutorial {
+public class Tutorial {
 
 }
