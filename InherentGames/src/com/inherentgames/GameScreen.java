@@ -22,8 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
-import android.widget.Toast;
-
 import com.bulletphysics.dynamics.RigidBody;
 import com.threed.jpct.Camera;
 import com.threed.jpct.Interact2D;
@@ -81,9 +79,6 @@ public class GameScreen extends Activity {
 		context = this;
 		assetsPropertyReader = new AssetsPropertyReader(context);
 		config = assetsPropertyReader.getProperties("config.properties");
-		
-		// Test the text
-		Toast.makeText(context, config.getProperty("app_name"), Toast.LENGTH_LONG).show();
          
 		mGLView = new GLSurfaceView(getApplication());
 		
@@ -102,7 +97,6 @@ public class GameScreen extends Activity {
 		});
 		
 		renderer = new MyRenderer(this, width, height);
-		//mGLView.setRenderMode(RENDERMODE_WHEN_DIRTY);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		
