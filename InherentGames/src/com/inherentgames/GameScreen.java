@@ -224,16 +224,6 @@ public class GameScreen extends Activity {
         return super.onOptionsItemSelected(item);
     }
 	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent msg) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			int pid = android.os.Process.myPid();
-			android.os.Process.killProcess(pid);
-			return true;
-		}
-		return super.onKeyDown(keyCode, msg);
-	}
-	
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}

@@ -2,16 +2,14 @@ package com.inherentgames;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 
 public class MenuScreen extends Activity implements OnClickListener {
 	
-	/** Called when the activity is first created */
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void onResume() {
+		super.onResume();
 		setContentView(R.layout.main);
 		// Click handler for buttons
 		View startButton = findViewById(R.id.start);
@@ -36,7 +34,6 @@ public class MenuScreen extends Activity implements OnClickListener {
 
 						} finally {
 							startActivity(i);
-							finish();
 						}
 					}
 				};
