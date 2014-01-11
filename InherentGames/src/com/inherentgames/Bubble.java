@@ -7,6 +7,10 @@ import com.threed.jpct.SimpleVector;
 public class Bubble extends WordObject{
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4649047534584957279L;
 	private boolean isHolding;
 	private int heldObjectId;
 	private int objectId= -1;

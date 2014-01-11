@@ -6,7 +6,6 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
@@ -36,7 +35,6 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private float touchTurnUp = 0;
 	
 	private SimpleVector V;
-	
 	
 	private Camera cam;
 	
@@ -183,7 +181,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 		
 		checkBubble();
-		for(Bubble bubble : world.getBubbleObjects()){
+		for(Bubble bubble : world.getBubbleObjects()) {
 			if(bubble.isHolding()){
 				Object3D obj = world.getObject(bubble.getHeldObjectId());
 				obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
@@ -317,6 +315,5 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	public SimpleVector toSimpleVector(Vector3f vector){
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
-	
 }
 

@@ -1,27 +1,20 @@
 package com.inherentgames;
 
-import javax.vecmath.Vector3f;
-
-import android.util.Log;
-
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.PolygonManager;
 import com.threed.jpct.SimpleVector;
 
-public class WordObject extends Object3D{
-	public static int MASCULINE = 0;
-	public static int FEMININE = 1;
+public class WordObject extends Object3D {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4088731260124106298L;
+	public static final int MASCULINE = 0;
+	public static final int FEMININE = 1;
 	
 	private boolean isStatic;
-	private SimpleVector centerTranslate;
 	private float maxDimension;
 	private int objectId = -1;
-	private Transform startTransform;
-	
 	private String word;
 	private int article;
 	
@@ -117,5 +110,5 @@ public class WordObject extends Object3D{
 	public Object3D toObject3D(){
 		return (Object3D)this;
 	}
-	
+
 }

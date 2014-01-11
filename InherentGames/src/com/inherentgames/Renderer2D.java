@@ -1,7 +1,5 @@
 package com.inherentgames;
 
-import android.util.Log;
-
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.Texture;

@@ -7,7 +7,7 @@
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:adjustViewBounds="true"
-    android:background="@drawable/splash"
+    android:background="@drawable/cover1"
     android:scaleType="fitXY" />
 
 </LinearLayout>

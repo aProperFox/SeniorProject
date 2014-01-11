@@ -1,5 +1,6 @@
 package com.inherentgames;
 
-public class settings {
-
+public class Settings {
+	
+	
 }
