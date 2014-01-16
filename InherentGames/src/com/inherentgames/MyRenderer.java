@@ -36,6 +36,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private float touchTurn = 0;
 	private float touchTurnUp = 0;
 	
+	private long lastRotateTime = 0;
+	
 	private SimpleVector V;
 	
 	private Camera cam;
@@ -78,7 +80,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128));
 		TextureManager.getInstance().addTexture("fireButton", buttons);
 		
-		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
+		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 128, 128));
 		TextureManager.getInstance().addTexture("Pizarra", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256));
 		TextureManager.getInstance().addTexture("Escritorio", objectNames);
@@ -198,13 +200,19 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			if(bubble.isHolding()){
 				Object3D obj = world.getObject(bubble.getHeldObjectId());
 				obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
+				Log.i("olsontl", "clock in milliseconds : " + (System.currentTimeMillis()));
+				if(lastRotateTime < (System.currentTimeMillis() - 15)){
+					obj.rotateY(0.1f);
+				}
 			}
 		}
+		if(lastRotateTime < (System.currentTimeMillis() - 15))
+			lastRotateTime = System.currentTimeMillis();
+		
 		float ms = clock.getTimeMicroseconds();
 		clock.reset();
 		dynamicWorld.stepSimulation(ms / 1000000f);
 		fb.clear(back);
-		
 		
 		world.renderScene(fb);
 		world.draw(fb);
@@ -269,10 +277,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 					if(collisionObject.getArticle() == bubble.getArticle()){
 						collisionObject.scale(5.0f);
 						bubble.setHeldObjectId(id);
-						/*Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
-						worldBubbleObject.calcTextureWrapSpherical();
-						worldBubbleObject.setTexture(collisionObject.getName(Translator.SPANISH));
-						worldBubbleObject.build();*/
+						//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
+						bubble.setTexture(collisionObject.getName(Translator.SPANISH));
+						bubble.calcTextureWrap();
+						bubble.build();
 					}
 					else{
 						deleteBubble(bubble);
