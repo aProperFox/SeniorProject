@@ -245,6 +245,7 @@ public class Room extends World {
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
 		object.build();
+		//object.setRotationPivot(pivot);
 		addObject(object);
 	}
 	
@@ -264,6 +265,9 @@ public class Room extends World {
 		}
 		Bubble bubble = new Bubble(position, article);
 		bubble.setAdditionalColor(bubbleColor);
+		bubble.setTexture("Default");
+		bubble.calcTextureWrapSpherical();
+		
 		int objectId = addObject(bubble);
 		bubble.setObjectId(objectId);
 		JPCTBulletMotionState ms = new JPCTBulletMotionState(bubble);
@@ -271,9 +275,9 @@ public class Room extends World {
 		//Creates a RigidBody and adds it to the DynamicWorld
 		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, ms, shape, localInertia);
 		RigidBody body = new RigidBody(rbInfo);
-		body.setRestitution(0.01f);
+		body.setRestitution(10f);
 		body.setFriction(0.01f);
-		body.setDamping(0f, 1.0f);
+		body.setDamping(0f, 0f);
 		body.setGravity(new Vector3f(0,0,0));
 		body.setUserPointer(getObject(bubble.getObjectId()));
 		getObject(bubble.getObjectId()).setUserObject(body);
@@ -343,6 +347,15 @@ public class Room extends World {
 				return wordObject;
 		}
 		return null;
+	}
+	
+	public boolean isBubbleType(int id){
+		for(Bubble bubble : bubbleObjects){
+			if(bubble.getObjectId() == id){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public Bubble getLastBubble(){

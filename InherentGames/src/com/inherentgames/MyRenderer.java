@@ -47,6 +47,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private Light sun = null;
 	Context context;
 	
+	private String fireButtonState = "fireButton";
+	
 	private Renderer2D renderer2D;
 	
 	private DiscreteDynamicsWorld dynamicWorld;
@@ -77,10 +79,12 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		TextureManager.getInstance().addTexture("bubbleRed", bubble);
 		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
 		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
-		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128));
+		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 256, 256));
 		TextureManager.getInstance().addTexture("fireButton", buttons);
+		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 256, 256));
+		TextureManager.getInstance().addTexture("fireButtonPressed", buttons);
 		
-		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 128, 128));
+		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
 		TextureManager.getInstance().addTexture("Pizarra", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256));
 		TextureManager.getInstance().addTexture("Escritorio", objectNames);
@@ -88,6 +92,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		TextureManager.getInstance().addTexture("Silla", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 256, 256));
 		TextureManager.getInstance().addTexture("Mochila", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
+		TextureManager.getInstance().addTexture("Default", objectNames);
 		
 		Texture[] textures = new Texture[6];
 		//set textures
@@ -200,9 +206,9 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			if(bubble.isHolding()){
 				Object3D obj = world.getObject(bubble.getHeldObjectId());
 				obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
-				Log.i("olsontl", "clock in milliseconds : " + (System.currentTimeMillis()));
 				if(lastRotateTime < (System.currentTimeMillis() - 15)){
 					obj.rotateY(0.1f);
+					world.getObject(bubble.getObjectId()).rotateY(0.1f);
 				}
 			}
 		}
@@ -219,8 +225,8 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		renderer2D.blitCrosshair(fb, width, height);
 		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
 		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
-		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
-		renderer2D.blitImage(fb, "fireButton", width/20, height-(width/20), 128,128, width/10, width/10, 5);
+		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.BLACK);
+		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 256, 256, width/8, width/8, 5);
 		fb.display();
 		
 		if (System.currentTimeMillis() - time >= 1000) {
@@ -273,16 +279,29 @@ class MyRenderer implements GLSurfaceView.Renderer {
 				SimpleVector motion = toSimpleVector(linearVelocity);
 				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
 				WordObject collisionObject;
-				if((collisionObject = world.getWordObject(id)) != null){
-					if(collisionObject.getArticle() == bubble.getArticle()){
-						collisionObject.scale(5.0f);
-						bubble.setHeldObjectId(id);
-						//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
-						bubble.setTexture(collisionObject.getName(Translator.SPANISH));
-						bubble.calcTextureWrap();
-						bubble.build();
+				if(id >= 0){
+					if((collisionObject = world.getWordObject(id)) != null){
+						if(collisionObject.getArticle() == bubble.getArticle()){
+							collisionObject.scale(5.0f);
+							bubble.setHeldObjectId(id);
+							//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
+							bubble.setTexture(collisionObject.getName(Translator.SPANISH));
+							bubble.calcTextureWrap();
+							bubble.build();
+							score += 100;
+							return 0;
+						}
+						else{
+							deleteBubble(bubble);
+							score -= 25;
+							return 0;
+						}
 					}
-					else{
+					else if(world.isBubbleType(id)){
+						score -= 10;
+						Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
+						world.removeObject(bubbleCollisionObject.getHeldObjectId());
+						deleteBubble(bubbleCollisionObject);
 						deleteBubble(bubble);
 						return 0;
 					}
@@ -308,6 +327,15 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			bubbleTexture = "bubbleRed";
 		else
 			bubbleTexture = "bubbleBlue";
+	}
+	
+	public void setFireButtonState(boolean isPressed){
+		if(isPressed){
+			fireButtonState = "fireButtonPressed";
+		}
+		else{
+			fireButtonState = "fireButton";
+		}
 	}
 	
 	public Vector3f getDimensions(Object3D obj){

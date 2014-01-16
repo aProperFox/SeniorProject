@@ -2,9 +2,9 @@ package com.inherentgames;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 
@@ -24,9 +24,10 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                                    Intent i = new Intent(MenuScreen.this, GameScreen.class);
-                                    startActivity(i);
-                            }
+                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
+                        Intent i = new Intent(MenuScreen.this, GameScreen.class);
+                        startActivity(i);
+                    }
             });
             
             Button settingsButton = (Button) findViewById(R.id.settingsbutton);
@@ -34,9 +35,10 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                                    Intent i = new Intent(MenuScreen.this, Settings.class);
-                                    startActivity(i);
-                            }
+                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
+                        Intent i = new Intent(MenuScreen.this, Settings.class);
+                        startActivity(i);
+                    }
             });
             
             
@@ -45,9 +47,10 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                                    Intent i = new Intent(MenuScreen.this, Tutorial.class);
-                                    startActivity(i);
-                            }
+        				v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
+                        Intent i = new Intent(MenuScreen.this, Tutorial.class);
+                        startActivity(i);
+                    }
             });
             
             
@@ -56,9 +59,10 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                                    Intent i = new Intent(MenuScreen.this, Store.class);
-                                    startActivity(i);
-                            }
+                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
+                        Intent i = new Intent(MenuScreen.this, Store.class);
+                        startActivity(i);
+                    }
             });
             
             
