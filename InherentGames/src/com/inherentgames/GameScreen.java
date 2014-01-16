@@ -149,9 +149,10 @@ public class GameScreen extends Activity {
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX();
 				ypos = me.getY();
-				if(xpos < width/10 && ypos > height - width/10){
+				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16){
 					isViewMode = false;
 					isShootMode = true;
+					renderer.setFireButtonState(true);
 				}
 				else{
 					isViewMode = true;
@@ -163,7 +164,6 @@ public class GameScreen extends Activity {
     		case MotionEvent.ACTION_POINTER_DOWN:
 				xpos = me.getX(1);
 				ypos = me.getY(1);
-				Log.i("olsontl", "SECOND POINTER AT: " + xpos + ", " + ypos);
 				firstX = xpos;
 				firstY = ypos;
 				return true;
@@ -175,6 +175,7 @@ public class GameScreen extends Activity {
 				renderer.setTouchTurnUp(0);
 				isShootMode = false;
 				isViewMode = true;
+				renderer.setFireButtonState(false);
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
@@ -184,12 +185,10 @@ public class GameScreen extends Activity {
 				renderer.setTouchTurnUp(0);
 				float xd = me.getX(1) - firstX;
 				float yd = me.getY(1) - firstY;
-				Log.i("olsontl", "lift x and y at: " + me.getX(1) + ", " + me.getY(1));
-				Log.i("olsontl", "XD and YD VALUES AT: " + xd +" "+ yd);
-				if (yd < (-height/5)) {
+				if (yd < (-height/5) && Math.abs(xd) < width/6) {
 					renderer.loadBubble(WordObject.MASCULINE);
 				}
-				else if(yd > (height/5)){
+				else if(yd > (height/5) && Math.abs(xd) < width/6){
 					renderer.loadBubble(WordObject.FEMININE);
 				}
 				else{
@@ -200,7 +199,7 @@ public class GameScreen extends Activity {
 				dir.scalarMul(-70);
 				RigidBody body = renderer.shoot(cam.getPosition());
 				if(body != null){
-					Vector3f force = new Vector3f(-dir.x, dir.y, dir.z);
+					Vector3f force = new Vector3f(-dir.x*2, dir.y*2, dir.z*2);
 					body.activate(true);
 					body.setLinearVelocity(force);
 				}
