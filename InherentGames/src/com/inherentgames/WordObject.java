@@ -17,6 +17,8 @@ public class WordObject extends Object3D {
 	private int objectId = -1;
 	private String word;
 	private int article;
+	private String names[] = new String[2];
+	
 	
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
@@ -90,6 +92,20 @@ public class WordObject extends Object3D {
 	
 	public int getArticle(){
 		return article;
+	}
+	
+	@Override
+	public void setName(String name){
+		/**
+		 * TODO: setting for language
+		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
+		 */
+		names[Translator.ENGLISH] = name;
+		names[Translator.SPANISH] = Translator.translateToLanguage(name,Translator.SPANISH);
+	}
+	
+	public String getName(int language){
+		return names[language];
 	}
 	
 	@Override
