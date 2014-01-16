@@ -52,33 +52,7 @@ public class Room extends World {
 			addObject(walls.get(i));
 		}
 
-			/*
-
-			backpack[i] = 
-			
-			backpack[0].setOrigin(new SimpleVector());
-			backpack[0].rotateY();
-			backpack[0].setTransparency(5);
-			backpack[1].setOrigin(new SimpleVector());
-			backpack[1].rotateY((float)Math.PI);
-			backpack[2].setOrigin(new SimpleVector());
-			backpack[2].rotateY((float)Math.PI/2);
-			backpack[2].rotateZ(-(float)Math.PI/2);
-			backpack[3].setOrigin(new SimpleVector());
-			backpack[3].rotateY((float)Math.PI/2);
-			backpack[3].rotateZ(-0.2f);
-			
-			for(int i = 0; i < 4; i++){
-				addObject(backpack[i]);
-			}
-			
-			pencil = Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/pencil.obj"), null, 50.0f));
-			pencil.setOrigin(new SimpleVector(-19,5,6));
-			addObject(pencil);
-			
-			
-			*/
-			setObjects(roomId);
+		setObjects(roomId);
 		
 	}
 	
@@ -211,26 +185,26 @@ public class Room extends World {
 				e.printStackTrace();
 			}
 			//Desks
-			addWordObject(-35,-6,45, roomObjects.get(0));
-			addWordObject(-35,-6,10, roomObjects.get(0));
-			addWordObject(-35,-6,-25, roomObjects.get(0));
-			addWordObject(35,-6,45, roomObjects.get(0));
-			addWordObject(35,-6,10, roomObjects.get(0));
-			addWordObject(35,-6,-25, roomObjects.get(0));
+			addWordObject(-35,-6,45, roomObjects.get(0), "Desk");
+			addWordObject(-35,-6,10, roomObjects.get(0), "Desk");
+			addWordObject(-35,-6,-25, roomObjects.get(0), "Desk");
+			addWordObject(35,-6,45, roomObjects.get(0), "Desk");
+			addWordObject(35,-6,10, roomObjects.get(0), "Desk");
+			addWordObject(35,-6,-25, roomObjects.get(0), "Desk");
 			//Chairs
-			addWordObject(-35,2,25, roomObjects.get(1));
-			addWordObject(-35,2,-10, roomObjects.get(1));
-			addWordObject(-35,2,-45, roomObjects.get(1));
-			addWordObject(35,2,25, roomObjects.get(1));
-			addWordObject(35,2,-10, roomObjects.get(1));
-			addWordObject(35,2,-45, roomObjects.get(1));
+			addWordObject(-35,2,25, roomObjects.get(1), "Chair");
+			addWordObject(-35,2,-10, roomObjects.get(1), "Chair");
+			addWordObject(-35,2,-45, roomObjects.get(1), "Chair");
+			addWordObject(35,2,25, roomObjects.get(1), "Chair");
+			addWordObject(35,2,-10, roomObjects.get(1), "Chair");
+			addWordObject(35,2,-45, roomObjects.get(1), "Chair");
 			//Chalk board
-			addWordObject(0,0,65,roomObjects.get(2));
+			addWordObject(0,0,65,roomObjects.get(2), "Chalkboard");
 			//BackPacks
-			addWordObject(-15,15,45,roomObjects.get(3));
-			addWordObject(35,4,40,roomObjects.get(3));
-			addWordObject(-30,-5,15,roomObjects.get(3));
-			addWordObject(17,15,-25,roomObjects.get(3));
+			addWordObject(-15,15,45,roomObjects.get(3), "Backpack");
+			addWordObject(35,4,40,roomObjects.get(3), "Backpack");
+			addWordObject(-30,-5,15,roomObjects.get(3), "Backpack");
+			addWordObject(17,15,-25,roomObjects.get(3), "Backpack");
 			break;
 		case 1:
 			try {
@@ -257,15 +231,17 @@ public class Room extends World {
 				e.printStackTrace();
 			}
 			
-			addWordObject(-35,-6,45, roomObjects.get(0));
+			addWordObject(-35,-6,45, roomObjects.get(0), "Desk");
+			break;
 		}
 	}
 	
-	private void addWordObject(float x, float y, float z, WordObject wordObject){
+	private void addWordObject(float x, float y, float z, WordObject wordObject, String name){
 		//Creates a new WordObject from the generic roomObject
 		//and adds it to the Room and wordObjects ArrayList
 		WordObject object = new WordObject(wordObject);
 		object.setOrigin(new SimpleVector(x,y,z));
+		object.setName(name);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
 		object.build();

@@ -6,6 +6,8 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
+
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
@@ -73,6 +75,17 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		TextureManager.getInstance().addTexture("bubbleRed", bubble);
 		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
 		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
+		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128));
+		TextureManager.getInstance().addTexture("fireButton", buttons);
+		
+		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
+		TextureManager.getInstance().addTexture("Pizarra", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256));
+		TextureManager.getInstance().addTexture("Escritorio", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256));
+		TextureManager.getInstance().addTexture("Silla", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 256, 256));
+		TextureManager.getInstance().addTexture("Mochila", objectNames);
 		
 		Texture[] textures = new Texture[6];
 		//set textures
@@ -196,9 +209,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		world.renderScene(fb);
 		world.draw(fb);
 		renderer2D.blitCrosshair(fb, width, height);
-		renderer2D.blitImage(fb, bubbleTexture, width/2, height, width/3, width/3, 5);
+		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
 		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
 		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
+		renderer2D.blitImage(fb, "fireButton", width/20, height-(width/20), 128,128, width/10, width/10, 5);
 		fb.display();
 		
 		if (System.currentTimeMillis() - time >= 1000) {
@@ -244,7 +258,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		//and sets it in the state to stay inside the bubble object
 		for(int i = 0; i < world.getNumBubbles(); i++){
 			Bubble bubble = world.getBubble(i);
-			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1){
+			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
 				RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
 				Vector3f linearVelocity = new Vector3f(0,0,0);
 				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
@@ -255,6 +269,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 					if(collisionObject.getArticle() == bubble.getArticle()){
 						collisionObject.scale(5.0f);
 						bubble.setHeldObjectId(id);
+						/*Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
+						worldBubbleObject.calcTextureWrapSpherical();
+						worldBubbleObject.setTexture(collisionObject.getName(Translator.SPANISH));
+						worldBubbleObject.build();*/
 					}
 					else{
 						deleteBubble(bubble);

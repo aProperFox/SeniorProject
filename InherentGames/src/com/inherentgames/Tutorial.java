@@ -1,5 +1,7 @@
 package com.inherentgames;
 
-public class Tutorial {
+import android.app.Activity;
+
+public class Tutorial extends Activity{
 
 }

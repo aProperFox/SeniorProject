@@ -2,50 +2,106 @@ package com.inherentgames;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.Button;
 
 
-public class MenuScreen extends Activity implements OnClickListener {
+public class MenuScreen extends Activity {
 	
-	public void onResume() {
-		super.onResume();
-		setContentView(R.layout.main);
-		// Click handler for buttons
-		View startButton = findViewById(R.id.start);
-		startButton.setOnClickListener(this);
-		View closeButton = findViewById(R.id.exit);
-		closeButton.setOnClickListener(this);
-	}
-	
-	public void onClick(View v) {
-		switch(v.getId()) {
-			case R.id.start:
-				final Intent i = new Intent(this, GameScreen.class);
-				setContentView(R.layout.splash);
-
-				Thread welcomeThread = new Thread() {
-					@Override
-					public void run() {
-						try {
-							super.run();
-							sleep(2000);  //Delay of 10 seconds
-						} catch (Exception e) {
-
-						} finally {
-							startActivity(i);
-						}
-					}
-				};
-				welcomeThread.start();
-				break;
-			case R.id.exit:
-				finish();
-				break;
-			case R.id.tutorial:
-				break;
-			case R.id.settings:
-				break;
-		}
-	}
+	@Override
+    
+    protected void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+            setContentView(R.layout.home);
+            
+            // click-handler for buttons
+            Button playButton = (Button) findViewById(R.id.playbutton);
+            playButton.setOnClickListener(new View.OnClickListener() {
+                    
+                    @Override
+                    public void onClick(View v) {
+                                    Intent i = new Intent(MenuScreen.this, GameScreen.class);
+                                    startActivity(i);
+                            }
+            });
+            
+            Button settingsButton = (Button) findViewById(R.id.settingsbutton);
+            settingsButton.setOnClickListener(new View.OnClickListener() {
+                    
+                    @Override
+                    public void onClick(View v) {
+                                    Intent i = new Intent(MenuScreen.this, Settings.class);
+                                    startActivity(i);
+                            }
+            });
+            
+            
+            Button tutorialButton = (Button) findViewById(R.id.tutorialbutton);
+            tutorialButton.setOnClickListener(new View.OnClickListener() {
+                    
+                    @Override
+                    public void onClick(View v) {
+                                    Intent i = new Intent(MenuScreen.this, Tutorial.class);
+                                    startActivity(i);
+                            }
+            });
+            
+            
+            Button storeButton = (Button) findViewById(R.id.storebutton);
+            storeButton.setOnClickListener(new View.OnClickListener() {
+                    
+                    @Override
+                    public void onClick(View v) {
+                                    Intent i = new Intent(MenuScreen.this, Store.class);
+                                    startActivity(i);
+                            }
+            });
+            
+            
+    }
 }
+    /*
+    public void onCreate(Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+            setContentView(R.layout.home);
+            
+            // click-handler for buttons
+            View playButton = findViewById(R.id.playbutton);
+            playButton.setOnClickListener((OnClickListener) this);
+            
+            View settingsButton = findViewById(R.id.settingsbutton);
+            settingsButton.setOnClickListener((OnClickListener) this);
+            
+            View storeButton = findViewById(R.id.storebutton);
+            storeButton.setOnClickListener((OnClickListener) this);
+            
+            View tutorialButton = findViewById(R.id.tutorialbutton);
+            tutorialButton.setOnClickListener((OnClickListener) this);
+            
+    }
+            public void onClick(View v) {
+                    switch(v.getId()){
+                    case R.id.playbutton:
+                            Intent i = new Intent(this, MainActivity.class);
+                            startActivity(i);
+                            break;
+                    case R.id.settingsbutton:
+                            Intent j = new Intent(this, Settings.class);
+                            startActivity(j);
+                            break;
+                    case R.id.tutorialbutton:
+                            Intent k = new Intent(this, Tutorial.class);
+                            startActivity(k);
+                            break;
+                    case R.id.storebutton:
+                            Intent l = new Intent(this, Store.class);
+                            startActivity(l);
+                            break;
+                    }                
+            }
+            */

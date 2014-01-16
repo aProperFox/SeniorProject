@@ -71,9 +71,9 @@ public class Renderer2D {
 		}
 	}
 	
-	public void blitImage(FrameBuffer fb, String textureName, int x, int y, int width, int height, int transparency){
+	public void blitImage(FrameBuffer fb, String textureName, int x, int y, int imageWidth, int imageHeight, int width, int height, int transparency){
 		Texture image = tm.getTexture(textureName);
-		fb.blit(image, 0,0, (x-width/2), y-(height/2), 512, 512, width, height, transparency, false,null);
+		fb.blit(image, 0,0, (x-width/2), y-(height/2), imageWidth, imageHeight, width, height, transparency, false,null);
 	}
 
 	public void blitFilledBox(FrameBuffer fb, int x, int y, int w, int h, int transparency, RGBColor color) {
