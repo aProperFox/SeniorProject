@@ -1,12 +1,16 @@
 package com.inherentgames;
 
+import java.util.ArrayList;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -28,7 +32,7 @@ import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-class MyRenderer implements GLSurfaceView.Renderer {
+class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	private FrameBuffer fb = null;
 	private Room world = null;
 	private RGBColor back = new RGBColor(50,50,100);
@@ -46,6 +50,10 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	private int lightCycle = 0;
 	private Light sun = null;
 	Context context;
+	
+	private int roomNum = 0;
+	
+	private ArrayList<String> bubbleWords = new ArrayList<String>();
 	
 	private String fireButtonState = "fireButton";
 	
@@ -126,7 +134,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		renderer2D = new Renderer2D(fb);
 		clock = new Clock();
 		
-		world = new Room(0, context);
+		world = new Room(roomNum, context);
 		world.setAmbientLight(20, 20, 20);
 		
 		
@@ -163,6 +171,46 @@ class MyRenderer implements GLSurfaceView.Renderer {
 	
 	}
 
+	private void changeLevel(){
+		clock = new Clock();
+		
+		world = new Room(roomNum, context);
+		world.setAmbientLight(20, 20, 20);
+		
+		
+		sun = new Light(world);
+		sun.setPosition(world.getLightLocation(0));
+		sun.setIntensity(250, 250, 250);
+		
+		
+		cam = world.getCamera();
+		cam.setPosition(new SimpleVector(0,0,0));
+		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
+		MemoryHelper.compact();
+		
+		collisionConfiguration = new DefaultCollisionConfiguration();
+		dispatcher = new CollisionDispatcher(collisionConfiguration);
+		Vector3f worldAabbMin = new Vector3f(-10000,-10000,-10000);
+		Vector3f worldAabbMax = new Vector3f(10000,10000,10000);
+		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
+		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
+		
+		dynamicWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+		dynamicWorld.setGravity(new Vector3f(0,-10,0));
+		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
+	
+		for(int i = 0; i < world.getNumBodies(); i++){
+			dynamicWorld.addCollisionObject(world.getBody(i));
+		}
+	
+		dynamicWorld.clearForces();
+
+		for(int i = 5; i < world.getNumBodies(); i++){
+			dynamicWorld.addRigidBody(world.getBody(i));
+		}
+	
+	}
+	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 	}
 	
@@ -225,7 +273,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		renderer2D.blitCrosshair(fb, width, height);
 		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
 		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
-		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.BLACK);
+		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
 		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 256, 256, width/8, width/8, 5);
 		fb.display();
 		
@@ -282,6 +330,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 				if(id >= 0){
 					if((collisionObject = world.getWordObject(id)) != null){
 						if(collisionObject.getArticle() == bubble.getArticle()){
+							bubbleWords.add(collisionObject.getWord());
 							collisionObject.scale(5.0f);
 							bubble.setHeldObjectId(id);
 							//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
@@ -289,6 +338,7 @@ class MyRenderer implements GLSurfaceView.Renderer {
 							bubble.calcTextureWrap();
 							bubble.build();
 							score += 100;
+							hasWonGame();
 							return 0;
 						}
 						else{
@@ -338,6 +388,24 @@ class MyRenderer implements GLSurfaceView.Renderer {
 		}
 	}
 	
+	public boolean hasWonGame(){
+		ArrayList<String> tempWords = world.getRoomObjectWords();
+		for(int i = 0; i < tempWords.size(); i++){
+			boolean doesWordExist = false;
+			for(int j = 0; j < bubbleWords.size(); j++){
+				if(bubbleWords.get(j) == tempWords.get(i)){
+					doesWordExist = true;
+					break;
+				}
+			}
+			if(!doesWordExist){
+				return false;
+			}
+		}
+		levelWin();
+		return true;
+	}
+	
 	public Vector3f getDimensions(Object3D obj){
 		PolygonManager polyMan = obj.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
@@ -360,6 +428,11 @@ class MyRenderer implements GLSurfaceView.Renderer {
 			}
 		}
 		return new Vector3f(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
+	}
+	
+	public void levelWin(){
+		roomNum ++;
+		changeLevel();
 	}
 	
 	public Vector3f toVector3f(SimpleVector vector){

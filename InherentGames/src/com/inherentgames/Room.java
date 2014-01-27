@@ -12,6 +12,7 @@ import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.threed.jpct.Loader;
+import com.threed.jpct.Matrix;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
@@ -35,10 +36,13 @@ public class Room extends World {
 	
 	private ArrayList<WordObject> roomObjects;
 
+	private ArrayList<String> roomObjectWords;
 	private RGBColor bubbleColor = RGBColor.BLUE;
 	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
+		
+		roomObjectWords = new ArrayList<String>();
 		
 		wordObjects = new ArrayList<WordObject>();
 		bubbleObjects = new ArrayList<Bubble>();
@@ -179,7 +183,7 @@ public class Room extends World {
 						context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
 				//
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"),
-						context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f)),new SimpleVector(0,0.8f*(float)Math.PI/2,(float)Math.PI),"BackPack",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f)),new SimpleVector(0,0.8f*(float)Math.PI/2,(float)Math.PI),"Backpack",WordObject.FEMININE));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -191,6 +195,7 @@ public class Room extends World {
 			addWordObject(35,-6,45, roomObjects.get(0), "Desk");
 			addWordObject(35,-6,10, roomObjects.get(0), "Desk");
 			addWordObject(35,-6,-25, roomObjects.get(0), "Desk");
+			roomObjectWords.add("Desk");
 			//Chairs
 			addWordObject(-35,2,25, roomObjects.get(1), "Chair");
 			addWordObject(-35,2,-10, roomObjects.get(1), "Chair");
@@ -198,17 +203,22 @@ public class Room extends World {
 			addWordObject(35,2,25, roomObjects.get(1), "Chair");
 			addWordObject(35,2,-10, roomObjects.get(1), "Chair");
 			addWordObject(35,2,-45, roomObjects.get(1), "Chair");
+			roomObjectWords.add("Chair");
 			//Chalk board
 			addWordObject(0,0,65,roomObjects.get(2), "Chalkboard");
+			roomObjectWords.add("Chalkboard");
 			//BackPacks
 			addWordObject(-15,15,45,roomObjects.get(3), "Backpack");
 			addWordObject(35,4,40,roomObjects.get(3), "Backpack");
 			addWordObject(-30,-5,15,roomObjects.get(3), "Backpack");
 			addWordObject(17,15,-25,roomObjects.get(3), "Backpack");
+			roomObjectWords.add("Backpack");
 			break;
 		case 1:
 			try {
-				//Table = 0
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
+						context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
+				/*Table = 0
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-table.obj"),null, 1.5f)),
 						new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Table",WordObject.FEMININE));
 				//Chair1 = 1
@@ -225,7 +235,7 @@ public class Room extends World {
 						null, 2.0f)),new SimpleVector(0,0,0),"Knife",WordObject.MASCULINE));
 				//Spoon = 5
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-spoon.obj"),
-						null, 2.0f)),new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));
+						null, 2.0f)),new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));*/
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -240,6 +250,7 @@ public class Room extends World {
 		//Creates a new WordObject from the generic roomObject
 		//and adds it to the Room and wordObjects ArrayList
 		WordObject object = new WordObject(wordObject);
+		object.setCenter(SimpleVector.ORIGIN);
 		object.setOrigin(new SimpleVector(x,y,z));
 		object.setName(name);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
@@ -275,7 +286,7 @@ public class Room extends World {
 		//Creates a RigidBody and adds it to the DynamicWorld
 		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, ms, shape, localInertia);
 		RigidBody body = new RigidBody(rbInfo);
-		body.setRestitution(10f);
+		body.setRestitution(0.01f);
 		body.setFriction(0.01f);
 		body.setDamping(0f, 0f);
 		body.setGravity(new Vector3f(0,0,0));
@@ -391,6 +402,10 @@ public class Room extends World {
 				num = i;
 		}
 		return num;
+	}
+	
+	public ArrayList getRoomObjectWords(){
+		return roomObjectWords;
 	}
 }
 
