@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib chalkboard.mtl
+mtllib chalkboardTex.mtl
 g default
 v -5.864023 0.000000 -0.297450
 v 5.014164 0.000000 -0.297450

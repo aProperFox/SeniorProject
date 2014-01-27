@@ -24,7 +24,6 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
                         Intent i = new Intent(MenuScreen.this, GameScreen.class);
                         startActivity(i);
                     }
@@ -35,7 +34,6 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
                         Intent i = new Intent(MenuScreen.this, Settings.class);
                         startActivity(i);
                     }
@@ -47,7 +45,6 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-        				v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
                         Intent i = new Intent(MenuScreen.this, Tutorial.class);
                         startActivity(i);
                     }
@@ -59,7 +56,6 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                    	v.getBackground().setColorFilter(0xFF3C6F89,PorterDuff.Mode.ADD);
                         Intent i = new Intent(MenuScreen.this, Store.class);
                         startActivity(i);
                     }
