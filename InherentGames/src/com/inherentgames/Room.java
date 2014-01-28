@@ -24,6 +24,9 @@ public class Room extends World {
 	 * 
 	 */
 	private static final long serialVersionUID = 9088044018714661773L;
+	public static RGBColor bubbleRed = new RGBColor(226,51,34);
+	public static RGBColor bubbleBlue = new RGBColor(132,211,245);
+	
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
 	Context context;
 	public Wall wall;
@@ -37,7 +40,7 @@ public class Room extends World {
 	private ArrayList<WordObject> roomObjects;
 
 	private ArrayList<String> roomObjectWords;
-	private RGBColor bubbleColor = RGBColor.BLUE;
+	private RGBColor bubbleColor = bubbleBlue;
 	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
@@ -180,7 +183,7 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),
 						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair",WordObject.FEMININE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
-						context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/chalkboard.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
 				//
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"),
 						context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f)),new SimpleVector(0,0.8f*(float)Math.PI/2,(float)Math.PI),"Backpack",WordObject.FEMININE));
@@ -205,7 +208,7 @@ public class Room extends World {
 			addWordObject(35,2,-45, roomObjects.get(1), "Chair");
 			roomObjectWords.add("Chair");
 			//Chalk board
-			addWordObject(0,0,65,roomObjects.get(2), "Chalkboard");
+			addWordObject(0,-15,65,roomObjects.get(2), "Chalkboard");
 			roomObjectWords.add("Chalkboard");
 			//BackPacks
 			addWordObject(-15,15,45,roomObjects.get(3), "Backpack");
@@ -239,7 +242,7 @@ public class Room extends World {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			} 
 			
 			addWordObject(-35,-6,45, roomObjects.get(0), "Desk");
 			break;
@@ -255,6 +258,9 @@ public class Room extends World {
 		object.setName(name);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+		if(name == "Chalkboard"|| name == "Backpack"){
+			object.setTexture(name);
+		}
 		object.build();
 		//object.setRotationPivot(pivot);
 		addObject(object);
@@ -268,10 +274,10 @@ public class Room extends World {
 		Vector3f localInertia = new Vector3f(0, 0, 0);
 		shape.calculateLocalInertia(mass, localInertia);
 		int article = 0;
-		if(bubbleColor == RGBColor.RED){
+		if(bubbleColor == bubbleRed){
 			article = WordObject.FEMININE;
 		}
-		else if(bubbleColor == RGBColor.BLUE){
+		else if(bubbleColor == bubbleBlue){
 			article = WordObject.MASCULINE;
 		}
 		Bubble bubble = new Bubble(position, article);
@@ -301,10 +307,10 @@ public class Room extends World {
 	
 	public void setBubbleColor(int state){
 		if(state == Bubble.MASCULINE){
-			bubbleColor = RGBColor.BLUE;
+			bubbleColor = bubbleBlue;
 		}
 		else if(state == Bubble.FEMININE){
-			bubbleColor = RGBColor.RED;
+			bubbleColor = bubbleRed;
 		}
 	}
 	
@@ -317,9 +323,9 @@ public class Room extends World {
 	}
 	
 	public String getBubbleArticle(){
-		if(bubbleColor == RGBColor.BLUE)
+		if(bubbleColor == bubbleBlue)
 			return "El";
-		else if(bubbleColor == RGBColor.RED)
+		else if(bubbleColor == bubbleRed)
 			return "La";
 		return "Nada";
 	}
