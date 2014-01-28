@@ -1,8 +1,13 @@
 package com.inherentgames;
 
+import java.util.HashMap;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -11,21 +16,51 @@ import android.widget.Button;
 
 public class MenuScreen extends Activity {
 	
+	private MediaPlayer mp;
+	
+	SoundPool soundPool;
+	HashMap<Integer, Integer> soundPoolMap;
+	int soundID = 1;
+
+	Context context;
+	
+	Button sound1;
+	
 	@Override
     
     protected void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
+            context = this;
+            mp = MediaPlayer.create(this, R.raw.time_pi_theme);
+            mp.start();
+            
+            soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
+            soundPoolMap = new HashMap<Integer, Integer>();
+            soundPoolMap.put(soundID, soundPool.load(this, R.raw.bubble_up, 1));
+
+            
     requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.home);
             
             // click-handler for buttons
             Button playButton = (Button) findViewById(R.id.playbutton);
+            
+            sound1 = (Button) playButton;
             playButton.setOnClickListener(new View.OnClickListener() {
                     
                     @Override
                     public void onClick(View v) {
+                    	AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+                        float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                        float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                        int priority = 1;
+                        int no_loop = 0;
+                        float normal_playback_rate = 1f;
                         Intent i = new Intent(MenuScreen.this, GameScreen.class);
                         startActivity(i);
+                        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+                        soundPool.play(soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate);
+                    	mp.stop();
                     }
             });
             
@@ -63,6 +98,26 @@ public class MenuScreen extends Activity {
             
             
     }
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		mp.pause();
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		mp.start();
+	}
+	
+	@Override
+	public void onStop(){
+		super.onStop();
+		mp.stop();
+		//mp.release();
+	}
+	
 }
     /*
     public void onCreate(Bundle savedInstanceState){

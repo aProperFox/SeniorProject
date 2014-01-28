@@ -80,6 +80,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		
 		width = w;
 		height = h;
+		try{
 		Texture text = new Texture(context.getResources().openRawResource(R.raw.font));
 		text.setFiltering(false);
 		TextureManager.getInstance().addTexture("gui_font", text);
@@ -130,7 +131,9 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("Room0Wall3", textures[3]);*/
 		TextureManager.getInstance().addTexture("Room0Floor", textures[1]);
 		TextureManager.getInstance().addTexture("Room0Ceiling", textures[2]);
-		
+		}catch(Exception e){
+			
+		}
 		
 	}
 
