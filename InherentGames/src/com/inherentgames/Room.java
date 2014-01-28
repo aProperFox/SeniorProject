@@ -208,7 +208,7 @@ public class Room extends World {
 			addWordObject(35,2,-45, roomObjects.get(1), "Chair");
 			roomObjectWords.add("Chair");
 			//Chalk board
-			addWordObject(0,-15,65,roomObjects.get(2), "Chalkboard");
+			addWordObject(0,-13,65,roomObjects.get(2), "Chalkboard");
 			roomObjectWords.add("Chalkboard");
 			//BackPacks
 			addWordObject(-15,15,45,roomObjects.get(3), "Backpack");
@@ -219,9 +219,8 @@ public class Room extends World {
 			break;
 		case 1:
 			try {
-				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
-						context.getResources().getAssets().open("raw/chalkboardTex.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
-				/*Table = 0
+				
+				//Table = 0
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-table.obj"),null, 1.5f)),
 						new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Table",WordObject.FEMININE));
 				//Chair1 = 1
@@ -238,7 +237,7 @@ public class Room extends World {
 						null, 2.0f)),new SimpleVector(0,0,0),"Knife",WordObject.MASCULINE));
 				//Spoon = 5
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-spoon.obj"),
-						null, 2.0f)),new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));*/
+						null, 2.0f)),new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
