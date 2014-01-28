@@ -103,6 +103,15 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
 		TextureManager.getInstance().addTexture("Default", objectNames);
 		
+		Texture objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256));
+		TextureManager.getInstance().addTexture("Chalkboard", objects);
+		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
+		TextureManager.getInstance().addTexture("Backpack", objects);
+		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
+		TextureManager.getInstance().addTexture("Chair", objects);
+		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
+		TextureManager.getInstance().addTexture("Desk", objects);
+		
 		Texture[] textures = new Texture[6];
 		//set textures
 		//Walls
