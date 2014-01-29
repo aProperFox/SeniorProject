@@ -180,15 +180,19 @@ public class Room extends World {
 		switch (roomId){
 		case 0:
 			try {
-				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),null, 1.5f)),
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/desk.obj"),
+						context.getResources().getAssets().open("raw/desk.mtl"), 1.5f)),
 						new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Desk",WordObject.MASCULINE));
-				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),null,3.0f)),
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chair.obj"),
+						context.getResources().getAssets().open("raw/chair.mtl"),3.0f)),
 						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair",WordObject.FEMININE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/chalkboard.obj"),
 						context.getResources().getAssets().open("raw/chalkboard.mtl"), 6.0f)),new SimpleVector(0,(float)Math.PI,(float)Math.PI),"Chalkboard",WordObject.FEMININE));
 				//
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/backpack.obj"),
 						context.getResources().getAssets().open("raw/backpackTex.mtl"), 2.0f)),new SimpleVector(0,0.8f*(float)Math.PI/2,(float)Math.PI),"Backpack",WordObject.FEMININE));
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/calendar.obj"),
+						context.getResources().getAssets().open("raw/calendar.mtl"), 1.0f)),new SimpleVector(0,(float)Math.PI/2.0f,(float)Math.PI),"Calendar",WordObject.FEMININE));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -218,6 +222,8 @@ public class Room extends World {
 			addWordObject(-30,-5,15,roomObjects.get(3), "Backpack");
 			addWordObject(17,15,-25,roomObjects.get(3), "Backpack");
 			roomObjectWords.add("Backpack");
+			addWordObject(60,-5,20,roomObjects.get(4), "Calendar");
+			roomObjectWords.add("Calendar");
 			break;
 		case 1:
 			try {
@@ -259,7 +265,7 @@ public class Room extends World {
 		object.setName(name);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		if(name == "Chalkboard"|| name == "Backpack"){
+		if(name == "Chalkboard"|| name == "Backpack" || name == "Calendar"){
 			object.setTexture(name);
 		}
 		object.build();
