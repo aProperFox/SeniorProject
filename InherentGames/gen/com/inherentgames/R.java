@@ -9,8 +9,9 @@ package com.inherentgames;
 
 public final class R {
     public static final class anim {
-        public static final int slide_in_up=0x7f040000;
-        public static final int slide_out_up=0x7f040001;
+        public static final int bubble_up=0x7f040000;
+        public static final int slide_in_up=0x7f040001;
+        public static final int slide_out_up=0x7f040002;
     }
     public static final class attr {
     }
@@ -46,8 +47,9 @@ public final class R {
         public static final int tutorialbutton=0x7f02001c;
     }
     public static final class id {
+        public static final int ball=0x7f09000a;
         public static final int exit=0x7f090008;
-        public static final int lighting=0x7f09000a;
+        public static final int lighting=0x7f09000b;
         public static final int loading=0x7f090004;
         public static final int playbutton=0x7f090003;
         public static final int resume=0x7f090009;
