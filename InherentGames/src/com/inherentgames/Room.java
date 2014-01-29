@@ -40,7 +40,7 @@ public class Room extends World {
 	private ArrayList<WordObject> roomObjects;
 
 	private ArrayList<String> roomObjectWords;
-	private RGBColor bubbleColor = bubbleBlue;
+	private RGBColor bubbleColor;
 	
 	public Room(int roomId, Context context) {
 		this.context = context.getApplicationContext();
@@ -50,6 +50,8 @@ public class Room extends World {
 		wordObjects = new ArrayList<WordObject>();
 		bubbleObjects = new ArrayList<Bubble>();
 		roomObjects = new ArrayList<WordObject>();
+		
+		bubbleColor = bubbleBlue;
 		
 		//Adds walls to list 'walls' based on room Id, also sets wallNum variable
 		setSurfaces(roomId);
