@@ -1,29 +1,24 @@
 package com.inherentgames;
 
-import javax.vecmath.Vector3f;
-
-import android.util.Log;
-
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.PolygonManager;
 import com.threed.jpct.SimpleVector;
 
-public class WordObject extends Object3D{
-	public static int MASCULINE = 0;
-	public static int FEMININE = 1;
+public class WordObject extends Object3D {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4088731260124106298L;
+	public static final int MASCULINE = 0;
+	public static final int FEMININE = 1;
 	
 	private boolean isStatic;
-	private SimpleVector centerTranslate;
 	private float maxDimension;
 	private int objectId = -1;
-	private Transform startTransform;
-	
 	private String word;
 	private int article;
+	private String names[] = new String[2];
+	
 	
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
@@ -100,6 +95,20 @@ public class WordObject extends Object3D{
 	}
 	
 	@Override
+	public void setName(String name){
+		/**
+		 * TODO: setting for language
+		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
+		 */
+		names[Translator.ENGLISH] = name;
+		names[Translator.SPANISH] = Translator.translateToLanguage(name,Translator.SPANISH);
+	}
+	
+	public String getName(int language){
+		return names[language];
+	}
+	
+	@Override
 	public void scale(float scaleTo){
 		super.scale(scaleTo/maxDimension);
 	}
@@ -117,5 +126,5 @@ public class WordObject extends Object3D{
 	public Object3D toObject3D(){
 		return (Object3D)this;
 	}
-	
+
 }

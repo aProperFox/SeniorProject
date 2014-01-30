@@ -4,16 +4,16 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
     <application 
         android:allowBackup="true"
-        android:icon="@drawable/cover1"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         
-        <activity android:name="com.inherentgames.MainActivity"
+        <activity android:name="com.inherentgames.MenuScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
             
@@ -22,6 +22,40 @@
 	            <category android:name="android.intent.category.LAUNCHER"/>
 	        </intent-filter>
         </activity>
+        
+        <activity android:name="com.inherentgames.GameScreen"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape">
+	        
+	        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.inherentgames.GameScreen" />
+        </activity>
+        
+        <activity android:name="com.inherentgames.Tutorial"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+		</activity>
+		
+        <activity android:name="com.inherentgames.Settings"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+		</activity>
+		
+        <activity android:name="com.inherentgames.Store"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+		</activity>
+		
+        <activity android:name="com.inherentgames.Popup"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+		</activity>
+		
+        <activity android:name="com.inherentgames.LoadingScreen"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+		</activity>
+		
     </application>
 
 </manifest>

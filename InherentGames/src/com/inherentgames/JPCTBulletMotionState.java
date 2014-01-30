@@ -61,7 +61,6 @@ public class JPCTBulletMotionState extends MotionState{
 		  (-tran.origin.y) - pos.y, 
 		  (-tran.origin.z) - pos.z);
 
-    float[] ma = new float[4];
     float[] dump = obj3d.getRotationMatrix().getDump(); //new float[16]; 
     Matrix matrixGfx = new Matrix();
     MatrixUtil.getOpenGLSubMatrix(tran.basis, dump);

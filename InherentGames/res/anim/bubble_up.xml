@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" >
+
+	<ImageView
+		android:id="@+id/ball"
+		android:layout_width="100dp"
+		android:layout_height="100dp"
+		android:onClick="ballClicked"
+		android:src="@drawable/bubbleblue"
+		android:layout_gravity="center_horizontal" />
+	
+	<translate xmlns:android="http://schemas.android.com/apk/res/android"
+		android:interpolator="@android:anim/accelerate_interpolator"
+		android:duration="1000"
+		android:fromYDelta="100%p"
+		android:toYDelta="0%p" />
+</FrameLayout>

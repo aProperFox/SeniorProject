@@ -1,7 +1,14 @@
 <resources>
 
     <string name="app_name">Time P.I.</string>
-	<string name="change_lighting">Cycle Lighting</string>
-	<string name="kill_bubbles">Kill bubbles</string>
-
+    <string name="btn_newgame">New Game</string>
+    <string name="btn_exit">Exit</string>
+    <string name="btn_tutorial">Tutorial</string>
+    <string name="btn_settings">Settings</string>
+    <string name="change_lighting">Cycle Lighting</string>
+    <string name="change_physics">Cycle Physics</string>
+    <string name="bt_txt">Menu</string>
+    <string name="win_game_title">You won the level!</string>
+    <string name="win_game_text">Now let us make it a bit harder!</string>
+    <string name="ok">OK</string>
 </resources>

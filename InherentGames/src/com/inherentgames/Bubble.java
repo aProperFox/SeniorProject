@@ -7,10 +7,15 @@ import com.threed.jpct.SimpleVector;
 public class Bubble extends WordObject{
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4649047534584957279L;
 	private boolean isHolding;
 	private int heldObjectId;
 	private int objectId= -1;
 	private int bodyIndex = -1;
+	private int localBodyIndex = -1;
 	private int article;
 	
 	public Bubble(SimpleVector translation, int article){
@@ -37,6 +42,14 @@ public class Bubble extends WordObject{
 	
 	public int getHeldObjectId(){
 		return heldObjectId;
+	}
+	
+	public void setLocalBodyIndex(int index){
+		localBodyIndex = index;
+	}
+	
+	public int getLocalBodyIndex(){
+		return localBodyIndex;
 	}
 	
 	public int getArticle(){
