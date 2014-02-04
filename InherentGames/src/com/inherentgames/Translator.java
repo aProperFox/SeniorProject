@@ -11,7 +11,13 @@ public class Translator {
 		{"Desk", "Escritorio"},
 		{"Chair", "Silla"},
 		{"Chalkboard", "Pizarra"},
-		{"Backpack", "Mochila"} 
+		{"Backpack", "Mochila"}, 
+		{"Calendar", "Calendario"},
+		{"Clock", "Reloj"},
+		{"Door", "Puerta"},
+		{"Book", "Libro"},
+		{"Paper", "Papel"},
+		{"Window", "Ventana"}
 	};
 
 	public static String translateToLanguage(String word, int language){
