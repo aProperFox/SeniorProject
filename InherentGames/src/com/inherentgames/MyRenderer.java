@@ -101,19 +101,30 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("Silla", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 256, 256));
 		TextureManager.getInstance().addTexture("Mochila", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.reloj)), 256, 256));
+		TextureManager.getInstance().addTexture("Reloj", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendario)), 256, 256));
+		TextureManager.getInstance().addTexture("Calendario", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.puerta)), 256, 256));
+		TextureManager.getInstance().addTexture("Puerta", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.libro)), 256, 256));
+		TextureManager.getInstance().addTexture("Libro", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.papel)), 256, 256));
+		TextureManager.getInstance().addTexture("Papel", objectNames);
+		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ventana)), 256, 256));
+		TextureManager.getInstance().addTexture("Ventana", objectNames);
+		
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
 		TextureManager.getInstance().addTexture("Default", objectNames);
 		
 		Texture objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256));
 		TextureManager.getInstance().addTexture("Chalkboard", objects);
-		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
-		TextureManager.getInstance().addTexture("Backpack", objects);
-		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
-		TextureManager.getInstance().addTexture("Chair", objects);
-		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
-		TextureManager.getInstance().addTexture("Desk", objects);
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendar)), 256, 256));
 		TextureManager.getInstance().addTexture("Calendar", objects);
+		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.clock)), 256, 256));
+		TextureManager.getInstance().addTexture("Clock", objects);
+		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.backpack)), 256, 256));
+		TextureManager.getInstance().addTexture("Backpack", objects);
 		
 		Texture[] textures = new Texture[6];
 		//set textures
@@ -188,14 +199,13 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	private void changeLevel(){
 		clock = new Clock();
 		
+		world.dispose();
 		world = new Room(roomNum, context);
 		world.setAmbientLight(20, 20, 20);
-		
 		
 		sun = new Light(world);
 		sun.setPosition(world.getLightLocation(0));
 		sun.setIntensity(250, 250, 250);
-		
 		
 		cam = world.getCamera();
 		cam.setPosition(new SimpleVector(0,0,0));
