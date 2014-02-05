@@ -192,13 +192,13 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/calendar.obj"),
 						context.getResources().getAssets().open("raw/calendar.mtl"), 1.0f)),new SimpleVector(0,(float)Math.PI/2.0f,(float)Math.PI),"Calendar",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/clock.obj"),
-						context.getResources().getAssets().open("raw/clock.mtl"), 1.0f)),new SimpleVector(0,0,0),"Clock",WordObject.MASCULINE));
+						context.getResources().getAssets().open("raw/clock.mtl"), 1.0f)),new SimpleVector(0,-(float)Math.PI*0.15f,0),"Clock",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/door.obj"),
-						context.getResources().getAssets().open("raw/door.mtl"), 1.0f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/door.mtl"), 4.0f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/book.obj"),
 						context.getResources().getAssets().open("raw/book.mtl"), 1.0f)),new SimpleVector(0,0,0),"Book",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/paper.obj"),
-						context.getResources().getAssets().open("raw/paper.mtl"), 1.0f)),new SimpleVector(0,0,0),"Paper",WordObject.MASCULINE));
+						context.getResources().getAssets().open("raw/paper.mtl"), 1.0f)),new SimpleVector(0,(float)Math.PI/2.0f,(float)Math.PI),"Paper",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/window.obj"),
 						context.getResources().getAssets().open("raw/window.mtl"), 1.0f)),new SimpleVector(0,(float)Math.PI/2.0f,0),"Window",WordObject.FEMININE));
 			} catch (IOException e) {
@@ -210,34 +210,29 @@ public class Room extends World {
 			addWordObject(-35,-6,-10, roomObjects.get(0), "Desk");
 			addWordObject(35,-6,25, roomObjects.get(0), "Desk");
 			addWordObject(35,-6,-10, roomObjects.get(0), "Desk");
-			roomObjectWords.add("Desk");
 			//Chairs 1
 			addWordObject(-35,2,5, roomObjects.get(1), "Chair");
 			addWordObject(-35,2,-30, roomObjects.get(1), "Chair");
 			addWordObject(35,2,5, roomObjects.get(1), "Chair");
 			addWordObject(35,2,-30, roomObjects.get(1), "Chair");
-			roomObjectWords.add("Chair");
 			//Chalk board 2
 			addWordObject(0,-13,65,roomObjects.get(2), "Chalkboard");
-			roomObjectWords.add("Chalkboard");
 			//BackPacks 3
 			addWordObject(-15,15,25,roomObjects.get(3), "Backpack");
 			addWordObject(35,4,20,roomObjects.get(3), "Backpack");
 			addWordObject(17,15,-25,roomObjects.get(3), "Backpack");
-			roomObjectWords.add("Backpack");
 			//Calendar 4
 			addWordObject(60,-5,20,roomObjects.get(4), "Calendar");
-			roomObjectWords.add("Calendar");
 			//Clock 5
-			addWordObject(0,-10,-65, roomObjects.get(5), "Clock");
-			roomObjectWords.add("Clock");
+			addWordObject(-30,-20,-71, roomObjects.get(5), "Clock");
 			//Door 6
+			addWordObject(0,-19,-74, roomObjects.get(6), "Door");
 			//Book 7
+			addWordObject(10,10,20, roomObjects.get(7), "Book");
 			//Paper 8
-			//Pencil 9
-			//Window 10
+			addWordObject(0,15,25, roomObjects.get(8), "Paper");
+			//Window 9
 			addWordObject(-50,-7,0, roomObjects.get(9), "Window");
-			roomObjectWords.add("Window");
 			
 			break;
 		case 1:
@@ -245,7 +240,7 @@ public class Room extends World {
 				
 				//Table = 0
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-table.obj"),null, 1.5f)),
-						new SimpleVector((float)Math.PI,-(float)Math.PI/2,0),"Table",WordObject.FEMININE));
+						new SimpleVector(0,0,0),"Table",WordObject.FEMININE));
 				//Chair1 = 1
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/restaurant-chair.obj"),null,3.0f)),
 						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Chair",WordObject.FEMININE));
@@ -266,7 +261,7 @@ public class Room extends World {
 				e.printStackTrace();
 			} 
 			
-			addWordObject(-35,-6,45, roomObjects.get(0), "Desk");
+			addWordObject(0,0,45, roomObjects.get(0), "Table");
 			break;
 		}
 	}
@@ -283,6 +278,9 @@ public class Room extends World {
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
 		if(TextureManager.getInstance().containsTexture(name)){
 			object.setTexture(name);
+		}
+		if(!roomObjectWords.contains(name)){
+			roomObjectWords.add(name);
 		}
 		object.build();
 		//object.setRotationPivot(pivot);

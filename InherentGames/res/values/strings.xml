@@ -11,4 +11,10 @@
     <string name="win_game_title">You won the level!</string>
     <string name="win_game_text">Now let us make it a bit harder!</string>
     <string name="ok">OK</string>
+    <string name="change_level">Change Level (dev)</string>
+    <string name="play_button">PLAY</string>
+    <string name="tutorial_button">TUTORIAL</string>
+    <string name="settings_button">SETTINGS</string>
+    <string name="store_button">STORE</string>
+    <string name="easter_egg">Easter Egg found!</string>
 </resources>

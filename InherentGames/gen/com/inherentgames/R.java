@@ -55,6 +55,7 @@ public final class R {
     }
     public static final class id {
         public static final int ball=0x7f09000a;
+        public static final int change_level=0x7f09000c;
         public static final int exit=0x7f090008;
         public static final int lighting=0x7f09000b;
         public static final int loading=0x7f090004;
@@ -80,8 +81,9 @@ public final class R {
     }
     public static final class raw {
         public static final int bubble_up=0x7f050000;
-        public static final int font=0x7f050001;
-        public static final int time_pi_theme=0x7f050002;
+        public static final int fly_haircut=0x7f050001;
+        public static final int font=0x7f050002;
+        public static final int time_pi_theme=0x7f050003;
     }
     public static final class string {
         public static final int app_name=0x7f060000;
@@ -90,9 +92,15 @@ public final class R {
         public static final int btn_newgame=0x7f060001;
         public static final int btn_settings=0x7f060004;
         public static final int btn_tutorial=0x7f060003;
+        public static final int change_level=0x7f06000b;
         public static final int change_lighting=0x7f060005;
         public static final int change_physics=0x7f060006;
+        public static final int easter_egg=0x7f060010;
         public static final int ok=0x7f06000a;
+        public static final int play_button=0x7f06000c;
+        public static final int settings_button=0x7f06000e;
+        public static final int store_button=0x7f06000f;
+        public static final int tutorial_button=0x7f06000d;
         public static final int win_game_text=0x7f060009;
         public static final int win_game_title=0x7f060008;
     }

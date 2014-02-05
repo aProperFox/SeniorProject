@@ -455,7 +455,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	}
 	
 	public void levelWin(){
-		roomNum ++;
+		if(roomNum == 0)
+			roomNum ++;
 		changeLevel();
 	}
 	

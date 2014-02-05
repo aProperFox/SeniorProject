@@ -2,19 +2,25 @@ package com.inherentgames;
 
 import java.util.HashMap;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.graphics.Color;
+import android.widget.Toast;
 
 
 public class MenuScreen extends Activity {
@@ -28,12 +34,31 @@ public class MenuScreen extends Activity {
 	Context context;
 	
 	Button sound1;
+	private int easterEggCount;
+	private int width;
+	private int height;
+	private boolean canEasterEggPlay;
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	@Override
-    
     protected void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
             context = this;
+            easterEggCount = 0;
+            canEasterEggPlay = true;
+            Display display = getWindowManager().getDefaultDisplay();
+    		
+    		// Use legacy code if running on older Android versions
+    		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+    			width = display.getWidth();
+    			height = display.getHeight();
+    		} else {
+    			Point size = new Point();
+    			display.getSize(size);
+    			width = size.x;
+    			height = size.y;
+    		}
+    		
             mp = MediaPlayer.create(this, R.raw.time_pi_theme);
             mp.start();
             
@@ -45,14 +70,14 @@ public class MenuScreen extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.home);
             
-
+            int buttonTextColor = Color.rgb(156, 192, 207);
             
             Typeface typeface = Typeface.createFromAsset(getAssets(), "futura-normal.ttf"); 
             // click-handler for buttons
             Button playButton = (Button) findViewById(R.id.playbutton);
-            playButton.setTextColor(Color.parseColor("gray"));
+            playButton.setTextColor(buttonTextColor);
             playButton.setTextSize(24);
-            playButton.setText("PLAY");
+            playButton.setText(R.string.play_button);
             playButton.setTypeface(typeface);
             
             sound1 = (Button) playButton;
@@ -75,9 +100,9 @@ public class MenuScreen extends Activity {
             });
             
             Button settingsButton = (Button) findViewById(R.id.settingsbutton);
-            settingsButton.setTextColor(Color.parseColor("gray"));
+            settingsButton.setTextColor(buttonTextColor);
             settingsButton.setTextSize(24);
-            settingsButton.setText("SETTINGS");
+            settingsButton.setText(R.string.settings_button);
             settingsButton.setTypeface(typeface);
             
             settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -91,9 +116,9 @@ public class MenuScreen extends Activity {
             
             
             Button tutorialButton = (Button) findViewById(R.id.tutorialbutton);
-            tutorialButton.setTextColor(Color.parseColor("gray"));
+            tutorialButton.setTextColor(buttonTextColor);
             tutorialButton.setTextSize(24);
-            tutorialButton.setText("TUTORIAL");
+            tutorialButton.setText(R.string.tutorial_button);
             tutorialButton.setTypeface(typeface);
             
             tutorialButton.setOnClickListener(new View.OnClickListener() {
@@ -107,9 +132,9 @@ public class MenuScreen extends Activity {
             
             
             Button storeButton = (Button) findViewById(R.id.storebutton);
-            storeButton.setTextColor(Color.parseColor("gray"));
+            storeButton.setTextColor(buttonTextColor);
             storeButton.setTextSize(24);
-            storeButton.setText("STORE");
+            storeButton.setText(R.string.store_button);
             storeButton.setTypeface(typeface);
             
             storeButton.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +148,28 @@ public class MenuScreen extends Activity {
             
             
     }
+	
+	public boolean onTouchEvent(MotionEvent me){
+		float xpos = me.getX();
+		float ypos = me.getY();
+		if(me.getAction() == MotionEvent.ACTION_DOWN){
+			if(xpos > width*.35 && xpos < width*.53 && ypos> height*.08 && ypos < height*.3){
+				easterEggCount++;
+				Log.i("olsontl", "Easter egg count: " + easterEggCount);
+			}
+			Log.i("olsontl", "X at " + xpos/width + "%, Y at " + ypos/height + "%");
+		}
+		if(easterEggCount >= 3 && canEasterEggPlay == true){
+			mp.stop();
+			mp.release();
+			mp = MediaPlayer.create(context, R.raw.fly_haircut);
+            mp.start();
+            canEasterEggPlay = false;
+            Toast toast = Toast.makeText(context, R.string.easter_egg, 5);
+            toast.show();
+		}
+		return true;
+	}
 	
 	@Override
 	public void onPause(){
