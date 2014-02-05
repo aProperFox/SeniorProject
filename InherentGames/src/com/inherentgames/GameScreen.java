@@ -232,7 +232,9 @@ public class GameScreen extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
-//
+        case R.id.change_level:
+        	renderer.levelWin();
+        	return true;
         }
         return super.onOptionsItemSelected(item);
     }
