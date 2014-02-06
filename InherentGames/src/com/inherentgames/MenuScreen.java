@@ -19,6 +19,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class MenuScreen extends Activity {
     			width = size.x;
     			height = size.y;
     		}
+    		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     		
             mp = MediaPlayer.create(this, R.raw.time_pi_theme);
             mp.start();
@@ -91,7 +93,7 @@ public class MenuScreen extends Activity {
                         int priority = 1;
                         int no_loop = 0;
                         float normal_playback_rate = 1f;
-                        Intent i = new Intent(MenuScreen.this, GameScreen.class);
+                        Intent i = new Intent(MenuScreen.this, VideoScreen.class);
                         startActivity(i);
                         overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
                         soundPool.play(soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate);

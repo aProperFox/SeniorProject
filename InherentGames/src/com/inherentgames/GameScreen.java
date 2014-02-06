@@ -154,6 +154,11 @@ public class GameScreen extends Activity {
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
+				else if(xpos < width/12 && xpos > 0 && ypos > 0 && ypos < width/12){
+					isViewMode = false;
+					isShootMode = false;
+					renderer.setPauseButtonState(true);
+				}
 				else{
 					isViewMode = true;
 					isShootMode = false;
@@ -176,6 +181,7 @@ public class GameScreen extends Activity {
 				isShootMode = false;
 				isViewMode = true;
 				renderer.setFireButtonState(false);
+				renderer.setPauseButtonState(false);
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
@@ -210,8 +216,8 @@ public class GameScreen extends Activity {
 				yd = me.getY() - ypos;
 				
 				if(isViewMode){
-					renderer.setTouchTurn(xd / -100.0f);
-					renderer.setTouchTurnUp(yd / -100.0f);
+					renderer.setTouchTurn(xd / -(width/10f));
+					renderer.setTouchTurnUp(yd / -(height/10f));
 				}
 				xpos = me.getX();
 				ypos = me.getY();

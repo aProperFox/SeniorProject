@@ -16,5 +16,5 @@
     <string name="tutorial_button">TUTORIAL</string>
     <string name="settings_button">SETTINGS</string>
     <string name="store_button">STORE</string>
-    <string name="easter_egg">Easter Egg found!</string>
+    <string name="easter_egg">Easter Egg unlocked!</string>
 </resources>

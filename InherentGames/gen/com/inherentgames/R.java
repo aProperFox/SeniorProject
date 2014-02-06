@@ -39,25 +39,29 @@ public final class R {
         public static final int loading=0x7f020014;
         public static final int mochila=0x7f020015;
         public static final int papel=0x7f020016;
-        public static final int pizarra=0x7f020017;
-        public static final int play_button=0x7f020018;
-        public static final int puerta=0x7f020019;
-        public static final int reloj=0x7f02001a;
-        public static final int room0ceiling=0x7f02001b;
-        public static final int room0floor=0x7f02001c;
-        public static final int room0wall0=0x7f02001d;
-        public static final int settings_button=0x7f02001e;
-        public static final int silla=0x7f02001f;
-        public static final int splash=0x7f020020;
-        public static final int store_button=0x7f020021;
-        public static final int tutorial_button=0x7f020022;
-        public static final int ventana=0x7f020023;
+        public static final int pause_button=0x7f020017;
+        public static final int pause_button_pressed=0x7f020018;
+        public static final int pizarra=0x7f020019;
+        public static final int play_button=0x7f02001a;
+        public static final int puerta=0x7f02001b;
+        public static final int reloj=0x7f02001c;
+        public static final int room0ceiling=0x7f02001d;
+        public static final int room0floor=0x7f02001e;
+        public static final int room0wall0=0x7f02001f;
+        public static final int settings_button=0x7f020020;
+        public static final int silla=0x7f020021;
+        public static final int splash=0x7f020022;
+        public static final int store_button=0x7f020023;
+        public static final int tutorial_button=0x7f020024;
+        public static final int ventana=0x7f020025;
+        public static final int window=0x7f020026;
     }
     public static final class id {
-        public static final int ball=0x7f09000a;
-        public static final int change_level=0x7f09000c;
+        public static final int VideoView=0x7f09000a;
+        public static final int ball=0x7f09000b;
+        public static final int change_level=0x7f09000d;
         public static final int exit=0x7f090008;
-        public static final int lighting=0x7f09000b;
+        public static final int lighting=0x7f09000c;
         public static final int loading=0x7f090004;
         public static final int playbutton=0x7f090003;
         public static final int resume=0x7f090009;
@@ -75,15 +79,17 @@ public final class R {
         public static final int popup=0x7f030003;
         public static final int popupmenu=0x7f030004;
         public static final int splash=0x7f030005;
+        public static final int videoscreen=0x7f030006;
     }
     public static final class menu {
         public static final int menu=0x7f080000;
     }
     public static final class raw {
         public static final int bubble_up=0x7f050000;
-        public static final int fly_haircut=0x7f050001;
-        public static final int font=0x7f050002;
-        public static final int time_pi_theme=0x7f050003;
+        public static final int comic1a=0x7f050001;
+        public static final int fly_haircut=0x7f050002;
+        public static final int font=0x7f050003;
+        public static final int time_pi_theme=0x7f050004;
     }
     public static final class string {
         public static final int app_name=0x7f060000;

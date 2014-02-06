@@ -23,6 +23,13 @@
 	        </intent-filter>
         </activity>
         
+        <activity android:name="com.inherentgames.VideoScreen"
+             android:label="@string/app_name"
+             android:screenOrientation="landscape">
+	        <meta-data android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.inherentgames.VideoScreen" />
+		</activity>
+        
         <activity android:name="com.inherentgames.GameScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
