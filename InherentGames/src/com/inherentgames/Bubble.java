@@ -1,5 +1,6 @@
 package com.inherentgames;
 
+import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;
@@ -17,9 +18,13 @@ public class Bubble extends WordObject{
 	private int bodyIndex = -1;
 	private int localBodyIndex = -1;
 	private int article;
+	private float timeCreated;
 	
-	public Bubble(SimpleVector translation, int article){
+	public Bubble(SimpleVector translation, int article, float timeInMillis){
 		super(Primitives.getSphere(5.0f),new SimpleVector(0,0,0),"Bubble", article);
+		
+		timeCreated = timeInMillis;
+		
 		setTransparency(5);
 		setSpecularLighting(Object3D.SPECULAR_ENABLED);
 		translate(translation);
@@ -70,5 +75,9 @@ public class Bubble extends WordObject{
 	
 	public void setObjectId(int id){
 		objectId = id;
+	}
+	
+	public float getTimeCreated(){
+		return timeCreated;
 	}
 }

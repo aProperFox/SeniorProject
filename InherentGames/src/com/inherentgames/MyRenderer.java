@@ -6,11 +6,10 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -68,7 +67,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	private int height = 0;
 	
 	private String bubbleTexture = "bubbleBlue";
-	
+	private String pauseButtonState = "pauseButton";
 	private int score = 0;
 	
 	private long time = System.currentTimeMillis();
@@ -88,10 +87,16 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("bubbleRed", bubble);
 		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
 		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
+		
 		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 256, 256));
 		TextureManager.getInstance().addTexture("fireButton", buttons);
 		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 256, 256));
 		TextureManager.getInstance().addTexture("fireButtonPressed", buttons);
+		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 256, 256));
+		TextureManager.getInstance().addTexture("pauseButton", buttons);
+		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 256, 256));
+		TextureManager.getInstance().addTexture("pauseButtonPressed", buttons);
+		
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
 		TextureManager.getInstance().addTexture("Pizarra", objectNames);
@@ -175,8 +180,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		
 		collisionConfiguration = new DefaultCollisionConfiguration();
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
-		Vector3f worldAabbMin = new Vector3f(-10000,-10000,-10000);
-		Vector3f worldAabbMax = new Vector3f(10000,10000,10000);
+		Vector3f worldAabbMin = new Vector3f(-1000,-1000,-1000);
+		Vector3f worldAabbMax = new Vector3f(1000,1000,1000);
 		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
 		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
@@ -214,8 +219,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		
 		collisionConfiguration = new DefaultCollisionConfiguration();
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
-		Vector3f worldAabbMin = new Vector3f(-10000,-10000,-10000);
-		Vector3f worldAabbMax = new Vector3f(10000,10000,10000);
+		Vector3f worldAabbMin = new Vector3f(-1000,-1000,-1000);
+		Vector3f worldAabbMax = new Vector3f(1000,1000,1000);
 		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
 		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
@@ -283,6 +288,12 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 					world.getObject(bubble.getObjectId()).rotateY(0.1f);
 				}
 			}
+			else{
+				if(clock.getTimeMilliseconds() > bubble.getTimeCreated() + 5000){
+					deleteBubble(bubble);
+					continue;
+				}
+			}
 		}
 		if(lastRotateTime < (System.currentTimeMillis() - 15))
 			lastRotateTime = System.currentTimeMillis();
@@ -299,6 +310,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
 		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
 		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 256, 256, width/8, width/8, 5);
+		renderer2D.blitImage(fb, pauseButtonState, width/30, width/30, 256, 256, width/20, width/20, 100);
 		fb.display();
 		
 		if (System.currentTimeMillis() - time >= 1000) {
@@ -345,11 +357,13 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		for(int i = 0; i < world.getNumBubbles(); i++){
 			Bubble bubble = world.getBubble(i);
 			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
+				Log.i("olsontl", "bubble index is: " + bubble.getBodyIndex() + ", there are " +
+						dynamicWorld.getNumCollisionObjects() + " objects");
 				RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
 				Vector3f linearVelocity = new Vector3f(0,0,0);
 				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
-				SimpleVector motion = toSimpleVector(linearVelocity);
-				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
+				SimpleVector motion = new SimpleVector(linearVelocity.x,-linearVelocity.y,-linearVelocity.z);
+				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
 				WordObject collisionObject;
 				if(id >= 0){
 					if((collisionObject = world.getWordObject(id)) != null){
@@ -409,6 +423,15 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		}
 		else{
 			fireButtonState = "fireButton";
+		}
+	}
+	
+	public void setPauseButtonState(boolean isPressed){
+		if(isPressed){
+			pauseButtonState = "pauseButtonPressed";
+		}
+		else{
+			pauseButtonState = "pauseButton";
 		}
 	}
 	
