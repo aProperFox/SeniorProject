@@ -18,14 +18,14 @@ public class Bubble extends WordObject{
 	private int bodyIndex = -1;
 	private int localBodyIndex = -1;
 	private int article;
-	private float timeCreated;
+	private long timeCreated;
 	
-	public Bubble(SimpleVector translation, int article, float timeInMillis){
+	public Bubble(SimpleVector translation, int article, long timeInMillis){
 		super(Primitives.getSphere(5.0f),new SimpleVector(0,0,0),"Bubble", article);
 		
 		timeCreated = timeInMillis;
 		
-		setTransparency(5);
+		setTransparency(8);
 		setSpecularLighting(Object3D.SPECULAR_ENABLED);
 		translate(translation);
 		build();

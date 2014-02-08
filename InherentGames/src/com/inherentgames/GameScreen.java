@@ -100,7 +100,6 @@ public class GameScreen extends Activity {
 		renderer = new MyRenderer(this, width, height);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
-		
 		setContentView(mGLView);
 	}
 	
@@ -154,7 +153,7 @@ public class GameScreen extends Activity {
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
-				else if(xpos < width/12 && xpos > 0 && ypos > 0 && ypos < width/12){
+				else if(xpos < width && xpos > width-(width/12) && ypos > 0 && ypos < width/12){
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState(true);

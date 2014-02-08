@@ -66,12 +66,17 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	private int width = 0;
 	private int height = 0;
 	
+	private int fuelHeight = 0;
+	private int timeHeight;
+	
 	private String bubbleTexture = "bubbleBlue";
 	private String pauseButtonState = "pauseButton";
 	private int score = 0;
 	
 	private long time = System.currentTimeMillis();
 	private long lastShot = System.currentTimeMillis();
+	private long endTime;
+	
 	
 	public MyRenderer(Context c, int w, int h) {
 		context = c.getApplicationContext();
@@ -79,6 +84,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		
 		width = w;
 		height = h;
+		
 		try{
 		Texture text = new Texture(context.getResources().openRawResource(R.raw.font));
 		text.setFiltering(false);
@@ -88,14 +94,20 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
 		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
 		
-		Texture buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 256, 256));
-		TextureManager.getInstance().addTexture("fireButton", buttons);
-		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 256, 256));
-		TextureManager.getInstance().addTexture("fireButtonPressed", buttons);
-		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 256, 256));
-		TextureManager.getInstance().addTexture("pauseButton", buttons);
-		buttons = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 256, 256));
-		TextureManager.getInstance().addTexture("pauseButtonPressed", buttons);
+		Texture screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128));
+		TextureManager.getInstance().addTexture("fireButton", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128));
+		TextureManager.getInstance().addTexture("fireButtonPressed", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128));
+		TextureManager.getInstance().addTexture("pauseButton", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128));
+		TextureManager.getInstance().addTexture("pauseButtonPressed", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 32, 1024));
+		TextureManager.getInstance().addTexture("FuelBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 32, 1024));
+		TextureManager.getInstance().addTexture("TimeBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024));
+		TextureManager.getInstance().addTexture("ScoreBars", screenImages);
 		
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
@@ -199,6 +211,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			dynamicWorld.addRigidBody(world.getBody(i));
 		}
 	
+		timeHeight = (int)(height*75);
+		endTime = System.currentTimeMillis() + 100000;
 	}
 
 	private void changeLevel(){
@@ -238,6 +252,9 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			dynamicWorld.addRigidBody(world.getBody(i));
 		}
 	
+		timeHeight = (int)(height*75);
+		endTime = System.currentTimeMillis() + 100000;
+		fuelHeight = 0;
 	}
 	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -278,6 +295,37 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			touchTurnUp = 0;
 		}
 		
+		float ms = clock.getTimeMicroseconds();
+		clock.reset();
+		dynamicWorld.stepSimulation(ms / 1000000f);
+		fb.clear(back);
+		
+		world.renderScene(fb);
+		world.draw(fb);
+		renderer2D.blitCrosshair(fb, width, height);
+		//Bubble image
+		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
+		//Bubble text
+		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
+		//Fire Button
+		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
+		//Pause Button
+		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/30, 128, 128, width/20, width/20, 100);
+		//Dynamic fuel/time bars
+		if(endTime - System.currentTimeMillis() > 0){
+			timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.75));
+		}
+		else{
+			levelLose();
+		}
+		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 32, 1024, width/38, fuelHeight, (int)(height*0.75), 100);
+		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.75), 100);
+		//Score bars
+		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 256, 1024, width/8, (int)(height*0.9), 100);
+		
+		
+		fb.display();
+		
 		checkBubble();
 		for(Bubble bubble : world.getBubbleObjects()) {
 			if(bubble.isHolding()){
@@ -289,36 +337,16 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 				}
 			}
 			else{
-				if(clock.getTimeMilliseconds() > bubble.getTimeCreated() + 5000){
+				/* Currently, the bubble pops but the next one shot breaks the physics engine.
+				if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
 					deleteBubble(bubble);
 					continue;
-				}
+				}*/
 			}
 		}
 		if(lastRotateTime < (System.currentTimeMillis() - 15))
 			lastRotateTime = System.currentTimeMillis();
 		
-		float ms = clock.getTimeMicroseconds();
-		clock.reset();
-		dynamicWorld.stepSimulation(ms / 1000000f);
-		fb.clear(back);
-		
-		world.renderScene(fb);
-		world.draw(fb);
-		renderer2D.blitCrosshair(fb, width, height);
-		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
-		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
-		renderer2D.blitText("Score: " + score, width-width/9, height/20, width/95, height/16, RGBColor.WHITE);
-		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 256, 256, width/8, width/8, 5);
-		renderer2D.blitImage(fb, pauseButtonState, width/30, width/30, 256, 256, width/20, width/20, 100);
-		fb.display();
-		
-		if (System.currentTimeMillis() - time >= 1000) {
-			Logger.log(fps + "fps");
-			fps = 0;
-			time = System.currentTimeMillis();
-		}
-		fps++;
 	}
 	
 	public void setTouchTurnUp(float value){
@@ -357,8 +385,6 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		for(int i = 0; i < world.getNumBubbles(); i++){
 			Bubble bubble = world.getBubble(i);
 			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
-				Log.i("olsontl", "bubble index is: " + bubble.getBodyIndex() + ", there are " +
-						dynamicWorld.getNumCollisionObjects() + " objects");
 				RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
 				Vector3f linearVelocity = new Vector3f(0,0,0);
 				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
@@ -437,17 +463,19 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	
 	public boolean hasWonGame(){
 		ArrayList<String> tempWords = world.getRoomObjectWords();
+		int listLength = tempWords.size();
+		float numWordsCaptured = 0;
 		for(int i = 0; i < tempWords.size(); i++){
-			boolean doesWordExist = false;
 			for(int j = 0; j < bubbleWords.size(); j++){
 				if(bubbleWords.get(j) == tempWords.get(i)){
-					doesWordExist = true;
+					numWordsCaptured++;
 					break;
 				}
 			}
-			if(!doesWordExist){
-				return false;
-			}
+		}
+		fuelHeight = (int)((float)(numWordsCaptured/listLength)*(height*0.75));
+		if(numWordsCaptured != listLength){
+			return false;
 		}
 		levelWin();
 		return true;
@@ -480,6 +508,10 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	public void levelWin(){
 		if(roomNum == 0)
 			roomNum ++;
+		changeLevel();
+	}
+	
+	public void levelLose(){
 		changeLevel();
 	}
 	

@@ -4,11 +4,12 @@
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:layout_gravity="center"
-  android:gravity="center">
+  android:gravity="center"
+  android:background="@color/black">
 
       <VideoView 
          android:layout_height="fill_parent"
          android:layout_width="fill_parent" 
-         android:id="@+id/VideoView" />
+         android:id="@+id/VideoView"/>
 
 </RelativeLayout>
