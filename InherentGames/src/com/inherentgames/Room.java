@@ -40,7 +40,6 @@ public class Room extends World {
 	private ArrayList<WordObject> roomObjects;
 	private ArrayList<String> roomObjectWords;
 	
-	Clock clock;
 	
 	private RGBColor bubbleColor;
 	
@@ -48,7 +47,6 @@ public class Room extends World {
 		this.context = context.getApplicationContext();
 		
 		roomObjectWords = new ArrayList<String>();
-		clock = new Clock();
 		wordObjects = new ArrayList<WordObject>();
 		bubbleObjects = new ArrayList<Bubble>();
 		roomObjects = new ArrayList<WordObject>();
@@ -309,7 +307,7 @@ public class Room extends World {
 		else if(bubbleColor == bubbleBlue){
 			article = WordObject.MASCULINE;
 		}
-		Bubble bubble = new Bubble(position, article, clock.getTimeMilliseconds());
+		Bubble bubble = new Bubble(position, article, System.currentTimeMillis());
 		bubble.setAdditionalColor(bubbleColor);
 		bubble.setTexture("Default");
 		bubble.calcTextureWrapSpherical();

@@ -15,6 +15,20 @@ public final class R {
     }
     public static final class attr {
     }
+    public static final class color {
+        public static final int article_title=0x7f06000a;
+        public static final int articlecolor=0x7f060009;
+        public static final int black=0x7f060004;
+        public static final int blue=0x7f060006;
+        public static final int blueback=0x7f060008;
+        public static final int cachecolor=0x7f06000b;
+        public static final int date_color=0x7f060003;
+        public static final int gold=0x7f060007;
+        public static final int gray=0x7f060005;
+        public static final int orange=0x7f060000;
+        public static final int transparent=0x7f060002;
+        public static final int white=0x7f060001;
+    }
     public static final class drawable {
         public static final int backpack=0x7f020000;
         public static final int bubbleblue=0x7f020001;
@@ -32,45 +46,50 @@ public final class R {
         public static final int firebutton=0x7f02000d;
         public static final int firebuttonpressed=0x7f02000e;
         public static final int floor=0x7f02000f;
-        public static final int ic_launcher=0x7f020010;
-        public static final int icon=0x7f020011;
-        public static final int lapiz=0x7f020012;
-        public static final int libro=0x7f020013;
-        public static final int loading=0x7f020014;
-        public static final int mochila=0x7f020015;
-        public static final int papel=0x7f020016;
-        public static final int pause_button=0x7f020017;
-        public static final int pause_button_pressed=0x7f020018;
-        public static final int pizarra=0x7f020019;
-        public static final int play_button=0x7f02001a;
-        public static final int puerta=0x7f02001b;
-        public static final int reloj=0x7f02001c;
-        public static final int room0ceiling=0x7f02001d;
-        public static final int room0floor=0x7f02001e;
-        public static final int room0wall0=0x7f02001f;
-        public static final int settings_button=0x7f020020;
-        public static final int silla=0x7f020021;
-        public static final int splash=0x7f020022;
-        public static final int store_button=0x7f020023;
-        public static final int tutorial_button=0x7f020024;
-        public static final int ventana=0x7f020025;
-        public static final int window=0x7f020026;
+        public static final int fuel_bar_arrow=0x7f020010;
+        public static final int ic_launcher=0x7f020011;
+        public static final int icon=0x7f020012;
+        public static final int info_bar=0x7f020013;
+        public static final int lapiz=0x7f020014;
+        public static final int libro=0x7f020015;
+        public static final int loading=0x7f020016;
+        public static final int mochila=0x7f020017;
+        public static final int papel=0x7f020018;
+        public static final int pause_button=0x7f020019;
+        public static final int pause_button_pressed=0x7f02001a;
+        public static final int pizarra=0x7f02001b;
+        public static final int play_button=0x7f02001c;
+        public static final int puerta=0x7f02001d;
+        public static final int reloj=0x7f02001e;
+        public static final int room0ceiling=0x7f02001f;
+        public static final int room0floor=0x7f020020;
+        public static final int room0wall0=0x7f020021;
+        public static final int score_bars=0x7f020022;
+        public static final int settings_button=0x7f020023;
+        public static final int silla=0x7f020024;
+        public static final int splash=0x7f020025;
+        public static final int store_button=0x7f020026;
+        public static final int time_bar=0x7f020027;
+        public static final int tutorial_button=0x7f020028;
+        public static final int ventana=0x7f020029;
+        public static final int window=0x7f02002a;
+        public static final int word_bar=0x7f02002b;
     }
     public static final class id {
-        public static final int VideoView=0x7f09000a;
-        public static final int ball=0x7f09000b;
-        public static final int change_level=0x7f09000d;
-        public static final int exit=0x7f090008;
-        public static final int lighting=0x7f09000c;
-        public static final int loading=0x7f090004;
-        public static final int playbutton=0x7f090003;
-        public static final int resume=0x7f090009;
-        public static final int settings=0x7f090007;
-        public static final int settingsbutton=0x7f090000;
-        public static final int start=0x7f090005;
-        public static final int storebutton=0x7f090002;
-        public static final int tutorial=0x7f090006;
-        public static final int tutorialbutton=0x7f090001;
+        public static final int VideoView=0x7f0a000a;
+        public static final int ball=0x7f0a000b;
+        public static final int change_level=0x7f0a000d;
+        public static final int exit=0x7f0a0008;
+        public static final int lighting=0x7f0a000c;
+        public static final int loading=0x7f0a0004;
+        public static final int playbutton=0x7f0a0003;
+        public static final int resume=0x7f0a0009;
+        public static final int settings=0x7f0a0007;
+        public static final int settingsbutton=0x7f0a0000;
+        public static final int start=0x7f0a0005;
+        public static final int storebutton=0x7f0a0002;
+        public static final int tutorial=0x7f0a0006;
+        public static final int tutorialbutton=0x7f0a0001;
     }
     public static final class layout {
         public static final int home=0x7f030000;
@@ -82,7 +101,7 @@ public final class R {
         public static final int videoscreen=0x7f030006;
     }
     public static final class menu {
-        public static final int menu=0x7f080000;
+        public static final int menu=0x7f090000;
     }
     public static final class raw {
         public static final int bubble_up=0x7f050000;
@@ -92,23 +111,23 @@ public final class R {
         public static final int time_pi_theme=0x7f050004;
     }
     public static final class string {
-        public static final int app_name=0x7f060000;
-        public static final int bt_txt=0x7f060007;
-        public static final int btn_exit=0x7f060002;
-        public static final int btn_newgame=0x7f060001;
-        public static final int btn_settings=0x7f060004;
-        public static final int btn_tutorial=0x7f060003;
-        public static final int change_level=0x7f06000b;
-        public static final int change_lighting=0x7f060005;
-        public static final int change_physics=0x7f060006;
-        public static final int easter_egg=0x7f060010;
-        public static final int ok=0x7f06000a;
-        public static final int play_button=0x7f06000c;
-        public static final int settings_button=0x7f06000e;
-        public static final int store_button=0x7f06000f;
-        public static final int tutorial_button=0x7f06000d;
-        public static final int win_game_text=0x7f060009;
-        public static final int win_game_title=0x7f060008;
+        public static final int app_name=0x7f070000;
+        public static final int bt_txt=0x7f070007;
+        public static final int btn_exit=0x7f070002;
+        public static final int btn_newgame=0x7f070001;
+        public static final int btn_settings=0x7f070004;
+        public static final int btn_tutorial=0x7f070003;
+        public static final int change_level=0x7f07000b;
+        public static final int change_lighting=0x7f070005;
+        public static final int change_physics=0x7f070006;
+        public static final int easter_egg=0x7f070010;
+        public static final int ok=0x7f07000a;
+        public static final int play_button=0x7f07000c;
+        public static final int settings_button=0x7f07000e;
+        public static final int store_button=0x7f07000f;
+        public static final int tutorial_button=0x7f07000d;
+        public static final int win_game_text=0x7f070009;
+        public static final int win_game_title=0x7f070008;
     }
     public static final class style {
         /** 
@@ -132,10 +151,10 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f070000;
+        public static final int AppBaseTheme=0x7f080000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f070001;
+        public static final int AppTheme=0x7f080001;
     }
 }
