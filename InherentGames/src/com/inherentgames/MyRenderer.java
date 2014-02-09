@@ -7,9 +7,9 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
 import android.content.Context;
+import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -21,7 +21,6 @@ import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
-import com.threed.jpct.Logger;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
@@ -108,7 +107,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("TimeBar", screenImages);
 		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024));
 		TextureManager.getInstance().addTexture("ScoreBars", screenImages);
-		
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 2048, 256));
+		TextureManager.getInstance().addTexture("InfoBar", screenImages);
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
 		TextureManager.getInstance().addTexture("Pizarra", objectNames);
@@ -211,7 +211,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			dynamicWorld.addRigidBody(world.getBody(i));
 		}
 	
-		timeHeight = (int)(height*75);
+		timeHeight = (int)(height*0.76);
 		endTime = System.currentTimeMillis() + 100000;
 	}
 
@@ -238,6 +238,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
 		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
+		dynamicWorld.destroy();
 		dynamicWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 		dynamicWorld.setGravity(new Vector3f(0,-10,0));
 		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
@@ -252,7 +253,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			dynamicWorld.addRigidBody(world.getBody(i));
 		}
 	
-		timeHeight = (int)(height*75);
+		timeHeight = (int)(height*0.76);
 		endTime = System.currentTimeMillis() + 100000;
 		fuelHeight = 0;
 	}
@@ -310,16 +311,18 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		//Fire Button
 		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
 		//Pause Button
-		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/30, 128, 128, width/20, width/20, 100);
+		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
+		//Info Bar
+		renderer2D.blitImage(fb, "InfoBar", (int)(width*0.4646), (int)(height*.1185), 2048, 256, (int)(width*0.93), (int)(height*0.237), 100);
 		//Dynamic fuel/time bars
 		if(endTime - System.currentTimeMillis() > 0){
-			timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.75));
+			timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
 		}
 		else{
 			levelLose();
 		}
-		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 32, 1024, width/38, fuelHeight, (int)(height*0.75), 100);
-		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.75), 100);
+		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 32, 1024, width/38, fuelHeight, (int)(height*0.76), 100);
+		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.76), 100);
 		//Score bars
 		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 256, 1024, width/8, (int)(height*0.9), 100);
 		
@@ -506,9 +509,14 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	}
 	
 	public void levelWin(){
+		Intent intent = new Intent(context, GameScreen.class);
+	    intent.setClass(context, VideoScreen.class);
+	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic1b");
+	    context.startActivity(intent);
+		changeLevel();
 		if(roomNum == 0)
 			roomNum ++;
-		changeLevel();
 	}
 	
 	public void levelLose(){

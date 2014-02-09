@@ -40,6 +40,8 @@ public class MenuScreen extends Activity {
 	private int height;
 	private boolean canEasterEggPlay;
 	
+	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
+	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	@Override
     protected void onCreate(Bundle savedInstanceState){
@@ -69,7 +71,7 @@ public class MenuScreen extends Activity {
             soundPoolMap.put(soundID, soundPool.load(this, R.raw.bubble_up, 1));
 
             
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.home);
             
             int buttonTextColor = Color.rgb(156, 192, 207);
@@ -94,6 +96,7 @@ public class MenuScreen extends Activity {
                         int no_loop = 0;
                         float normal_playback_rate = 1f;
                         Intent i = new Intent(MenuScreen.this, VideoScreen.class);
+                        i.putExtra(EXTRA_MESSAGE, "comic1a");
                         startActivity(i);
                         overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
                         soundPool.play(soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate);
