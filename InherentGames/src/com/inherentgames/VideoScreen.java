@@ -51,6 +51,7 @@ public class VideoScreen extends Activity{
 		if(me.getAction() == MotionEvent.ACTION_DOWN){
 			videoView.stopPlayback();
 			Intent intent = new Intent(VideoScreen.this, GameScreen.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
             finish();
 		}
