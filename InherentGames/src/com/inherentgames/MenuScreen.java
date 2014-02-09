@@ -1,5 +1,6 @@
 package com.inherentgames;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import android.annotation.TargetApi;
@@ -65,17 +66,21 @@ public class MenuScreen extends Activity {
     			height = size.y;
     		}
     		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    		
-            mp = MediaPlayer.create(this, R.raw.time_pi_theme);
-            mp.start();
-            
-            soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
-            soundPoolMap = new HashMap<Integer, Integer>();
-            soundPoolMap.put(soundID, soundPool.load(this, R.raw.bubble_up, 1));
 
             
             requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.home);
+            
+            try {
+	            mp = MediaPlayer.create(this, R.raw.time_pi_theme);
+	            mp.start();
+            } catch (Exception e) {
+            	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
+            }
+            
+            soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
+            soundPoolMap = new HashMap<Integer, Integer>();
+            soundPoolMap.put(soundID, soundPool.load(this, R.raw.bubble_up, 1));
             
             buttonTextColor = Color.rgb(156, 192, 207);
             
@@ -89,7 +94,7 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick(View v) {
-                    	AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
+                    	AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
                         float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                         int priority = 1;
                         int no_loop = 0;
@@ -159,7 +164,7 @@ public class MenuScreen extends Activity {
 			mp = MediaPlayer.create(context, R.raw.fly_haircut);
             mp.start();
             canEasterEggPlay = false;
-            Toast toast = Toast.makeText(context, R.string.easter_egg, 5);
+            Toast toast = Toast.makeText(context, R.string.easter_egg, Toast.LENGTH_LONG);
             toast.show();
 		}
 		return true;
@@ -174,14 +179,18 @@ public class MenuScreen extends Activity {
 	@Override
 	public void onResume(){
 		super.onResume();
-		mp.start();
+		try {
+            mp.start();
+        } catch (Exception e) {
+        	Log.e("MenuScreen", "Something went wrong with the MediaPlayer: " + e.getMessage());
+        }
 	}
 	
 	@Override
 	public void onStop(){
 		super.onStop();
 		mp.stop();
-		//mp.release();
+		mp.release();
 	}
 	
 	private void setButtonConfig(Button button, String text){
