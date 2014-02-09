@@ -225,7 +225,7 @@ public class Room extends World {
 			//Clock 5
 			addWordObject(-30,-20,-71, roomObjects.get(5), "Clock");
 			//Door 6
-			addWordObject(-5,-19,-74, roomObjects.get(6), "Door");
+			addWordObject(-5,-13,-74, roomObjects.get(6), "Door");
 			//Book 7
 			addWordObject(10,15,20, roomObjects.get(7), "Book");
 			addWordObject(-10,15,30, roomObjects.get(7), "Book");
@@ -321,12 +321,9 @@ public class Room extends World {
 		//Creates a RigidBody and adds it to the DynamicWorld
 		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, ms, shape, localInertia);
 		RigidBody body = new RigidBody(rbInfo);
-		body.setRestitution(0.01f);
-		body.setFriction(0.01f);
-		body.setDamping(0f, 0f);
+		body.setRestitution(0f);
+		body.setFriction(0f);
 		body.setGravity(new Vector3f(0,0,0));
-		body.setUserPointer(getObject(bubble.getObjectId()));
-		getObject(bubble.getObjectId()).setUserObject(body);
 		bubbles.add(body);
 		bubble.setLocalBodyIndex(bubbles.size()-1);
 		bubbleObjects.add(bubble);
@@ -359,17 +356,6 @@ public class Room extends World {
 		return "Nada";
 	}
 	
-	public int getNumObjectsByRoomId(int room){
-		//Returns the number of WordObjects per room
-		int num = 0;
-		switch(room){
-		case 0:
-			num = 19;
-			break;
-		}
-		return num;
-	}
-	
 	public int getBubbleCounter(){
 		return bubbles.size();
 	}
@@ -393,6 +379,10 @@ public class Room extends World {
 				return wordObject;
 		}
 		return null;
+	}
+	
+	public int getNumWordObjects(){
+		return wordObjects.size();
 	}
 	
 	public boolean isBubbleType(int id){
