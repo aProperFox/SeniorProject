@@ -1,6 +1,7 @@
 package com.inherentgames;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -8,8 +9,12 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.opengl.GLSurfaceView;
-import android.support.v4.app.FragmentActivity;
+import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -30,7 +35,7 @@ import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
+class MyRenderer implements GLSurfaceView.Renderer{
 	private FrameBuffer fb = null;
 	private Room world = null;
 	private RGBColor back = new RGBColor(50,50,100);
@@ -70,12 +75,19 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	
 	private String bubbleTexture = "bubbleBlue";
 	private String pauseButtonState = "pauseButton";
-	private int score = 0;
 	
-	private long time = System.currentTimeMillis();
 	private long lastShot = System.currentTimeMillis();
 	private long endTime;
+	private long timeLeft;
 	
+	private Handler handler = new Handler();
+	
+	private SoundPool soundPool;
+	HashMap<Integer, Integer> soundPoolMap;
+	int soundID = 1;
+	
+	private boolean isLocked;
+	private boolean isPaused;
 	
 	public MyRenderer(Context c, int w, int h) {
 		context = c.getApplicationContext();
@@ -107,9 +119,9 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("TimeBar", screenImages);
 		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024));
 		TextureManager.getInstance().addTexture("ScoreBars", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 2048, 256));
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 1024, 256));
 		TextureManager.getInstance().addTexture("InfoBar", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 2048, 256));
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 64, 64));
 		TextureManager.getInstance().addTexture("ScoreArrow", screenImages);
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
@@ -167,6 +179,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 			
 		}
 		
+		
 	}
 
 	public void onSurfaceChanged(GL10 gl, int w, int h) {
@@ -196,7 +209,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
 		Vector3f worldAabbMin = new Vector3f(-1000,-1000,-1000);
 		Vector3f worldAabbMax = new Vector3f(1000,1000,1000);
-		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
+		
+		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax, world.getNumWordObjects() + 50);
 		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
 		dynamicWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
@@ -215,6 +229,21 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	
 		timeHeight = (int)(height*0.76);
 		endTime = System.currentTimeMillis() + 100000;
+		
+		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
+        soundPoolMap = new HashMap<Integer, Integer>();
+        soundPoolMap.put(1, soundPool.load(context, R.raw.escritorio, 1));
+        soundPoolMap.put(2, soundPool.load(context, R.raw.silla, 1));
+        soundPoolMap.put(3, soundPool.load(context, R.raw.pizarra, 1));
+        soundPoolMap.put(4, soundPool.load(context, R.raw.mochila, 1));
+        soundPoolMap.put(5, soundPool.load(context, R.raw.calendario, 1));
+        soundPoolMap.put(6, soundPool.load(context, R.raw.reloj, 1));
+        soundPoolMap.put(7, soundPool.load(context, R.raw.puerta, 1));
+        soundPoolMap.put(8, soundPool.load(context, R.raw.libro, 1));
+        soundPoolMap.put(9, soundPool.load(context, R.raw.papel, 1));
+        soundPoolMap.put(10, soundPool.load(context, R.raw.ventana, 1));
+        isLocked = false;
+        isPaused = false;
 	}
 
 	private void changeLevel(){
@@ -237,7 +266,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
 		Vector3f worldAabbMin = new Vector3f(-1000,-1000,-1000);
 		Vector3f worldAabbMax = new Vector3f(1000,1000,1000);
-		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax);
+		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax, 200);
 		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
 		dynamicWorld.destroy();
@@ -258,6 +287,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		timeHeight = (int)(height*0.76);
 		endTime = System.currentTimeMillis() + 100000;
 		fuelHeight = 0;
+		isLocked = false;
 	}
 	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -300,7 +330,11 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		
 		float ms = clock.getTimeMicroseconds();
 		clock.reset();
-		dynamicWorld.stepSimulation(ms / 1000000f);
+		if(!isLocked){
+			isLocked = true;
+			dynamicWorld.stepSimulation(ms / 1000000f);
+			isLocked = false;
+		}
 		fb.clear(back);
 		
 		world.renderScene(fb);
@@ -315,44 +349,52 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		//Pause Button
 		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
 		//Info Bar
-		renderer2D.blitImage(fb, "InfoBar", (int)(width*0.4646), (int)(height*.1185), 2048, 256, (int)(width*0.93), (int)(height*0.237), 100);
+		renderer2D.blitImage(fb, "InfoBar", (int)(width*0.5), (int)(height*.222), 1024, 255, (int)(width), (int)(height*0.444), 100);
 		//Dynamic fuel/time bars
-		if(endTime - System.currentTimeMillis() > 0){
-			timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
-		}
-		else{
-			levelLose();
+		if(!isPaused){
+			if(endTime - System.currentTimeMillis() > 0){
+				timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
+			}
+			else{
+				levelLose();
+			}
 		}
 		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 32, 1024, width/38, fuelHeight, (int)(height*0.76), 100);
 		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.76), 100);
 		//Score bars
 		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 256, 1024, width/8, (int)(height*0.9), 100);
-		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.45 + height/2)- fuelHeight, 64, 64, width/39, width/38, 100);
+		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 64, 64, width/38, width/38, 100);
 		
 		
 		fb.display();
-		
-		checkBubble();
-		for(Bubble bubble : world.getBubbleObjects()) {
-			if(bubble.isHolding()){
-				Object3D obj = world.getObject(bubble.getHeldObjectId());
-				obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
-				if(lastRotateTime < (System.currentTimeMillis() - 15)){
-					obj.rotateY(0.1f);
-					world.getObject(bubble.getObjectId()).rotateY(0.1f);
+		if(!isLocked){
+			isLocked = true;
+			for(Bubble bubble : world.getBubbleObjects()) {
+				if(bubble.isHolding()){
+					Object3D obj = world.getObject(bubble.getHeldObjectId());
+					obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
+					if(lastRotateTime < (System.currentTimeMillis() - 15)){
+						obj.rotateY(0.1f);
+						world.getObject(bubble.getObjectId()).rotateY(0.1f);
+					}
+				}
+				else{
+					/* Currently, the bubble pops but the next one shot breaks the physics engine.
+					if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
+						deleteBubble(bubble);
+						continue;
+					}*/
 				}
 			}
-			else{
-				/* Currently, the bubble pops but the next one shot breaks the physics engine.
-				if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
-					deleteBubble(bubble);
-					continue;
-				}*/
-			}
+			isLocked = false;
 		}
 		if(lastRotateTime < (System.currentTimeMillis() - 15))
 			lastRotateTime = System.currentTimeMillis();
-		
+		if(!isLocked){
+			isLocked = true;
+			checkBubble();
+			isLocked = false;
+		}
 	}
 	
 	public void setTouchTurnUp(float value){
@@ -372,15 +414,21 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	}
 	
 	public RigidBody shoot(SimpleVector position){
-		if ((System.currentTimeMillis()-lastShot) > 1000){
-			RigidBody body = world.addBubble(position);
-			dynamicWorld.addRigidBody(body);
-			int size = dynamicWorld.getCollisionObjectArray().size();
-			body = (RigidBody) dynamicWorld.getCollisionObjectArray().get(size-1);
-			body.setGravity(new Vector3f(0,0,0));
-			world.getLastBubble().setBodyIndex(size-1);
-			lastShot = System.currentTimeMillis();
-			return body;
+		if(!isPaused){
+			if(System.currentTimeMillis() > lastShot + 500){
+				RigidBody body = world.addBubble(position);
+				if(body != null){
+					Log.i("olsontl", "Before adding bubble to physics world");
+					dynamicWorld.addRigidBody(body);
+					int size = dynamicWorld.getCollisionObjectArray().size();
+					body = (RigidBody) dynamicWorld.getCollisionObjectArray().get(size-1);
+					body.setGravity(new Vector3f(0,0,0));
+					world.getLastBubble().setBodyIndex(size-1);
+					lastShot = System.currentTimeMillis();
+					Log.i("olsontl", "After adding bubble to physics world: " );
+					return body;
+				}
+			}
 		}
 		return null;
 	}
@@ -400,25 +448,23 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 				if(id >= 0){
 					if((collisionObject = world.getWordObject(id)) != null){
 						if(collisionObject.getArticle() == bubble.getArticle()){
-							bubbleWords.add(collisionObject.getWord());
+							bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
 							collisionObject.scale(5.0f);
 							bubble.setHeldObjectId(id);
 							//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
 							bubble.setTexture(collisionObject.getName(Translator.SPANISH));
 							bubble.calcTextureWrap();
 							bubble.build();
-							score += 100;
+							soundPool.play(Translator.getIndexByWord(collisionObject.getName(Translator.SPANISH)) + 1, 3, 3, 1, 0, 1f);
 							hasWonGame();
 							return 0;
 						}
 						else{
 							deleteBubble(bubble);
-							score -= 25;
 							return 0;
 						}
 					}
 					else if(world.isBubbleType(id)){
-						score -= 10;
 						Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
 						world.removeObject(bubbleCollisionObject.getHeldObjectId());
 						deleteBubble(bubbleCollisionObject);
@@ -458,11 +504,15 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		}
 	}
 	
-	public void setPauseButtonState(boolean isPressed){
-		if(isPressed){
+	public void setPauseButtonState(){
+		if(pauseButtonState == "pauseButton"){
+			isPaused = true;
+			timeLeft = endTime - System.currentTimeMillis();
 			pauseButtonState = "pauseButtonPressed";
 		}
 		else{
+			endTime = System.currentTimeMillis() + timeLeft;
+			isPaused = false;
 			pauseButtonState = "pauseButton";
 		}
 	}
@@ -512,14 +562,21 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 	}
 	
 	public void levelWin(){
-		Intent intent = new Intent(context, GameScreen.class);
-	    intent.setClass(context, VideoScreen.class);
-	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic1b");
-	    context.startActivity(intent);
-		changeLevel();
-		if(roomNum == 0)
-			roomNum ++;
+	        handler.post(new Runnable(){
+	            public void run(){
+	            	Toast toast = Toast.makeText(context, R.string.win_game_title, 5);
+	                toast.show();
+	        		Intent intent = new Intent(context, GameScreen.class);
+	        	    intent.setClass(context, VideoScreen.class);
+	        	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	        	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic1b");
+	        	    context.startActivity(intent);
+	        		if(roomNum == 0)
+	        			roomNum ++;
+	            }
+	        });
+		
+
 	}
 	
 	public void levelLose(){

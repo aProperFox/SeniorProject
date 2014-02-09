@@ -29,4 +29,17 @@ public class Translator {
 		}
 		return null;
 	}
+	
+	public static int getIndexByWord(String word){
+		for(int i = 0; i < wordList.length; i++){
+			for(int j = 0; j < wordList[0].length; j++){
+				if(wordList[i][j] == word){
+					Log.i("olsontl", "Word + id: " + wordList[i][j] + " " + i);
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
 }

@@ -105,11 +105,21 @@ public final class R {
     }
     public static final class raw {
         public static final int bubble_up=0x7f050000;
-        public static final int comic1a=0x7f050001;
-        public static final int comic1b=0x7f050002;
-        public static final int fly_haircut=0x7f050003;
-        public static final int font=0x7f050004;
-        public static final int time_pi_theme=0x7f050005;
+        public static final int calendario=0x7f050001;
+        public static final int comic1a=0x7f050002;
+        public static final int comic1b=0x7f050003;
+        public static final int escritorio=0x7f050004;
+        public static final int fly_haircut=0x7f050005;
+        public static final int font=0x7f050006;
+        public static final int libro=0x7f050007;
+        public static final int mochila=0x7f050008;
+        public static final int papel=0x7f050009;
+        public static final int pizarra=0x7f05000a;
+        public static final int puerta=0x7f05000b;
+        public static final int reloj=0x7f05000c;
+        public static final int silla=0x7f05000d;
+        public static final int time_pi_theme=0x7f05000e;
+        public static final int ventana=0x7f05000f;
     }
     public static final class string {
         public static final int app_name=0x7f070000;

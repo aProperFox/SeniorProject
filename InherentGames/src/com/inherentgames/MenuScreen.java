@@ -40,6 +40,9 @@ public class MenuScreen extends Activity {
 	private int height;
 	private boolean canEasterEggPlay;
 	
+	private int buttonTextColor;
+	private Typeface typeface;
+	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -74,15 +77,12 @@ public class MenuScreen extends Activity {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
             setContentView(R.layout.home);
             
-            int buttonTextColor = Color.rgb(156, 192, 207);
+            buttonTextColor = Color.rgb(156, 192, 207);
             
-            Typeface typeface = Typeface.createFromAsset(getAssets(), "futura-normal.ttf"); 
+            typeface = Typeface.createFromAsset(getAssets(), "futura-normal.ttf"); 
             // click-handler for buttons
             Button playButton = (Button) findViewById(R.id.playbutton);
-            playButton.setTextColor(buttonTextColor);
-            playButton.setTextSize(24);
-            playButton.setText(R.string.play_button);
-            playButton.setTypeface(typeface);
+            setButtonConfig(playButton, getString(R.string.play_button));
             
             sound1 = (Button) playButton;
             playButton.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +91,6 @@ public class MenuScreen extends Activity {
                     public void onClick(View v) {
                     	AudioManager audioManager = (AudioManager)getSystemService(context.AUDIO_SERVICE);
                         float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                        float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
                         int priority = 1;
                         int no_loop = 0;
                         float normal_playback_rate = 1f;
@@ -100,15 +99,13 @@ public class MenuScreen extends Activity {
                         startActivity(i);
                         overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
                         soundPool.play(soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate);
+                        
                     	mp.stop();
                     }
             });
             
             Button settingsButton = (Button) findViewById(R.id.settingsbutton);
-            settingsButton.setTextColor(buttonTextColor);
-            settingsButton.setTextSize(24);
-            settingsButton.setText(R.string.settings_button);
-            settingsButton.setTypeface(typeface);
+            setButtonConfig(settingsButton, getString(R.string.settings_button));
             
             settingsButton.setOnClickListener(new View.OnClickListener() {
                     
@@ -121,10 +118,7 @@ public class MenuScreen extends Activity {
             
             
             Button tutorialButton = (Button) findViewById(R.id.tutorialbutton);
-            tutorialButton.setTextColor(buttonTextColor);
-            tutorialButton.setTextSize(24);
-            tutorialButton.setText(R.string.tutorial_button);
-            tutorialButton.setTypeface(typeface);
+            setButtonConfig(tutorialButton, getString(R.string.tutorial_button));
             
             tutorialButton.setOnClickListener(new View.OnClickListener() {
                     
@@ -137,10 +131,7 @@ public class MenuScreen extends Activity {
             
             
             Button storeButton = (Button) findViewById(R.id.storebutton);
-            storeButton.setTextColor(buttonTextColor);
-            storeButton.setTextSize(24);
-            storeButton.setText(R.string.store_button);
-            storeButton.setTypeface(typeface);
+            setButtonConfig(storeButton, getString(R.string.store_button));
             
             storeButton.setOnClickListener(new View.OnClickListener() {
                     
@@ -160,9 +151,7 @@ public class MenuScreen extends Activity {
 		if(me.getAction() == MotionEvent.ACTION_DOWN){
 			if(xpos > width*.35 && xpos < width*.53 && ypos> height*.08 && ypos < height*.3){
 				easterEggCount++;
-				Log.i("olsontl", "Easter egg count: " + easterEggCount);
 			}
-			Log.i("olsontl", "X at " + xpos/width + "%, Y at " + ypos/height + "%");
 		}
 		if(easterEggCount >= 3 && canEasterEggPlay == true){
 			mp.stop();
@@ -193,6 +182,13 @@ public class MenuScreen extends Activity {
 		super.onStop();
 		mp.stop();
 		//mp.release();
+	}
+	
+	private void setButtonConfig(Button button, String text){
+		button.setTextColor(buttonTextColor);
+        button.setTextSize(24);
+        button.setText(text);
+        button.setTypeface(typeface);
 	}
 	
 }

@@ -50,6 +50,7 @@ public class GameScreen extends Activity {
 	private int width;
 	private int height;
 	
+	
 	// Stops Eclipse from complaining about new API calls
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,7 +157,7 @@ public class GameScreen extends Activity {
 				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10){
 					isViewMode = false;
 					isShootMode = false;
-					renderer.setPauseButtonState(true);
+					renderer.setPauseButtonState();
 				}
 				else{
 					isViewMode = true;
@@ -180,7 +181,6 @@ public class GameScreen extends Activity {
 				isShootMode = false;
 				isViewMode = true;
 				renderer.setFireButtonState(false);
-				renderer.setPauseButtonState(false);
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
