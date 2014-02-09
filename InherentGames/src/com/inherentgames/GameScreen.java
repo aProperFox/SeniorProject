@@ -153,7 +153,7 @@ public class GameScreen extends Activity {
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
-				else if(xpos < width && xpos > width-(width/12) && ypos > 0 && ypos < width/12){
+				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10){
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState(true);

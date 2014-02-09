@@ -193,7 +193,7 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/clock.obj"),
 						context.getResources().getAssets().open("raw/clock.mtl"), 1.0f)),new SimpleVector(0,0,(float)Math.PI),"Clock",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/door.obj"),
-						context.getResources().getAssets().open("raw/door.mtl"), 4.0f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/door.mtl"), 3.5f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/book.obj"),
 						context.getResources().getAssets().open("raw/book.mtl"), 1.0f)),new SimpleVector(0,0,0),"Book",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/paper.obj"),
@@ -225,7 +225,7 @@ public class Room extends World {
 			//Clock 5
 			addWordObject(-30,-20,-71, roomObjects.get(5), "Clock");
 			//Door 6
-			addWordObject(0,-19,-74, roomObjects.get(6), "Door");
+			addWordObject(-5,-19,-74, roomObjects.get(6), "Door");
 			//Book 7
 			addWordObject(10,15,20, roomObjects.get(7), "Book");
 			addWordObject(-10,15,30, roomObjects.get(7), "Book");
@@ -237,7 +237,9 @@ public class Room extends World {
 			addWordObject(0,14.5f,10, roomObjects.get(8), "Paper");
 			addWordObject(0,14.75f,10, roomObjects.get(8), "Paper");
 			//Window 9
-			addWordObject(-64,-7,0, roomObjects.get(9), "Window");
+			addWordObject(-64,-8,0, roomObjects.get(9), "Window");
+			addWordObject(-64,-8,40, roomObjects.get(9), "Window");
+			addWordObject(-64,-8,-40, roomObjects.get(9), "Window");
 			
 			break;
 		case 1:

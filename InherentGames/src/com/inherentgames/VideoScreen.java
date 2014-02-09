@@ -3,6 +3,7 @@ package com.inherentgames;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -16,31 +17,34 @@ public class VideoScreen extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.videoscreen);
-        View someView = findViewById(R.id.VideoView);
-        View root = someView.getRootView();
+        
+        Intent intent = getIntent();
+        final String message = intent.getStringExtra(MenuScreen.EXTRA_MESSAGE);
+        
+        videoView = (VideoView)findViewById(R.id.VideoView);
+        View root = videoView.getRootView();
         root.setBackgroundColor(Color.BLACK);
         		
-        videoView = (VideoView)findViewById(R.id.VideoView);
-        //MediaController mediaController = new MediaController(this);
-        // mediaController.setAnchorView(videoView);
-        //videoView.setMediaController(mediaController);
-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/"+R.raw.comic1a);    
+        Uri uri = Uri.parse("android.resource://com.inherentgames/raw/" + message);   
+
         videoView.setVideoURI(uri);
         videoView.start();  
-        new Thread() {
-            public void run() {
-                    try{
-
-                            sleep(123000);
-                    } catch (Exception e) {
-
-                    }
-                  Intent intent = new Intent(VideoScreen.this, GameScreen.class);
-                  startActivity(intent);
-                  finish();
+        
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() 
+        {
+            @Override
+            public void onCompletion(MediaPlayer mp) 
+            {
+            	Intent intent = new Intent(VideoScreen.this, GameScreen.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                finish();
             }
-    }.start();
+        });
+
     }
+	
+	
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent me){
