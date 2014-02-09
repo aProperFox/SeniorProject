@@ -109,6 +109,8 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		TextureManager.getInstance().addTexture("ScoreBars", screenImages);
 		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 2048, 256));
 		TextureManager.getInstance().addTexture("InfoBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 2048, 256));
+		TextureManager.getInstance().addTexture("ScoreArrow", screenImages);
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
 		TextureManager.getInstance().addTexture("Pizarra", objectNames);
@@ -325,6 +327,7 @@ class MyRenderer extends FragmentActivity implements GLSurfaceView.Renderer{
 		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.76), 100);
 		//Score bars
 		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 256, 1024, width/8, (int)(height*0.9), 100);
+		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.45 + height/2)- fuelHeight, 64, 64, width/39, width/38, 100);
 		
 		
 		fb.display();
