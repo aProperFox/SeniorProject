@@ -9,6 +9,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.vecmath.Vector3f;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
@@ -74,7 +75,6 @@ public class GameScreen extends Activity {
          
 		mGLView = new GLSurfaceView(getApplication());
 		
-		/*
 		// Enable Immersive mode (hides status and nav bar)
 		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
 	        mGLView.setSystemUiVisibility(
@@ -84,15 +84,8 @@ public class GameScreen extends Activity {
 	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_FULLSCREEN
 	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    	} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-    		mGLView.setSystemUiVisibility(
-	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_FULLSCREEN);
+	        this.UiChangeListener();
     	}
-		*/
 		
 		// Use legacy code if running on older Android versions
 		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
@@ -264,37 +257,28 @@ public class GameScreen extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-	/*
-	 * Messing up touches
-	@SuppressLint("InlinedApi")
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		
-		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-			mGLView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-			mGLView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN);
-		}
-	}*/
 	
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
 	
-	
-	
-	
+	public void UiChangeListener() {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+            @TargetApi(19)
+			@Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                }
+            }
+        });
+    }
 	
 }

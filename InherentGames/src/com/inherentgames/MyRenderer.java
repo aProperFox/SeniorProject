@@ -357,7 +357,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		clock.reset();
 		if(!isLocked){
 			isLocked = true;
-			dynamicWorld.stepSimulation(ms / 1000000f);
+			try {
+				dynamicWorld.stepSimulation(ms / 1000000f);
+			} catch (NullPointerException e) {
+				Log.e("MyRenderer", "BullePhysics threw a NullPointerException.");
+			}
 			isLocked = false;
 		}
 		fb.clear(back);
