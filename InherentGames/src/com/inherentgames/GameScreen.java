@@ -14,10 +14,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,8 +26,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.bulletphysics.dynamics.RigidBody;
 import com.threed.jpct.Camera;
@@ -211,7 +207,9 @@ public class GameScreen extends Activity {
 					final CharSequence[] items = {getString(R.string.c_resume), getString(R.string.c_settings), getString(R.string.c_exit)};
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setIcon(R.drawable.tempicon);
+					Drawable icon = getResources().getDrawable(R.drawable.pause_button_pressed);
+					icon.setBounds(0, 0, icon.getIntrinsicWidth()/2, icon.getIntrinsicHeight()/2);
+					builder.setIcon(icon);
 					builder.setTitle(getString(R.string.c_title));
 					builder.setItems(items, new DialogInterface.OnClickListener() {
 					    public void onClick(DialogInterface dialog, int item) {

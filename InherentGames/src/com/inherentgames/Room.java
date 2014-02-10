@@ -239,17 +239,17 @@ public class Room extends World {
 			//Clock 5
 			addWordObject(-30,-20,-71, roomObjects.get(5), "Clock");
 			//Door 6
-			addWordObject(-5,-13,-74, roomObjects.get(6), "Door");
+			addWordObject(-25,-13,-74, roomObjects.get(6), "Door");
 			//Book 7
-			addWordObject(10,15,20, roomObjects.get(7), "Book");
-			addWordObject(-10,15,30, roomObjects.get(7), "Book");
+			addWordObject(10,15,20, roomObjects.get(7), "Book", new SimpleVector(0,(float)Math.PI,0));
+			addWordObject(-10,15,30, roomObjects.get(7), "Book", new SimpleVector(0,(float)Math.PI/2,0));
 			addWordObject(-20,15,-10, roomObjects.get(7), "Book");
 			addWordObject(30,15,-50, roomObjects.get(7), "Book");
 			//Paper 8
-			addWordObject(0,15,10, roomObjects.get(8), "Paper");
-			addWordObject(0,14.25f,10, roomObjects.get(8), "Paper");
-			addWordObject(0,14.5f,10, roomObjects.get(8), "Paper");
-			addWordObject(0,14.75f,10, roomObjects.get(8), "Paper");
+			addWordObject(0,15,10, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.1,0));
+			addWordObject(0,14.25f,10, roomObjects.get(8), "Paper", new SimpleVector(0,-(float)Math.PI*0.1,0));
+			addWordObject(0,14.5f,10, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.2,0));
+			addWordObject(0,14.75f,10, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.15,0));
 			//Window 9
 			addWordObject(-64,-8,0, roomObjects.get(9), "Window");
 			addWordObject(-64,-8,40, roomObjects.get(9), "Window");
@@ -334,6 +334,10 @@ public class Room extends World {
 	*/
 	
 	private void addWordObject(float x, float y, float z, WordObject wordObject, String name){
+		addWordObject(x, y, z, wordObject, name, new SimpleVector(0,0,0));
+	}
+	
+	private void addWordObject(float x, float y, float z, WordObject wordObject, String name, SimpleVector rotateBy){
 		//Creates a new WordObject from the generic roomObject
 		//and adds it to the Room and wordObjects ArrayList
 		Log.i("olsontl", "Adding object " + name);
@@ -341,6 +345,7 @@ public class Room extends World {
 		object.setCenter(SimpleVector.ORIGIN);
 		object.setOrigin(new SimpleVector(x,y,z));
 		object.setName(name);
+		object.rotateBy(rotateBy);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
 		if(tm.containsTexture(name)){
