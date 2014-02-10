@@ -34,9 +34,10 @@ import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-class MyRenderer implements GLSurfaceView.Renderer{
+class MyRenderer implements GLSurfaceView.Renderer {
 	private FrameBuffer fb = null;
 	private Room world = null;
+	private TextureManager tm = TextureManager.getInstance();
 	private RGBColor back = new RGBColor(50,50,100);
 	
 	private float touchTurn = 0;
@@ -97,63 +98,63 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		try{
 		Texture text = new Texture(context.getResources().openRawResource(R.raw.font));
 		text.setFiltering(false);
-		TextureManager.getInstance().addTexture("gui_font", text);
-		Texture bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 512, 512));
-		TextureManager.getInstance().addTexture("bubbleRed", bubble);
-		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512));
-		TextureManager.getInstance().addTexture("bubbleBlue", bubble);
+		tm.addTexture("gui_font", text);
+		Texture bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 512, 512), true);
+		tm.addTexture("bubbleRed", bubble);
+		bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512), true);
+		tm.addTexture("bubbleBlue", bubble);
 		
-		Texture screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128));
-		TextureManager.getInstance().addTexture("fireButton", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128));
-		TextureManager.getInstance().addTexture("fireButtonPressed", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128));
-		TextureManager.getInstance().addTexture("pauseButton", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128));
-		TextureManager.getInstance().addTexture("pauseButtonPressed", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 32, 1024));
-		TextureManager.getInstance().addTexture("FuelBar", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 32, 1024));
-		TextureManager.getInstance().addTexture("TimeBar", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024));
-		TextureManager.getInstance().addTexture("ScoreBars", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 1024, 256));
-		TextureManager.getInstance().addTexture("InfoBar", screenImages);
-		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 64, 64));
-		TextureManager.getInstance().addTexture("ScoreArrow", screenImages);
+		Texture screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128), true);
+		tm.addTexture("fireButton", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128), true);
+		tm.addTexture("fireButtonPressed", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128), true);
+		tm.addTexture("pauseButton", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128), true);
+		tm.addTexture("pauseButtonPressed", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 32, 1024), true);
+		tm.addTexture("FuelBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 32, 1024), true);
+		tm.addTexture("TimeBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024), true);
+		tm.addTexture("ScoreBars", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 256, 256), true);
+		tm.addTexture("InfoBar", screenImages);
+		screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 64, 64), true);
+		tm.addTexture("ScoreArrow", screenImages);
 		
 		Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256));
-		TextureManager.getInstance().addTexture("Pizarra", objectNames);
+		tm.addTexture("Pizarra", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256));
-		TextureManager.getInstance().addTexture("Escritorio", objectNames);
+		tm.addTexture("Escritorio", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256));
-		TextureManager.getInstance().addTexture("Silla", objectNames);
+		tm.addTexture("Silla", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 256, 256));
-		TextureManager.getInstance().addTexture("Mochila", objectNames);
+		tm.addTexture("Mochila", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.reloj)), 256, 256));
-		TextureManager.getInstance().addTexture("Reloj", objectNames);
+		tm.addTexture("Reloj", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendario)), 256, 256));
-		TextureManager.getInstance().addTexture("Calendario", objectNames);
+		tm.addTexture("Calendario", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.puerta)), 256, 256));
-		TextureManager.getInstance().addTexture("Puerta", objectNames);
+		tm.addTexture("Puerta", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.libro)), 256, 256));
-		TextureManager.getInstance().addTexture("Libro", objectNames);
+		tm.addTexture("Libro", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.papel)), 256, 256));
-		TextureManager.getInstance().addTexture("Papel", objectNames);
+		tm.addTexture("Papel", objectNames);
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ventana)), 256, 256));
-		TextureManager.getInstance().addTexture("Ventana", objectNames);
+		tm.addTexture("Ventana", objectNames);
 		
 		objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256));
-		TextureManager.getInstance().addTexture("Default", objectNames);
+		tm.addTexture("Default", objectNames);
 		
 		Texture objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256));
-		TextureManager.getInstance().addTexture("Chalkboard", objects);
+		tm.addTexture("Chalkboard", objects);
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendar)), 256, 256));
-		TextureManager.getInstance().addTexture("Calendar", objects);
+		tm.addTexture("Calendar", objects);
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.clock)), 256, 256));
-		TextureManager.getInstance().addTexture("Clock", objects);
+		tm.addTexture("Clock", objects);
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.backpack)), 256, 256));
-		TextureManager.getInstance().addTexture("Backpack", objects);
+		tm.addTexture("Backpack", objects);
 		
 		Texture[] textures = new Texture[6];
 		//set textures
@@ -167,12 +168,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			//Ceiling
 		textures[2] = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024));
 		
-		TextureManager.getInstance().addTexture("Room0Wall0", textures[0]);
-		/*TextureManager.getInstance().addTexture("Room0Wall1", textures[1]);
-		TextureManager.getInstance().addTexture("Room0Wall2", textures[2]);
-		TextureManager.getInstance().addTexture("Room0Wall3", textures[3]);*/
-		TextureManager.getInstance().addTexture("Room0Floor", textures[1]);
-		TextureManager.getInstance().addTexture("Room0Ceiling", textures[2]);
+		tm.addTexture("Room0Wall0", textures[0]);
+		/*tm.addTexture("Room0Wall1", textures[1]);
+		tm.addTexture("Room0Wall2", textures[2]);
+		tm.addTexture("Room0Wall3", textures[3]);*/
+		tm.addTexture("Room0Floor", textures[1]);
+		tm.addTexture("Room0Ceiling", textures[2]);
 		}catch(Exception e){
 			
 		}
@@ -348,7 +349,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		//Pause Button
 		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
 		//Info Bar
-		renderer2D.blitImage(fb, "InfoBar", (int)(width*0.5), (int)(height*.222), 1024, 255, (int)(width), (int)(height*0.444), 100);
+		renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 256, 256, width/5, width/5, 100);
 		//Dynamic fuel/time bars
 		if(!isPaused){
 			if(endTime - System.currentTimeMillis() > 0){
