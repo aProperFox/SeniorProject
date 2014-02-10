@@ -1,6 +1,5 @@
 package com.inherentgames;
 
-import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;

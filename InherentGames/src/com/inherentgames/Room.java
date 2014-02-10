@@ -11,7 +11,6 @@ import android.util.Log;
 import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.RGBColor;
@@ -429,7 +428,7 @@ public class Room extends World {
 		return num;
 	}
 	
-	public ArrayList getRoomObjectWords(){
+	public ArrayList<String> getRoomObjectWords(){
 		return roomObjectWords;
 	}
 	

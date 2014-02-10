@@ -14,6 +14,7 @@ import android.media.SoundPool;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.widget.Toast;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
@@ -49,7 +50,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	
 	private Camera cam;
 	
-	private int fps = 0;
 	private int lightCycle = 0;
 	private Light sun = null;
 	Context context;
@@ -83,7 +83,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private Handler handler = new Handler();
 	
 	private SoundPool soundPool;
-	HashMap<Integer, Integer> soundPoolMap;
+	SparseIntArray soundPoolMap;
 	int soundID = 1;
 	
 	private boolean isLocked;
@@ -231,7 +231,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		endTime = System.currentTimeMillis() + 100000;
 		
 		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
-        soundPoolMap = new HashMap<Integer, Integer>();
+        //soundPoolMap = new HashMap<Integer, Integer>();
+        soundPoolMap = new SparseIntArray();
         soundPoolMap.put(1, soundPool.load(context, R.raw.escritorio, 1));
         soundPoolMap.put(2, soundPool.load(context, R.raw.silla, 1));
         soundPoolMap.put(3, soundPool.load(context, R.raw.pizarra, 1));
@@ -564,7 +565,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	public void levelWin(){
 	        handler.post(new Runnable(){
 	            public void run(){
-	            	Toast toast = Toast.makeText(context, R.string.win_game_title, 5);
+	            	Toast toast = Toast.makeText(context, R.string.win_game_title, Toast.LENGTH_LONG);
 	                toast.show();
 	        		Intent intent = new Intent(context, GameScreen.class);
 	        	    intent.setClass(context, VideoScreen.class);
