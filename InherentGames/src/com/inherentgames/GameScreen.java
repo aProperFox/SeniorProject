@@ -74,6 +74,7 @@ public class GameScreen extends Activity {
          
 		mGLView = new GLSurfaceView(getApplication());
 		
+		/*
 		// Enable Immersive mode (hides status and nav bar)
 		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
 	        mGLView.setSystemUiVisibility(
@@ -91,6 +92,7 @@ public class GameScreen extends Activity {
 	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_FULLSCREEN);
     	}
+		*/
 		
 		// Use legacy code if running on older Android versions
 		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
@@ -262,7 +264,8 @@ public class GameScreen extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-	
+	/*
+	 * Messing up touches
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -284,7 +287,7 @@ public class GameScreen extends Activity {
 				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 				| View.SYSTEM_UI_FLAG_FULLSCREEN);
 		}
-	}
+	}*/
 	
 	protected boolean isFullscreenOpaque() {
 		return true;

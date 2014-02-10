@@ -27,6 +27,7 @@ public class VideoScreen extends Activity{
         videoView = (VideoView)findViewById(R.id.VideoView);
         View root = videoView.getRootView();
         
+        /*
         // Enable Immersive mode (hides status and nav bar)
         if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
 	        videoView.setSystemUiVisibility(
@@ -44,6 +45,7 @@ public class VideoScreen extends Activity{
 	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_FULLSCREEN);
     	}
+    	*/
         
         root.setBackgroundColor(Color.BLACK);
         		
@@ -79,6 +81,8 @@ public class VideoScreen extends Activity{
 		return true;
 	}
 	
+	/*
+	 * Messing up touches
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -101,4 +105,5 @@ public class VideoScreen extends Activity{
 				| View.SYSTEM_UI_FLAG_FULLSCREEN);
 		}
 	}
+	*/
 }

@@ -181,6 +181,8 @@ public class MenuScreen extends Activity {
 		}
 	}
 	
+	/*
+	 * Messing up touches
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onResume(){
@@ -216,6 +218,7 @@ public class MenuScreen extends Activity {
         	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
         }
 	}
+	*/
 	
 	@Override
 	public void onStop(){
@@ -237,7 +240,7 @@ public class MenuScreen extends Activity {
         button.setText(text);
         button.setTypeface(typeface);
 	}
-	
+	/*
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -261,45 +264,5 @@ public class MenuScreen extends Activity {
 				| View.SYSTEM_UI_FLAG_FULLSCREEN);
 		}
 	}
+	*/
 }
-    /*
-    public void onCreate(Bundle savedInstanceState){
-            super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-            setContentView(R.layout.home);
-            
-            // click-handler for buttons
-            View playButton = findViewById(R.id.playbutton);
-            playButton.setOnClickListener((OnClickListener) this);
-            
-            View settingsButton = findViewById(R.id.settingsbutton);
-            settingsButton.setOnClickListener((OnClickListener) this);
-            
-            View storeButton = findViewById(R.id.storebutton);
-            storeButton.setOnClickListener((OnClickListener) this);
-            
-            View tutorialButton = findViewById(R.id.tutorialbutton);
-            tutorialButton.setOnClickListener((OnClickListener) this);
-            
-    }
-            public void onClick(View v) {
-                    switch(v.getId()){
-                    case R.id.playbutton:
-                            Intent i = new Intent(this, MainActivity.class);
-                            startActivity(i);
-                            break;
-                    case R.id.settingsbutton:
-                            Intent j = new Intent(this, Settings.class);
-                            startActivity(j);
-                            break;
-                    case R.id.tutorialbutton:
-                            Intent k = new Intent(this, Tutorial.class);
-                            startActivity(k);
-                            break;
-                    case R.id.storebutton:
-                            Intent l = new Intent(this, Store.class);
-                            startActivity(l);
-                            break;
-                    }                
-            }
-            */

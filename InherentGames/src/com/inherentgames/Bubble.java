@@ -76,7 +76,7 @@ public class Bubble extends WordObject{
 		objectId = id;
 	}
 	
-	public float getTimeCreated(){
+	public long getTimeCreated(){
 		return timeCreated;
 	}
 }
