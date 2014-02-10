@@ -1,8 +1,5 @@
 package com.inherentgames;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +13,7 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,7 +28,7 @@ public class MenuScreen extends Activity {
 	private MediaPlayer mp;
 	
 	SoundPool soundPool;
-	HashMap<Integer, Integer> soundPoolMap;
+	SparseIntArray soundPoolMap;
 	int soundID = 1;
 
 	Context context;
@@ -73,13 +71,14 @@ public class MenuScreen extends Activity {
             
             try {
 	            mp = MediaPlayer.create(this, R.raw.time_pi_theme);
+	            mp.setLooping(true);
 	            mp.start();
             } catch (Exception e) {
             	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
             }
             
             soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
-            soundPoolMap = new HashMap<Integer, Integer>();
+            soundPoolMap = new SparseIntArray();
             soundPoolMap.put(soundID, soundPool.load(this, R.raw.bubble_up, 1));
             
             buttonTextColor = Color.rgb(156, 192, 207);
@@ -182,7 +181,7 @@ public class MenuScreen extends Activity {
 		try {
             mp.start();
         } catch (Exception e) {
-        	Log.e("MenuScreen", "Something went wrong with the MediaPlayer: " + e.getMessage());
+        	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
         }
 	}
 	
@@ -190,6 +189,7 @@ public class MenuScreen extends Activity {
 	public void onStop(){
 		super.onStop();
 		mp.stop();
+		mp.reset();
 		mp.release();
 	}
 	
