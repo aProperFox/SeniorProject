@@ -463,46 +463,50 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	public int checkBubble(){
 		//Checks bubble collision and if a collision occurs, it shrinks the object down
 		//and sets it in the state to stay inside the bubble object
-		for(int i = 0; i < world.getNumBubbles(); i++){
-			Bubble bubble = world.getBubble(i);
-			if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
-				RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
-				Vector3f linearVelocity = new Vector3f(0,0,0);
-				linearVelocity = tempBody.getLinearVelocity(linearVelocity);
-				SimpleVector motion = new SimpleVector(linearVelocity.x,-linearVelocity.y,-linearVelocity.z);
-				int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
-				WordObject collisionObject;
-				if(id != -100) Log.i("olsontl", "Checking object with id: " + id);
-				if(id >= 0){
-					if((collisionObject = world.getWordObject(id)) != null){
-						Log.i("olsontl", "Object is a WordObject!");
-						if(collisionObject.getArticle() == bubble.getArticle()){
-							bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
-							collisionObject.scale(5.0f);
-							bubble.setHeldObjectId(id);
-							//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
-							bubble.setTexture(collisionObject.getName(Translator.SPANISH));
-							bubble.calcTextureWrap();
-							bubble.build();
-							soundPool.play(Translator.getIndexByWord(collisionObject.getName(Translator.SPANISH)) + 1, 3, 3, 1, 0, 1f);
-							hasWonGame();
-							return 0;
+		try {
+			for(int i = 0; i < world.getNumBubbles(); i++) {
+				Bubble bubble = world.getBubble(i);
+				if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
+					RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
+					Vector3f linearVelocity = new Vector3f(0,0,0);
+					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
+					SimpleVector motion = new SimpleVector(linearVelocity.x,-linearVelocity.y,-linearVelocity.z);
+					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
+					WordObject collisionObject;
+					if(id != -100) Log.i("olsontl", "Checking object with id: " + id);
+					if(id >= 0){
+						if((collisionObject = world.getWordObject(id)) != null){
+							Log.i("olsontl", "Object is a WordObject!");
+							if(collisionObject.getArticle() == bubble.getArticle()){
+								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
+								collisionObject.scale(5.0f);
+								bubble.setHeldObjectId(id);
+								//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
+								bubble.setTexture(collisionObject.getName(Translator.SPANISH));
+								bubble.calcTextureWrap();
+								bubble.build();
+								soundPool.play(Translator.getIndexByWord(collisionObject.getName(Translator.SPANISH)) + 1, 3, 3, 1, 0, 1f);
+								hasWonGame();
+								return 0;
+							}
+							else{
+								deleteBubble(bubble);
+								return 0;
+							}
 						}
-						else{
+						else if(world.isBubbleType(id)){
+							Log.i("olsontl", "Object is a bubble!");
+							Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
+							world.removeObject(bubbleCollisionObject.getHeldObjectId());
+							deleteBubble(bubbleCollisionObject);
 							deleteBubble(bubble);
 							return 0;
 						}
 					}
-					else if(world.isBubbleType(id)){
-						Log.i("olsontl", "Object is a bubble!");
-						Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
-						world.removeObject(bubbleCollisionObject.getHeldObjectId());
-						deleteBubble(bubbleCollisionObject);
-						deleteBubble(bubble);
-						return 0;
-					}
 				}
 			}
+		} catch (IndexOutOfBoundsException e) {
+			Log.e("MyRenderer", "Index is out of bounds: " + e.getMessage());
 		}
 		return 0;
 	}
