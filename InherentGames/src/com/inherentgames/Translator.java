@@ -11,7 +11,13 @@ public class Translator {
 		{"Desk", "Escritorio"},
 		{"Chair", "Silla"},
 		{"Chalkboard", "Pizarra"},
-		{"Backpack", "Mochila"} 
+		{"Backpack", "Mochila"}, 
+		{"Calendar", "Calendario"},
+		{"Clock", "Reloj"},
+		{"Door", "Puerta"},
+		{"Book", "Libro"},
+		{"Paper", "Papel"},
+		{"Window", "Ventana"}
 	};
 
 	public static String translateToLanguage(String word, int language){
@@ -23,4 +29,17 @@ public class Translator {
 		}
 		return null;
 	}
+	
+	public static int getIndexByWord(String word){
+		for(int i = 0; i < wordList.length; i++){
+			for(int j = 0; j < wordList[0].length; j++){
+				if(wordList[i][j] == word){
+					Log.i("olsontl", "Word + id: " + wordList[i][j] + " " + i);
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
 }

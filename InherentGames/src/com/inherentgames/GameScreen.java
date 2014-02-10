@@ -1,4 +1,5 @@
 package com.inherentgames;
+
 import java.lang.reflect.Field;
 import java.util.Properties;
 
@@ -7,6 +8,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.vecmath.Vector3f;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -14,13 +16,12 @@ import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.MotionEvent.PointerCoords;
+import android.view.View;
 import android.view.Window;
 
 import com.bulletphysics.dynamics.RigidBody;
@@ -50,8 +51,10 @@ public class GameScreen extends Activity {
 	private int width;
 	private int height;
 	
+	
 	// Stops Eclipse from complaining about new API calls
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	@SuppressWarnings("deprecation")
+	@SuppressLint({ "InlinedApi", "NewApi" })
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log("onCreate");
 		
@@ -63,17 +66,6 @@ public class GameScreen extends Activity {
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		
-		// Use legacy code if running on older Android versions
-		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
-			width = display.getWidth();
-			height = display.getHeight();
-		} else {
-			Point size = new Point();
-			display.getSize(size);
-			width = size.x;
-			height = size.y;
-		}
-		
 		// Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
@@ -82,6 +74,29 @@ public class GameScreen extends Activity {
 		config = assetsPropertyReader.getProperties("config.properties");
          
 		mGLView = new GLSurfaceView(getApplication());
+		
+		// Enable Immersive mode (hides status and nav bar)
+		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+	        mGLView.setSystemUiVisibility(
+	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_FULLSCREEN
+	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+	        this.UiChangeListener();
+    	}
+		
+		// Use legacy code if running on older Android versions
+		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+			width = display.getWidth();
+			height = display.getHeight();
+		} else {
+			Point size = new Point();
+			display.getRealSize(size);
+			width = size.x;
+			height = size.y;
+		}
 		
 		mGLView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
 			
@@ -96,11 +111,11 @@ public class GameScreen extends Activity {
 				return configs[0];
 			}
 		});
-		
-		renderer = new MyRenderer(this, width, height);
+		if(renderer == null){
+			renderer = new MyRenderer(this, width, height);
+		}
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
-		
 		setContentView(mGLView);
 	}
 	
@@ -143,7 +158,6 @@ public class GameScreen extends Activity {
 	}
 	
 	public boolean onTouchEvent(MotionEvent me){
-		
 		switch(me.getAction() & MotionEvent.ACTION_MASK){
 	    	
     		case MotionEvent.ACTION_DOWN:
@@ -153,6 +167,11 @@ public class GameScreen extends Activity {
 					isViewMode = false;
 					isShootMode = true;
 					renderer.setFireButtonState(true);
+				}
+				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10){
+					isViewMode = false;
+					isShootMode = false;
+					renderer.setPauseButtonState();
 				}
 				else{
 					isViewMode = true;
@@ -208,10 +227,9 @@ public class GameScreen extends Activity {
     		case MotionEvent.ACTION_MOVE:
 				xd = me.getX() - xpos;
 				yd = me.getY() - ypos;
-				
 				if(isViewMode){
-					renderer.setTouchTurn(xd / -100.0f);
-					renderer.setTouchTurnUp(yd / -100.0f);
+					renderer.setTouchTurn(xd / -(width/15f));
+					renderer.setTouchTurnUp(yd / -(height/15f));
 				}
 				xpos = me.getX();
 				ypos = me.getY();
@@ -232,7 +250,9 @@ public class GameScreen extends Activity {
         case R.id.lighting:
         	renderer.cycleLighting();
             return true;
-//
+        case R.id.change_level:
+        	renderer.levelWin();
+        	return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -241,8 +261,23 @@ public class GameScreen extends Activity {
 		return true;
 	}
 	
-	
-	
-	
+	public void UiChangeListener() {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+            @TargetApi(19)
+			@Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                }
+            }
+        });
+    }
 	
 }

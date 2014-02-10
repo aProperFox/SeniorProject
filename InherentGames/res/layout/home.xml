@@ -9,7 +9,9 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentRight="true"
 	    android:layout_below="@+id/tutorialbutton"
-	    android:background="@drawable/settings_button" />
+	    android:background="@drawable/settings_button"
+	    android:layout_marginRight="25dp"
+	    android:layout_marginBottom="5dp" />
  
 	<Button
 	    android:id="@+id/storebutton"
@@ -17,7 +19,9 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentRight="true"
 	    android:layout_below="@+id/settingsbutton"
-	    android:background="@drawable/store_button" />
+	    android:background="@drawable/store_button"
+	    android:layout_marginRight="25dp"
+	    android:layout_marginBottom="5dp" />
  
 	<Button
 		android:id="@+id/tutorialbutton"
@@ -25,7 +29,9 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentRight="true"
 		android:layout_below="@+id/playbutton"
-		android:background="@drawable/tutorial_button" />
+		android:background="@drawable/tutorial_button"
+		android:layout_marginRight="25dp"
+		android:layout_marginBottom="5dp" />
  
 	<Button
 		android:id="@+id/playbutton"
@@ -34,6 +40,8 @@
 		android:layout_alignParentRight="true"
 		android:layout_alignParentTop="true"
 		android:layout_marginTop="132dp"
-		android:background="@drawable/play_button" />
+		android:background="@drawable/play_button"
+		android:layout_marginRight="25dp"
+		android:layout_marginBottom="5dp" />
  
 </RelativeLayout>

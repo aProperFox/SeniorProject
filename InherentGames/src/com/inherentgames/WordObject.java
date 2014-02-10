@@ -15,22 +15,22 @@ public class WordObject extends Object3D {
 	private boolean isStatic;
 	private float maxDimension;
 	private int objectId = -1;
-	private String word;
 	private int article;
 	private String names[] = new String[2];
 	
 	
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
+		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
-		this.word = obj.getWord();
+		names[Translator.ENGLISH] = obj.getName(Translator.ENGLISH);
 		this.article = obj.getArticle();
 	}
 	
-	public WordObject(Object3D obj, SimpleVector rotationAxis, String word, int article){
+	public WordObject(Object3D obj, SimpleVector rotationAxis, String name, int article){
 		super(obj);
 		isStatic = true;
-		this.word = word;
+		names[Translator.ENGLISH] = name;
 		this.article = article;
 		rotateBy(rotationAxis);
 		setMaxDimension();
@@ -84,10 +84,6 @@ public class WordObject extends Object3D {
 	
 	public int getObjectId(){
 		return objectId;
-	}
-	
-	public String getWord(){
-		return word;
 	}
 	
 	public int getArticle(){
