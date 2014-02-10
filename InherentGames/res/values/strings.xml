@@ -8,8 +8,9 @@
     <string name="change_lighting">Cycle Lighting</string>
     <string name="change_physics">Cycle Physics</string>
     <string name="bt_txt">Menu</string>
-    <string name="win_game_title">You won the level!</string>
-    <string name="win_game_text">Now let us make it a bit harder!</string>
+    <string name="win_level_title">You won the level!</string>
+    <string name="win_level_text">Now let us make it a bit harder!</string>
+    <string name="lose_level_title">You lost the level!</string>
     <string name="ok">OK</string>
     <string name="change_level">Change Level (dev)</string>
     <string name="play_button">PLAY</string>
