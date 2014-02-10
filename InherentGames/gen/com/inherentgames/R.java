@@ -71,11 +71,12 @@ public final class R {
         public static final int silla=0x7f02002e;
         public static final int splash=0x7f02002f;
         public static final int store_button=0x7f020030;
-        public static final int time_bar=0x7f020031;
-        public static final int tutorial_button=0x7f020032;
-        public static final int ventana=0x7f020033;
-        public static final int window=0x7f020034;
-        public static final int word_bar=0x7f020035;
+        public static final int tempicon=0x7f020031;
+        public static final int time_bar=0x7f020032;
+        public static final int tutorial_button=0x7f020033;
+        public static final int ventana=0x7f020034;
+        public static final int window=0x7f020035;
+        public static final int word_bar=0x7f020036;
     }
     public static final class id {
         public static final int VideoView=0x7f0b000a;
@@ -132,6 +133,10 @@ public final class R {
         public static final int btn_newgame=0x7f080001;
         public static final int btn_settings=0x7f080004;
         public static final int btn_tutorial=0x7f080003;
+        public static final int c_exit=0x7f080015;
+        public static final int c_resume=0x7f080013;
+        public static final int c_settings=0x7f080014;
+        public static final int c_title=0x7f080012;
         public static final int change_level=0x7f08000c;
         public static final int change_lighting=0x7f080005;
         public static final int change_physics=0x7f080006;
