@@ -87,7 +87,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	SparseIntArray soundPoolMap;
 	int soundID = 1;
 	
-	private boolean isLocked;
 	private boolean isPaused;
 	
 	public MyRenderer(Context c, int w, int h) {
@@ -156,7 +155,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.clock)), 256, 256), true);
 		tm.addTexture("Clock", objects);
 		objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.backpack)), 256, 256), true);
-		tm.addTexture("Backpack", objects);
+		//tm.addTexture("Backpack", objects);
 		
 		
 		//set textures
@@ -175,6 +174,21 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		//Ceiling
 		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024), true);
 		tm.addTexture("Room0Ceiling", wallTextures);
+		
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall0)), 1024, 512), true);
+		tm.addTexture("Room1Wall0", wallTextures);
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall1)), 1024, 512), true);
+		tm.addTexture("Room1Wall1", wallTextures);
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall2)), 1024, 512), true);
+		tm.addTexture("Room1Wall2", wallTextures);
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall3)), 1024, 512), true);
+		tm.addTexture("Room1Wall3", wallTextures);
+		//Floor
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1floor)), 1024, 1024), true);
+		tm.addTexture("Room1Floor", wallTextures);	
+		//Ceiling
+		wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1ceiling)), 1024, 1024), true);
+		tm.addTexture("Room1Ceiling", wallTextures);
 		
 		}catch(Exception e){
 			
@@ -245,7 +259,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
         soundPoolMap.put(8, soundPool.load(context, R.raw.libro, 1));
         soundPoolMap.put(9, soundPool.load(context, R.raw.papel, 1));
         soundPoolMap.put(10, soundPool.load(context, R.raw.ventana, 1));
-        isLocked = false;
         isPaused = false;
 	}
 	
@@ -311,7 +324,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
         soundPoolMap.put(8, soundPool.load(context, R.raw.libro, 1));
         soundPoolMap.put(9, soundPool.load(context, R.raw.papel, 1));
         soundPoolMap.put(10, soundPool.load(context, R.raw.ventana, 1));
-        isLocked = false;
         isPaused = false;
 	}
 	
@@ -355,14 +367,10 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		float ms = clock.getTimeMicroseconds();
 		clock.reset();
-		if(!isLocked){
-			isLocked = true;
-			try {
-				dynamicWorld.stepSimulation(ms / 1000000f);
-			} catch (NullPointerException e) {
-				Log.e("MyRenderer", "BullePhysics threw a NullPointerException.");
-			}
-			isLocked = false;
+		try {
+			dynamicWorld.stepSimulation(ms / 1000000f);
+		} catch (NullPointerException e) {
+			Log.e("MyRenderer", "BullePhysics threw a NullPointerException.");
 		}
 		fb.clear(back);
 		
@@ -397,35 +405,41 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		
 		fb.display();
-		if(!isLocked){
-			isLocked = true;
-			for(Bubble bubble : Reversed.reversed(world.getBubbleObjects())) {
+		
+		if(lastRotateTime < (System.currentTimeMillis() - 15)){
+			lastRotateTime = System.currentTimeMillis();
+			ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
+			for(Bubble bubble : Reversed.reversed(bubbleObjects)) {
 				if(bubble.isHolding()){
 					Object3D obj = world.getObject(bubble.getHeldObjectId());
 					obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
-					if(lastRotateTime < (System.currentTimeMillis() - 15)){
-						obj.rotateY(0.1f);
-						world.getObject(bubble.getObjectId()).rotateY(0.1f);
-					}
+					obj.rotateY(0.1f);
+					world.getObject(bubble.getObjectId()).rotateY(0.1f);
+					
 				}
 				else{
-					// Currently, the bubble pops but the next one shot breaks the physics engine.
+					/* Currently, the bubble pops but the next one shot breaks the physics engine.
 					if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
 						Log.i("olsontl", "I'm deleting the bubble!");
 						deleteBubble(bubble);
 						continue;
-					}
+					}*/
 				}
 			}
-			isLocked = false;
 		}
-		if(lastRotateTime < (System.currentTimeMillis() - 15))
-			lastRotateTime = System.currentTimeMillis();
-		if(!isLocked){
-			isLocked = true;
-			checkBubble();
-			isLocked = false;
+		
+		checkBubble();
+		/*
+		 * TODO: add color to WordObjects when camera is aimed at them
+		int id = world.getCameraBox().checkForCollision(cam.getDirection(), 80);
+		if(id != -100){
+			WordObject wordObject = (WordObject)world.getObject(id);
+			if(wordObject.getStaticState()){
+				wordObject.setAdditionalColor(255,255,0);
+			}
 		}
+		*/
+			
 	}
 	
 	public void setTouchTurnUp(float value){
@@ -484,6 +498,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 							if(collisionObject.getArticle() == bubble.getArticle()){
 								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
 								collisionObject.scale(5.0f);
+								collisionObject.setStatic(false);
 								bubble.setHeldObjectId(id);
 								//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
 								bubble.setTexture(collisionObject.getName(Translator.SPANISH));
@@ -604,13 +619,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	            public void run(){
 	            	Toast toast = Toast.makeText(context, R.string.win_level_title, SHORT_TOAST);
 	                toast.show();
+	                roomNum++;
 	        		Intent intent = new Intent(context, GameScreen.class);
 	        	    intent.setClass(context, VideoScreen.class);
 	        	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	        	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic1a");
+	        	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic" + roomNum + "b");
 	        	    context.startActivity(intent);
-	        		if(roomNum == 0)
-	        			roomNum ++;
 	        		world.dispose();
 	            }
 	        });

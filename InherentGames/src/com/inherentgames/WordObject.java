@@ -21,6 +21,7 @@ public class WordObject extends Object3D {
 	
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
+		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
 		names[Translator.ENGLISH] = obj.getName(Translator.ENGLISH);
 		this.article = obj.getArticle();
