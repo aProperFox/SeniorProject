@@ -1,6 +1,6 @@
 package com.inherentgames;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -44,7 +44,8 @@ public class MenuScreen extends Activity {
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	@SuppressWarnings("deprecation")
+	@SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
@@ -180,9 +181,30 @@ public class MenuScreen extends Activity {
 		}
 	}
 	
+	@SuppressLint("InlinedApi")
 	@Override
 	public void onResume(){
 		super.onResume();
+		
+		// Enable Immersive mode (hides status and nav bar)
+		View currentView = getWindow().getDecorView();
+		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+			currentView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+			currentView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN);
+		}
+		
 		try {
 			if (mp == null)
 				mp = MediaPlayer.create(this, R.raw.time_pi_theme);
@@ -216,6 +238,29 @@ public class MenuScreen extends Activity {
         button.setTypeface(typeface);
 	}
 	
+	@SuppressLint("InlinedApi")
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		
+		View currentView = getWindow().getDecorView();
+		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+			currentView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+			currentView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN);
+		}
+	}
 }
     /*
     public void onCreate(Bundle savedInstanceState){

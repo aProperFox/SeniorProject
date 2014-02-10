@@ -1,4 +1,5 @@
 package com.inherentgames;
+
 import java.lang.reflect.Field;
 import java.util.Properties;
 
@@ -7,7 +8,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.vecmath.Vector3f;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 
 import com.bulletphysics.dynamics.RigidBody;
@@ -50,7 +52,8 @@ public class GameScreen extends Activity {
 	
 	
 	// Stops Eclipse from complaining about new API calls
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	@SuppressWarnings("deprecation")
+	@SuppressLint({ "InlinedApi", "NewApi" })
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log("onCreate");
 		
@@ -62,17 +65,6 @@ public class GameScreen extends Activity {
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		
-		// Use legacy code if running on older Android versions
-		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
-			width = display.getWidth();
-			height = display.getHeight();
-		} else {
-			Point size = new Point();
-			display.getSize(size);
-			width = size.x;
-			height = size.y;
-		}
-		
 		// Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
@@ -81,6 +73,35 @@ public class GameScreen extends Activity {
 		config = assetsPropertyReader.getProperties("config.properties");
          
 		mGLView = new GLSurfaceView(getApplication());
+		
+		// Enable Immersive mode (hides status and nav bar)
+		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+	        mGLView.setSystemUiVisibility(
+	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_FULLSCREEN
+	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    	} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+    		mGLView.setSystemUiVisibility(
+	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	                | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    	}
+		
+		// Use legacy code if running on older Android versions
+		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+			width = display.getWidth();
+			height = display.getHeight();
+		} else {
+			Point size = new Point();
+			display.getRealSize(size);
+			width = size.x;
+			height = size.y;
+		}
 		
 		mGLView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
 			
@@ -241,6 +262,29 @@ public class GameScreen extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+	
+	@SuppressLint("InlinedApi")
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		
+		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+			mGLView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+			mGLView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN);
+		}
+	}
 	
 	protected boolean isFullscreenOpaque() {
 		return true;

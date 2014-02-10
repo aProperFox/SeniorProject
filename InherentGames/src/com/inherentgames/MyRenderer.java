@@ -1,8 +1,6 @@
 package com.inherentgames;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
