@@ -1,6 +1,7 @@
 package com.inherentgames;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -181,8 +182,7 @@ public class MenuScreen extends Activity {
 		}
 	}
 	
-	/*
-	 * Messing up touches
+	
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onResume(){
@@ -198,13 +198,7 @@ public class MenuScreen extends Activity {
 				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 				| View.SYSTEM_UI_FLAG_FULLSCREEN
 				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-			currentView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN);
+		    this.UiChangeListener();
 		}
 		
 		try {
@@ -218,7 +212,6 @@ public class MenuScreen extends Activity {
         	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
         }
 	}
-	*/
 	
 	@Override
 	public void onStop(){
@@ -240,29 +233,24 @@ public class MenuScreen extends Activity {
         button.setText(text);
         button.setTypeface(typeface);
 	}
-	/*
-	@SuppressLint("InlinedApi")
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		
-		View currentView = getWindow().getDecorView();
-		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-			currentView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-			currentView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN);
-		}
-	}
-	*/
+	
+	public void UiChangeListener() {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+            @TargetApi(19)
+			@Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                }
+            }
+        });
+    }
+	
 }

@@ -1,6 +1,7 @@
 package com.inherentgames;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,7 +28,6 @@ public class VideoScreen extends Activity{
         videoView = (VideoView)findViewById(R.id.VideoView);
         View root = videoView.getRootView();
         
-        /*
         // Enable Immersive mode (hides status and nav bar)
         if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
 	        videoView.setSystemUiVisibility(
@@ -37,15 +37,8 @@ public class VideoScreen extends Activity{
 	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_FULLSCREEN
 	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    	} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-    		videoView.setSystemUiVisibility(
-	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_FULLSCREEN);
-    	}
-    	*/
+     	    this.UiChangeListener();
+        }
         
         root.setBackgroundColor(Color.BLACK);
         		
@@ -81,29 +74,22 @@ public class VideoScreen extends Activity{
 		return true;
 	}
 	
-	/*
-	 * Messing up touches
-	@SuppressLint("InlinedApi")
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		
-		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-			videoView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-		} else if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-			videoView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN);
-		}
-	}
-	*/
+	public void UiChangeListener() {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+            @TargetApi(19)
+			@Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                }
+            }
+        });
+    }
 }
