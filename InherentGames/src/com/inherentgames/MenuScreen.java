@@ -172,13 +172,23 @@ public class MenuScreen extends Activity {
 	@Override
 	public void onPause(){
 		super.onPause();
-		mp.pause();
+		try {
+			if (mp != null && mp.isPlaying())
+				mp.pause();
+		} catch (IllegalStateException e) {
+			Log.e("MenuScreen", "Can't pause the media player.");
+		}
 	}
 	
 	@Override
 	public void onResume(){
 		super.onResume();
 		try {
+			if (mp == null)
+				mp = MediaPlayer.create(this, R.raw.time_pi_theme);
+			else if (!mp.isPlaying())
+				mp.prepare();
+            mp.setLooping(true);
             mp.start();
         } catch (Exception e) {
         	Log.e("MenuScreen", "Something went wrong with the MediaPlayer.");
@@ -188,9 +198,15 @@ public class MenuScreen extends Activity {
 	@Override
 	public void onStop(){
 		super.onStop();
-		mp.stop();
-		mp.reset();
-		mp.release();
+		try {
+			if (mp.isPlaying())
+				mp.stop();
+			mp.reset();
+			mp.release();
+			mp = null;
+		} catch (IllegalStateException e) {
+			Log.e("MenuScreen", "Can't stop the player.");
+		}
 	}
 	
 	private void setButtonConfig(Button button, String text){
