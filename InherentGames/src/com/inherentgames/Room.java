@@ -13,6 +13,7 @@ import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
+import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.TextureManager;
@@ -40,6 +41,10 @@ public class Room extends World {
 	private ArrayList<String> roomObjectWords;
 	
 	TextureManager tm;
+	/*
+	 * TODO: add color to WordObjects when camera is aimed at them
+	private int cameraBoxId = 0;
+	*/
 	
 	private RGBColor bubbleColor;
 	
@@ -140,35 +145,35 @@ public class Room extends World {
 			
 		case 1:
 			//First wall
-			wall = new Wall(new SimpleVector(0,0,75), 130, 50,"Room0Wall0");
+			wall = new Wall(new SimpleVector(0,0,75), 130, 50,"Room1Wall0");
 			walls.add(wall.getWall());
-			walls.get(0).setTexture("Room0Wall0");
+			walls.get(0).setTexture("Room1Wall0");
 			bodies.add(wall.getBody());
 			//Second wall
-			wall = new Wall(new SimpleVector(65,0,0), 150, 50,"Room0Wall0");
+			wall = new Wall(new SimpleVector(65,0,0), 150, 50,"Room1Wall1");
 			walls.add(wall.getWall());
-			walls.get(1).setTexture("Room0Wall0");
+			walls.get(1).setTexture("Room1Wall1");
 			bodies.add(wall.getBody());
 			//Third wall
-			wall = new Wall(new SimpleVector(0,0,-75), 130, 50,"Room0Wall0");
+			wall = new Wall(new SimpleVector(0,0,-75), 130, 50,"Room1Wall2");
 			walls.add(wall.getWall());
-			walls.get(2).setTexture("Room0Wall0");
+			walls.get(2).setTexture("Room1Wall2");
 			bodies.add(wall.getBody());
 			//Fourth wall
-			wall = new Wall(new SimpleVector(-65,0,0), 150, 50,"Room0Wall0");
+			wall = new Wall(new SimpleVector(-65,0,0), 150, 50,"Room1Wall3");
 			walls.add(wall.getWall());
-			walls.get(3).setTexture("Room0Wall0");
+			walls.get(3).setTexture("Room1Wall3");
 			bodies.add(wall.getBody());
 			
 			
 			
 			//Wall class and floor class to be changed to extend surface class
 			floor = new Floor(new SimpleVector(130,25,150),0);
-			floor.setTexture("Room0Floor");
+			floor.setTexture("Room1Floor");
 			bodies.add(floor.getBody());
 			addObject(floor.getFloor());
 			ceiling = new Floor(new SimpleVector(130,-25,150),0);
-			ceiling.setTexture("Room0Ceiling");
+			ceiling.setTexture("Room1Ceiling");
 			bodies.add(ceiling.getBody());
 			addObject(ceiling.getFloor());
 			break;
@@ -177,6 +182,12 @@ public class Room extends World {
 	}
 	
 	public void setObjects(int roomId){
+		/*
+		 * TODO: add color to WordObjects when camera is aimed at them
+		Object3D box = Primitives.getBox(5.0f,  1.0f);
+		box.setOrigin(new SimpleVector(0,0,0));
+		cameraBoxId = addObject(box);
+		*/
 		roomObjectWords = new ArrayList<String>();
 		switch (roomId){
 		case 0:
@@ -279,7 +290,7 @@ public class Room extends World {
 						context.getResources().getAssets().open("raw/room1/spoon.mtl"), 0.4f)), new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));
 				//Table = 9
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/table.obj"),
-						context.getResources().getAssets().open("raw/room1/table.mtl"), 1.0f)), new SimpleVector((float)Math.PI,0,0),"Table",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/room1/table.mtl"), 1.5f)), new SimpleVector((float)Math.PI,0,0),"Table",WordObject.FEMININE));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -304,11 +315,23 @@ public class Room extends World {
 			//Spoon 8
 			addWordObject(0,5,25, roomObjects.get(7), "Spoon");
 			//Table 9
+			addWordObject(-50,5,40, roomObjects.get(8), "Table");
 			addWordObject(-50,5,0, roomObjects.get(8), "Table");
+			addWordObject(-50,5,-40, roomObjects.get(8), "Table");
+			addWordObject(50,5,40, roomObjects.get(8), "Table");
+			addWordObject(50,5,0, roomObjects.get(8), "Table");
+			addWordObject(50,5,-40, roomObjects.get(8), "Table");
 
 			break;
 		}
 	}
+	
+	/*
+	 * TODO: add color to WordObjects when camera is aimed at them
+	public Object3D getCameraBox(){
+		return getObject(cameraBoxId);
+	}
+	*/
 	
 	private void addWordObject(float x, float y, float z, WordObject wordObject, String name){
 		//Creates a new WordObject from the generic roomObject
@@ -427,6 +450,10 @@ public class Room extends World {
 	
 	public int getNumWordObjects(){
 		return wordObjects.size();
+	}
+	
+	public ArrayList<WordObject> getWordObjects(){
+		return wordObjects;
 	}
 	
 	public boolean isBubbleType(int id){

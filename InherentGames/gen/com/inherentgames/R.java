@@ -60,16 +60,22 @@ public final class R {
         public static final int room0wall1=0x7f020023;
         public static final int room0wall2=0x7f020024;
         public static final int room0wall3=0x7f020025;
-        public static final int score_bars=0x7f020026;
-        public static final int settings_button=0x7f020027;
-        public static final int silla=0x7f020028;
-        public static final int splash=0x7f020029;
-        public static final int store_button=0x7f02002a;
-        public static final int time_bar=0x7f02002b;
-        public static final int tutorial_button=0x7f02002c;
-        public static final int ventana=0x7f02002d;
-        public static final int window=0x7f02002e;
-        public static final int word_bar=0x7f02002f;
+        public static final int room1ceiling=0x7f020026;
+        public static final int room1floor=0x7f020027;
+        public static final int room1wall0=0x7f020028;
+        public static final int room1wall1=0x7f020029;
+        public static final int room1wall2=0x7f02002a;
+        public static final int room1wall3=0x7f02002b;
+        public static final int score_bars=0x7f02002c;
+        public static final int settings_button=0x7f02002d;
+        public static final int silla=0x7f02002e;
+        public static final int splash=0x7f02002f;
+        public static final int store_button=0x7f020030;
+        public static final int time_bar=0x7f020031;
+        public static final int tutorial_button=0x7f020032;
+        public static final int ventana=0x7f020033;
+        public static final int window=0x7f020034;
+        public static final int word_bar=0x7f020035;
     }
     public static final class id {
         public static final int VideoView=0x7f0b000a;

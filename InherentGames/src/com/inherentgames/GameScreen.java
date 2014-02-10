@@ -111,8 +111,9 @@ public class GameScreen extends Activity {
 				return configs[0];
 			}
 		});
-		
-		renderer = new MyRenderer(this, width, height);
+		if(renderer == null){
+			renderer = new MyRenderer(this, width, height);
+		}
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		setContentView(mGLView);
@@ -157,7 +158,6 @@ public class GameScreen extends Activity {
 	}
 	
 	public boolean onTouchEvent(MotionEvent me){
-		
 		switch(me.getAction() & MotionEvent.ACTION_MASK){
 	    	
     		case MotionEvent.ACTION_DOWN:
@@ -227,10 +227,9 @@ public class GameScreen extends Activity {
     		case MotionEvent.ACTION_MOVE:
 				xd = me.getX() - xpos;
 				yd = me.getY() - ypos;
-				
 				if(isViewMode){
-					renderer.setTouchTurn(xd / -(width/10f));
-					renderer.setTouchTurnUp(yd / -(height/10f));
+					renderer.setTouchTurn(xd / -(width/15f));
+					renderer.setTouchTurnUp(yd / -(height/15f));
 				}
 				xpos = me.getX();
 				ypos = me.getY();
