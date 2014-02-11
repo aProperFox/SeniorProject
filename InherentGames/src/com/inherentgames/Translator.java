@@ -17,7 +17,16 @@ public class Translator {
 		{"Door", "Puerta"},
 		{"Book", "Libro"},
 		{"Paper", "Papel"},
-		{"Window", "Ventana"}
+		{"Window", "Ventana"},
+		{"Bill", "Cuenta"},
+		{"Bread", "Pan"},
+		{"Cake", "Pastel"},
+		{"Cup", "Copa"},
+		{"Knife", "Cuchillo"},
+		{"Money", "Efectivo"},
+		{"Plate", "Plato"},
+		{"Spoon", "Cuchara"},
+		{"Table", "Mesa"},
 	};
 
 	public static String translateToLanguage(String word, int language){

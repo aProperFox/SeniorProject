@@ -14,12 +14,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,6 +60,7 @@ public class GameScreen extends Activity {
 	private int width;
 	private int height;
 	
+	private Drawable icon;
 	
 	// Stops Eclipse from complaining about new API calls
 	@SuppressWarnings("deprecation")
@@ -113,12 +120,29 @@ public class GameScreen extends Activity {
 				return configs[0];
 			}
 		});
-		if(renderer == null){
-			renderer = new MyRenderer(this, width, height);
-		}
+		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
+		int levelNum = settings.getInt("nextLevel", 1);
+		renderer = new MyRenderer(this, width, height, levelNum);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		setContentView(mGLView);
+		
+		
+		icon = getResources().getDrawable(R.drawable.pause_button_pressed);
+		Bitmap bb=((BitmapDrawable) icon).getBitmap();
+
+		int iconWidth = bb.getWidth();
+		int iconHeight = bb.getHeight();           
+		  
+		float scaleWidth = ((float) width/8) / iconWidth;
+		float scaleHeight = ((float) width/8) / iconHeight;
+
+
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);
+
+		Bitmap resultBitmap = Bitmap.createBitmap(bb, 0, 0,iconWidth, iconHeight, matrix, true);
+		icon = new BitmapDrawable(resultBitmap);
 		
 	}
 	
@@ -207,8 +231,6 @@ public class GameScreen extends Activity {
 					final CharSequence[] items = {getString(R.string.c_resume), getString(R.string.c_settings), getString(R.string.c_exit)};
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					Drawable icon = getResources().getDrawable(R.drawable.pause_button_pressed);
-					icon.setBounds(0, 0, icon.getIntrinsicWidth()/2, icon.getIntrinsicHeight()/2);
 					builder.setIcon(icon);
 					builder.setTitle(getString(R.string.c_title));
 					builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -232,6 +254,7 @@ public class GameScreen extends Activity {
 					alert.show();
 					
 				}
+				
 				else{
 					isViewMode = true;
 					isShootMode = false;
