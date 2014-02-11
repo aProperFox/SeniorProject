@@ -11,7 +11,12 @@ import javax.vecmath.Vector3f;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
@@ -23,6 +28,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.bulletphysics.dynamics.RigidBody;
 import com.threed.jpct.Camera;
@@ -63,7 +70,6 @@ public class GameScreen extends Activity {
 		}
 		
 		super.onCreate(savedInstanceState);
-		
 		Display display = getWindowManager().getDefaultDisplay();
 		
 		// Remove title bar
@@ -117,7 +123,37 @@ public class GameScreen extends Activity {
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		setContentView(mGLView);
+		
 	}
+	
+	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
+	/*
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.setHeaderTitle(getString(R.string.c_title));
+		menu.add(0, v.getId(), 0, getString(R.string.c_resume));
+		menu.add(0, v.getId(), 0, getString(R.string.c_restart));
+		menu.add(0, v.getId(), 0, getString(R.string.c_exit));	
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item){
+		if(item.getTitle()==getString(R.string.c_resume)){
+			renderer.setPauseButtonState();
+		}
+		else if(item.getTitle()==getString(R.string.c_restart)){
+    	    renderer.levelLose();
+		}
+		else if(item.getTitle()==getString(R.string.c_exit)){
+			 Intent intent = new Intent(context, MenuScreen.class);
+			 startActivity(intent);
+		}
+		
+		return true;
+	}
+	*/
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -172,6 +208,31 @@ public class GameScreen extends Activity {
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState();
+					final CharSequence[] items = {getString(R.string.c_resume), getString(R.string.c_settings), getString(R.string.c_exit)};
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					builder.setIcon(R.drawable.tempicon);
+					builder.setTitle(getString(R.string.c_title));
+					builder.setItems(items, new DialogInterface.OnClickListener() {
+					    public void onClick(DialogInterface dialog, int item) {
+							if(items[item]==getString(R.string.c_resume)){
+								renderer.setPauseButtonState();
+							}
+							else if(items[item]==getString(R.string.c_settings)){
+								renderer.setPauseButtonState();
+								/*
+								Intent intent = new Intent(context, Settings.class);
+								startActivity(intent);
+								*/
+							}
+							else if(items[item]==getString(R.string.c_exit)){
+								renderer.restart();
+							}
+					    }
+					});
+					AlertDialog alert = builder.create();
+					alert.show();
+					
 				}
 				else{
 					isViewMode = true;

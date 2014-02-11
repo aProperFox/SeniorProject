@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	 android:layout_width="match_parent"
+	 android:layout_height="match_parent"
+	 android:background="@drawable/basemap" >
+
+    <Button
+        android:id="@+id/stage_one"
+        android:layout_width="110dp"
+        android:layout_height="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="70dp"
+        android:layout_marginTop="52dp"
+        android:background="@android:color/transparent"
+    />
+        
+
+</RelativeLayout>

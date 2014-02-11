@@ -645,6 +645,17 @@ class MyRenderer implements GLSurfaceView.Renderer{
             }
         });
 	}
+	public void restart(){
+		handler.post(new Runnable(){
+            public void run(){
+                Intent intent = new Intent(context, GameScreen.class);
+        	    intent.setClass(context, MenuScreen.class);
+        	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        	    context.startActivity(intent);
+        	    world.dispose();
+            }
+        });
+	}
 	
 	public Vector3f toVector3f(SimpleVector vector){
 		return new Vector3f(vector.x,vector.y,vector.z);
