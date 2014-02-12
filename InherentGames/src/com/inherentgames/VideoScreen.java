@@ -16,6 +16,8 @@ import android.widget.VideoView;
 public class VideoScreen extends Activity{
 	VideoView videoView;
 	
+	private boolean shouldLoadMap = false;
+	
 	@SuppressLint("InlinedApi")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,12 @@ public class VideoScreen extends Activity{
      	    this.UiChangeListener();
         }
         
+        if(message.contains("b")){
+        	shouldLoadMap = true;
+        }
+        else
+        	shouldLoadMap = false;
+        
         root.setBackgroundColor(Color.BLACK);
         		
         Uri uri = Uri.parse("android.resource://com.inherentgames/raw/" + message);   
@@ -52,10 +60,18 @@ public class VideoScreen extends Activity{
             @Override
             public void onCompletion(MediaPlayer mp) 
             {
-            	Intent intent = new Intent(VideoScreen.this, GameScreen.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                finish();
+            	if(shouldLoadMap){
+            		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
+                    startActivity(intent);
+                    finish();
+            	}
+            	else{
+            		Intent intent = new Intent(VideoScreen.this, GameScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    finish();
+            	}
+            	
             }
         });
 
@@ -65,10 +81,17 @@ public class VideoScreen extends Activity{
 	public boolean onTouchEvent(MotionEvent me){
 		if(me.getAction() == MotionEvent.ACTION_DOWN){
 			videoView.stopPlayback();
-			Intent intent = new Intent(VideoScreen.this, GameScreen.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-            finish();
+			if(shouldLoadMap){
+        		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
+                startActivity(intent);
+                finish();
+        	}
+        	else{
+        		Intent intent = new Intent(VideoScreen.this, GameScreen.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                finish();
+        	}
 		}
 			
 		return true;

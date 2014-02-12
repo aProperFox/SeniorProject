@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -44,12 +45,22 @@ public class MenuScreen extends Activity {
 	private Typeface typeface;
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
+	public static final String PREFERENCES = "BABBLE_PREF";
 	
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
+            
+            SharedPreferences settings = getSharedPreferences(PREFERENCES, 0);
+
+            if (settings.getBoolean("my_first_time", true)) {
+                //the app is being launched for first time, do something        
+                Log.i("Comments", "First time");
+                settings.edit().putBoolean("my_first_time", false).commit(); 
+            }
+            
             context = this;
             easterEggCount = 0;
             canEasterEggPlay = true;
@@ -100,8 +111,7 @@ public class MenuScreen extends Activity {
                         int priority = 1;
                         int no_loop = 0;
                         float normal_playback_rate = 1f;
-                        Intent i = new Intent(MenuScreen.this, VideoScreen.class);
-                        i.putExtra(EXTRA_MESSAGE, "comic1a");
+                        Intent i = new Intent(MenuScreen.this, SelectMap.class);
                         startActivity(i);
                         overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
                         soundPool.play(soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate);
