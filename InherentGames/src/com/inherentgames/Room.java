@@ -337,8 +337,8 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/money.obj"),
 						context.getResources().getAssets().open("raw/room1/money.mtl"), 1.0f)), new SimpleVector(0,0,0),"Money",WordObject.MASCULINE));
 				//Plate = 7
-				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/plate1.obj"),
-						context.getResources().getAssets().open("raw/room1/plate1.mtl"), 1.0f)), new SimpleVector(0,0,0),"Plate",WordObject.MASCULINE));
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/plate2.obj"),
+						context.getResources().getAssets().open("raw/room1/plate2.mtl"), 1.0f)), new SimpleVector(0,0,0),"Plate",WordObject.MASCULINE));
 				//Spoon = 8
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/spoon.obj"),
 						context.getResources().getAssets().open("raw/room1/spoon.mtl"), 0.4f)), new SimpleVector(0,0,0),"Spoon",WordObject.FEMININE));
@@ -353,28 +353,28 @@ public class Room extends World {
 			//Bill 0
 			addWordObject(0,-5,60, roomObjects.get(0), "Bill");
 			//Bread 1
-			addWordObject(-50,5,50, roomObjects.get(1), "Bread");
+			addWordObject(-30,2,40, roomObjects.get(1), "Bread");
 			//Cake 2
-			addWordObject(50,5,-50,roomObjects.get(2), "Cake");
+			addWordObject(30,5,-50,roomObjects.get(2), "Cake");
 			//Cup 3
-			addWordObject(50,5,50,roomObjects.get(3), "Cup");
+			addWordObject(30,5,50,roomObjects.get(3), "Cup");
 			//Fork 4
 			//addWordObject(60,-5,20,roomObjects.get(4), "Fork");
 			//Knife 5
-			addWordObject(-25,5,-25, roomObjects.get(4), "Knife");
+			addWordObject(-25,3,-25, roomObjects.get(4), "Knife");
 			//Money 6
 			addWordObject(0,5,-50, roomObjects.get(5), "Money");
 			//Plate 7
-			addWordObject(50,5,0, roomObjects.get(6), "Plate");
+			addWordObject(50,2,0, roomObjects.get(6), "Plate");
 			//Spoon 8
-			addWordObject(0,5,15, roomObjects.get(7), "Spoon");
+			addWordObject(0,2,15, roomObjects.get(7), "Spoon");
 			//Table 9
-			addWordObject(-50,-5,40, roomObjects.get(8), "Table");
-			addWordObject(-50,-5,0, roomObjects.get(8), "Table");
-			addWordObject(-50,-5,-40, roomObjects.get(8), "Table");
-			addWordObject(50,-5,40, roomObjects.get(8), "Table");
-			addWordObject(50,-5,0, roomObjects.get(8), "Table");
-			addWordObject(50,-5,-40, roomObjects.get(8), "Table");
+			addWordObject(-30,-4,40, roomObjects.get(8), "Table");
+			addWordObject(-30,-4,0, roomObjects.get(8), "Table");
+			addWordObject(-30,-4,-40, roomObjects.get(8), "Table");
+			addWordObject(30,-4,40, roomObjects.get(8), "Table");
+			addWordObject(30,-4,0, roomObjects.get(8), "Table");
+			addWordObject(30,-4,-40, roomObjects.get(8), "Table");
 
 			break;
 		}

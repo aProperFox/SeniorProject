@@ -62,7 +62,6 @@ public class VideoScreen extends Activity{
             {
             	if(shouldLoadMap){
             		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                     finish();
             	}
@@ -84,7 +83,6 @@ public class VideoScreen extends Activity{
 			videoView.stopPlayback();
 			if(shouldLoadMap){
         		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 finish();
         	}

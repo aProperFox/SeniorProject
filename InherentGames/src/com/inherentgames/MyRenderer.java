@@ -107,10 +107,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	public MyRenderer(Context c, int w, int h, int roomNum) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
-		
+		this.roomNum = roomNum;
 		
 		if(roomNum == 0){
-			this.roomNum = roomNum;
 			isTutorial = true;
 			
 			width = w;
@@ -126,8 +125,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		width = w;
 		height = h;
-		SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
-	      if(settings.getBoolean("hasLoadedTextures", false)){
+	      if(tm.containsTexture("gui_font")){
 	    	  
 	      }
 	      else{
@@ -162,10 +160,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			
 			Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256), true);
 			tm.addTexture("Default", objectNames);
-			
-		      SharedPreferences.Editor editor = settings.edit();
-		      editor.putBoolean("hasLoadedTextures", true);
-		      editor.commit();
 		      
 			}catch(Exception e){
 				
@@ -288,6 +282,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				tm.addTexture("Mesa", objectNames);
 				break;
 			}
+		
 		} catch(Exception e){
 			Log.i("MyRenderer", "Caught exception loading textures: " + e);
 		}
@@ -770,30 +765,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
             	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             	    context.startActivity(intent);
             	    world.dispose();
-            	    removeTextures();
                 }
             });
-    	else if(roomNum == 2){
-    		roomNum++;
-			SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putInt("nextLevel", roomNum);
-
-  	        // Commit the edits!
-  	        editor.commit();
-	        handler.post(new Runnable(){
-	            public void run(){
-	            	Toast toast = Toast.makeText(context, R.string.win_level_title, Toast.LENGTH_LONG);
-	                toast.show();
-	                Intent intent = new Intent(context, GameScreen.class);
-            	    intent.setClass(context, MenuScreen.class);
-            	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            	    context.startActivity(intent);
-            	    world.dispose();
-            	    removeTextures();
-	            }
-	        });
-    	}
     	else{
     		  roomNum++;
     		  SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
@@ -812,7 +785,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	        	    intent.putExtra(MenuScreen.EXTRA_MESSAGE, "comic" + (roomNum-1) + "b");
 	        	    context.startActivity(intent);
 	        		world.dispose();
-	        		removeTextures();
 	            }
 	        });
     	}
@@ -869,19 +841,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			tm.removeTexture("Room1Floor");
 			tm.removeTexture("Room1Ceiling");
 		}
-		tm.removeTexture("gui_font");
-		tm.removeTexture("bubbleRed");
-		tm.removeTexture("bubbleBlue");
-		tm.removeTexture("fireButton");
-		tm.removeTexture("fireButtonPressed");
-		tm.removeTexture("pauseButton");
-		tm.removeTexture("pauseButtonPressed");
-		tm.removeTexture("FuelBar");
-		tm.removeTexture("TimeBar");
-		tm.removeTexture("ScoreBars");
-		tm.removeTexture("InfoBar");
-		tm.removeTexture("ScoreArrow");
-		tm.removeTexture("Default");
+
 	}
 	
 	public void levelLose(){
