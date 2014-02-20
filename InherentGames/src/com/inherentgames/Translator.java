@@ -21,7 +21,7 @@ public class Translator {
 		{"Bill", "Cuenta"},
 		{"Bread", "Pan"},
 		{"Cake", "Pastel"},
-		{"Cup", "Copa"},
+		{"Cup", "Taza"},
 		{"Knife", "Cuchillo"},
 		{"Money", "Efectivo"},
 		{"Plate", "Plato"},

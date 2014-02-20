@@ -17,6 +17,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -25,6 +28,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+@SuppressLint("NewApi")
 public class MenuScreen extends Activity {
 	
 	private MediaPlayer mp;
@@ -175,7 +179,7 @@ public class MenuScreen extends Activity {
 			mp = MediaPlayer.create(context, R.raw.fly_haircut);
             mp.start();
             canEasterEggPlay = false;
-            Toast toast = Toast.makeText(context, R.string.easter_egg, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(context, R.string.unavailable, Toast.LENGTH_LONG);
             toast.show();
 		}
 		return true;
@@ -236,6 +240,31 @@ public class MenuScreen extends Activity {
 			Log.e("MenuScreen", "Can't stop the player.");
 		}
 	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+    	mp.release();
+    	mp = null;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, menu);
+	    return true;
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.delete_data:
+        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
+        	return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+	
 	
 	private void setButtonConfig(Button button, String text){
 		button.setTextColor(buttonTextColor);
