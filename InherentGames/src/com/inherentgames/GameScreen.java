@@ -120,7 +120,7 @@ public class GameScreen extends Activity {
 			}
 		});
 		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
-		int levelNum = settings.getInt("nextLevel", 1);
+		int levelNum = settings.getInt("loadLevel", 1);
 		Log.i("GameScreen", "Current level is: " + levelNum);
 		renderer = new MyRenderer(this, width, height, levelNum);
 		mGLView.setRenderer(renderer);
@@ -191,6 +191,7 @@ public class GameScreen extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();
+		renderer.setTextures();
 		mGLView.onResume();
 	}
 
@@ -310,8 +311,8 @@ public class GameScreen extends Activity {
 				xd = me.getX() - xpos;
 				yd = me.getY() - ypos;
 				if(isViewMode){
-					renderer.setTouchTurn(xd / -(width/15f));
-					renderer.setTouchTurnUp(yd / -(height/15f));
+					renderer.setTouchTurn(xd / -(width/8f));
+					renderer.setTouchTurnUp(yd / -(height/8f));
 				}
 				xpos = me.getX();
 				ypos = me.getY();
@@ -334,6 +335,9 @@ public class GameScreen extends Activity {
             return true;
         case R.id.change_level:
         	renderer.levelWin();
+        	return true;
+        case R.id.delete_data:
+        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
         	return true;
         }
         return super.onOptionsItemSelected(item);

@@ -4,4 +4,6 @@
           android:title="@string/change_lighting" />
     <item android:id="@+id/change_level"
           android:title="@string/change_level" />
+    <item android:id="@+id/delete_data"
+          android:title="@string/delete_data" />
 </menu>

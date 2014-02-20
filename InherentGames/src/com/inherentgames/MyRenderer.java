@@ -9,6 +9,7 @@ import javax.vecmath.Vector3f;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.opengl.GLSurfaceView;
@@ -125,6 +126,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		width = w;
 		height = h;
+		Bitmap bitmap;
 	      if(tm.containsTexture("gui_font")){
 	    	  
 	      }
@@ -134,32 +136,32 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			Texture text = new Texture(context.getResources().openRawResource(R.raw.font));
 			text.setFiltering(false);
 			tm.addTexture("gui_font", text);
-			Texture bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 512, 512), true);
-			tm.addTexture("bubbleRed", bubble);
-			bubble = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 512, 512), true);
-			tm.addTexture("bubbleBlue", bubble);
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 256, 256);
+			tm.addTexture("bubbleRed", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 256, 256);
+			tm.addTexture("bubbleBlue", new Texture(bitmap,true));
 			
-			Texture screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128), true);
-			tm.addTexture("fireButton", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128), true);
-			tm.addTexture("fireButtonPressed", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128), true);
-			tm.addTexture("pauseButton", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128), true);
-			tm.addTexture("pauseButtonPressed", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 32, 1024), true);
-			tm.addTexture("FuelBar", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 32, 1024), true);
-			tm.addTexture("TimeBar", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 256, 1024), true);
-			tm.addTexture("ScoreBars", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 256, 256), true);
-			tm.addTexture("InfoBar", screenImages);
-			screenImages = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 64, 64), true);
-			tm.addTexture("ScoreArrow", screenImages);
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128);
+			tm.addTexture("fireButton", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128);
+			tm.addTexture("fireButtonPressed", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128);
+			tm.addTexture("pauseButton", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128);
+			tm.addTexture("pauseButtonPressed", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 16, 512);
+			tm.addTexture("FuelBar", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 16, 512);
+			tm.addTexture("TimeBar", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 128, 512);
+			tm.addTexture("ScoreBars", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 128, 128);
+			tm.addTexture("InfoBar", new Texture(bitmap,true));
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 32, 32);
+			tm.addTexture("ScoreArrow", new Texture(bitmap,true));
 			
-			Texture objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256), true);
-			tm.addTexture("Default", objectNames);
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256);
+			tm.addTexture("Default", new Texture(bitmap,true));
 		      
 			}catch(Exception e){
 				
@@ -171,115 +173,155 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 
 	public void setTextures(){
-		Texture objectNames;
-		Texture objects;
-		Texture wallTextures;
-		
+		Bitmap bitmap;
 		try{
 		switch(roomNum){
 			case 0:
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256), true);
-				tm.addTexture("Escritorio", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256), true);
-				tm.addTexture("Silla", objectNames);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialwall)), 512, 256), true);
-				tm.addTexture("TutorialWall", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256);
+				tm.addTexture("Escritorio", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256);
+				tm.addTexture("Silla", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialwall)), 512, 256);
+				tm.addTexture("TutorialWall", new Texture(bitmap,true));
+				bitmap.recycle();
 				//Floor
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialfloor)), 256, 256), true);
-				tm.addTexture("TutorialFloor", wallTextures);	
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialfloor)), 256, 256);
+				tm.addTexture("TutorialFloor", new Texture(bitmap,true));	
+				bitmap.recycle();
 				//Ceiling
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialceiling)), 512, 512), true);
-				tm.addTexture("TutorialCeiling", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialceiling)), 512, 512);
+				tm.addTexture("TutorialCeiling", new Texture(bitmap,true));
+				bitmap.recycle();
 				break;
 			case 1:
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256), true);
-				tm.addTexture("Chalkboard", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendar)), 256, 256), true);
-				tm.addTexture("Calendar", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.clock)), 256, 256), true);
-				tm.addTexture("Clock", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.backpack)), 256, 256), true);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256);
+				tm.addTexture("Chalkboard", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendar)), 256, 256);
+				tm.addTexture("Calendar", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.clock)), 256, 256);
+				tm.addTexture("Clock", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.backpack)), 256, 256);
 				//tm.addTexture("Backpack", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.paper)), 256, 128), true);
-				tm.addTexture("Paper", objects);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.paper)), 256, 128);
+				tm.addTexture("Paper", new Texture(bitmap,true));
+				bitmap.recycle();
 				
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256), true);
-				tm.addTexture("Escritorio", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256), true);
-				tm.addTexture("Silla", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 256, 256), true);
-				tm.addTexture("Pizarra", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 256, 256), true);
-				tm.addTexture("Mochila", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.reloj)), 256, 256), true);
-				tm.addTexture("Reloj", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendario)), 256, 256), true);
-				tm.addTexture("Calendario", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.puerta)), 256, 256), true);
-				tm.addTexture("Puerta", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.libro)), 256, 256), true);
-				tm.addTexture("Libro", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.papel)), 256, 256), true);
-				tm.addTexture("Papel", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ventana)), 256, 256), true);
-				tm.addTexture("Ventana", objectNames);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 128, 128);
+				tm.addTexture("Escritorio", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 128, 128);
+				tm.addTexture("Silla", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 128, 128);
+				tm.addTexture("Pizarra", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mochila)), 128, 128);
+				tm.addTexture("Mochila", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.reloj)), 128, 128);
+				tm.addTexture("Reloj", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.calendario)), 128, 128);
+				tm.addTexture("Calendario", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.puerta)), 128, 128);
+				tm.addTexture("Puerta", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.libro)), 128, 128);
+				tm.addTexture("Libro", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.papel)), 128, 128);
+				tm.addTexture("Papel", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ventana)), 128, 128);
+				tm.addTexture("Ventana", new Texture(bitmap,true));
+				bitmap.recycle();
 				
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall0)), 1024, 512), true);
-				tm.addTexture("Room0Wall0", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall1)), 1024, 512), true);
-				tm.addTexture("Room0Wall1", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall2)), 1024, 512), true);
-				tm.addTexture("Room0Wall2", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall3)), 1024, 512), true);
-				tm.addTexture("Room0Wall3", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall0)), 1024, 512);
+				tm.addTexture("Room0Wall0", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall1)), 1024, 512);
+				tm.addTexture("Room0Wall1", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall2)), 1024, 512);
+				tm.addTexture("Room0Wall2", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0wall3)), 1024, 512);
+				tm.addTexture("Room0Wall3", new Texture(bitmap,true));
+				bitmap.recycle();
 				//Floor
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0floor)), 1024, 1024), true);
-				tm.addTexture("Room0Floor", wallTextures);	
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0floor)), 1024, 1024);
+				tm.addTexture("Room0Floor", new Texture(bitmap,true));	
+				bitmap.recycle();
 				//Ceiling
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024), true);
-				tm.addTexture("Room0Ceiling", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024);
+				tm.addTexture("Room0Ceiling", new Texture(bitmap,true));
+				bitmap.recycle();
 				break;
 			case 2:
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.money1)), 512, 256), true);
-				tm.addTexture("Money", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bread)), 512, 512), true);
-				tm.addTexture("Bread", objects);
-				objects = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bill)), 256, 512), true);
-				tm.addTexture("Bill", objects);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.money1)), 512, 256);
+				tm.addTexture("Money", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bread)), 512, 512);
+				tm.addTexture("Bread", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bill)), 256, 512);
+				tm.addTexture("Bill", new Texture(bitmap,true));
+				bitmap.recycle();
 				
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall0)), 1024, 512), true);
-				tm.addTexture("Room1Wall0", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall1)), 1024, 512), true);
-				tm.addTexture("Room1Wall1", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall2)), 1024, 512), true);
-				tm.addTexture("Room1Wall2", wallTextures);
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall3)), 1024, 512), true);
-				tm.addTexture("Room1Wall3", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall0)), 1024, 512);
+				tm.addTexture("Room1Wall0", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall1)), 1024, 512);
+				tm.addTexture("Room1Wall1", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall2)), 1024, 512);
+				tm.addTexture("Room1Wall2", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1wall3)), 1024, 512);
+				tm.addTexture("Room1Wall3", new Texture(bitmap,true));
+				bitmap.recycle();
 				//Floor
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1floor)), 1024, 1024), true);
-				tm.addTexture("Room1Floor", wallTextures);	
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1floor)), 1024, 1024);
+				tm.addTexture("Room1Floor", new Texture(bitmap,true));
+				bitmap.recycle();
 				//Ceiling
-				wallTextures = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1ceiling)), 1024, 1024), true);
-				tm.addTexture("Room1Ceiling", wallTextures);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room1ceiling)), 1024, 1024);
+				tm.addTexture("Room1Ceiling", new Texture(bitmap,true));
+				bitmap.recycle();
 				
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuenta)), 256, 256), true);
-				tm.addTexture("Cuenta", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pan)), 256, 256), true);
-				tm.addTexture("Pan", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pastel)), 256, 256), true);
-				tm.addTexture("Pastel", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.copa)), 256, 256), true);
-				tm.addTexture("Copa", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuchillo)), 256, 256), true);
-				tm.addTexture("Cuchillo", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.efectivo)), 256, 256), true);
-				tm.addTexture("Efectivo", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.plato)), 256, 256), true);
-				tm.addTexture("Plato", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuchara)), 256, 256), true);
-				tm.addTexture("Cuchara", objectNames);
-				objectNames = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mesa)), 256, 256), true);
-				tm.addTexture("Mesa", objectNames);
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuenta)), 128, 128);
+				tm.addTexture("Cuenta", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pan)), 128, 128);
+				tm.addTexture("Pan", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pastel)), 128, 128);
+				tm.addTexture("Pastel", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.taza)), 128, 128);
+				tm.addTexture("Taza", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuchillo)), 128, 128);
+				tm.addTexture("Cuchillo", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.efectivo)), 128, 128);
+				tm.addTexture("Efectivo", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.plato)), 128, 128);
+				tm.addTexture("Plato", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.cuchara)), 128, 128);
+				tm.addTexture("Cuchara", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mesa)), 128, 128);
+				tm.addTexture("Mesa", new Texture(bitmap,true));
+				bitmap.recycle();
 				break;
 			}
 		
@@ -350,9 +392,19 @@ class MyRenderer implements GLSurfaceView.Renderer{
         soundPoolMap.put(8, soundPool.load(context, R.raw.libro, 1));
         soundPoolMap.put(9, soundPool.load(context, R.raw.papel, 1));
         soundPoolMap.put(10, soundPool.load(context, R.raw.ventana, 1));
+        soundPoolMap.put(11, soundPool.load(context, R.raw.cuenta, 1));
+        soundPoolMap.put(12, soundPool.load(context, R.raw.pan, 1));
+        soundPoolMap.put(13, soundPool.load(context, R.raw.pastel, 1));
+        soundPoolMap.put(14, soundPool.load(context, R.raw.taza, 1));
+        soundPoolMap.put(15, soundPool.load(context, R.raw.cuchillo, 1));
+        soundPoolMap.put(16, soundPool.load(context, R.raw.efectivo, 1));
+        soundPoolMap.put(17, soundPool.load(context, R.raw.plato, 1));
+        soundPoolMap.put(18, soundPool.load(context, R.raw.cuchara, 1));
+        soundPoolMap.put(19, soundPool.load(context, R.raw.mesa, 1));
         isPaused = false;
         
 	}
+	
 	
 	public void changeLevel(){
 		if (fb != null) {
@@ -470,7 +522,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		world.draw(fb);
 		renderer2D.blitCrosshair(fb, width, height);
 		//Bubble image
-		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 512, 512, width/3, width/3, 5);
+		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
 		//Bubble text
 		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
 		//Fire Button
@@ -479,7 +531,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
 		//Info Bar
 		//Has extra 1 px hang if using real size? Decremented to 255x255
-		renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 255, 255, width/5, width/5, 100);
+		renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 127, 127, width/5, width/5, 100);
 		//Dynamic fuel/time bars
 
 		//Only called for 
@@ -492,11 +544,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			}
 		}
 
-		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 32, 1024, width/38, fuelHeight, (int)(height*0.76), 100);
-		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 32, 1024, width/38, timeHeight, (int)(height*0.76), 100);
+		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 16, 512, width/38, fuelHeight, (int)(height*0.76), 100);
+		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 16, 512, width/38, timeHeight, (int)(height*0.76), 100);
 		//Score bars
-		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 256, 1024, width/8, (int)(height*0.9), 100);
-		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 64, 64, width/38, width/38, 100);
+		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
+		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
 	
 		//Wattson help text
 		int letterWidth = width/96;
@@ -754,7 +806,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 	
 	public void levelWin(){
-		
+		bubbleTexture = "bubbleBlue";
     	if(isTutorial)
     		handler.post(new Runnable(){
                 public void run(){
@@ -769,12 +821,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
             });
     	else{
     		  roomNum++;
-    		  SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
-    	      SharedPreferences.Editor editor = settings.edit();
-    	      editor.putInt("nextLevel", roomNum);
-
-    	      // Commit the edits!
-    	      editor.commit();
+    		  context.getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("nextLevel", roomNum).commit();
+    	      
 	        handler.post(new Runnable(){
 	            public void run(){
 	            	Toast toast = Toast.makeText(context, R.string.win_level_title, Toast.LENGTH_LONG);
@@ -791,58 +839,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 
 	}
 	
-	public void removeTextures(){
-		if(roomNum == 0){
-			tm.removeTexture("TutorialWall");
-			tm.removeTexture("TutorialFloor");
-			tm.removeTexture("TutorialCeiling");
-			
-		}
-		else if(roomNum == 1){
-			tm.removeTexture("Chalkboard");
-			tm.removeTexture("Calendar");
-			tm.removeTexture("Clock");
-			tm.removeTexture("Paper");
-			tm.removeTexture("Paper");
-			tm.removeTexture("Escritorio");
-			tm.removeTexture("Silla");
-			tm.removeTexture("Pizarra");
-			tm.removeTexture("Mochila");
-			tm.removeTexture("Reloj");
-			tm.removeTexture("Calendario");
-			tm.removeTexture("Libro");
-			tm.removeTexture("Papel");
-			tm.removeTexture("Ventana");
-			tm.removeTexture("Room0Wall0");
-			tm.removeTexture("Room0Wall1");
-			tm.removeTexture("Room0Wall2");
-			tm.removeTexture("Room0Wall3");
-			tm.removeTexture("Room0Floor");
-			tm.removeTexture("Room0Ceiling");
-		}
-		else{
-			tm.removeTexture("Bill");
-			tm.removeTexture("Money");
-			tm.removeTexture("Bread");
-			tm.removeTexture("Cuenta");
-			tm.removeTexture("Pan");
-			tm.removeTexture("Pastel");
-			tm.removeTexture("Copa");
-			tm.removeTexture("Cuchillo");
-			tm.removeTexture("Efectivo");
-			tm.removeTexture("Plato");
-			tm.removeTexture("Cuchara");
-			tm.removeTexture("Mesa");
-			
-			tm.removeTexture("Room1Wall0");
-			tm.removeTexture("Room1Wall1");
-			tm.removeTexture("Room1Wall2");
-			tm.removeTexture("Room1Wall3");
-			tm.removeTexture("Room1Floor");
-			tm.removeTexture("Room1Ceiling");
-		}
-
-	}
 	
 	public void levelLose(){
 		handler.post(new Runnable(){

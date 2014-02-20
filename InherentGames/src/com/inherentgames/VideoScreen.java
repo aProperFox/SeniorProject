@@ -80,7 +80,6 @@ public class VideoScreen extends Activity{
 	@Override
 	public boolean onTouchEvent(MotionEvent me){
 		if(me.getAction() == MotionEvent.ACTION_DOWN){
-			videoView.stopPlayback();
 			if(shouldLoadMap){
         		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
                 startActivity(intent);
@@ -115,4 +114,23 @@ public class VideoScreen extends Activity{
             }
         });
     }
+	
+	@Override
+	protected void onResume() {
+	    videoView.resume();
+	    super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+	    videoView.suspend();
+	    super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+	    videoView.stopPlayback();
+	    super.onDestroy();
+	}
+	
 }
