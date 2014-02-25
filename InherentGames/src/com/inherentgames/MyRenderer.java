@@ -64,6 +64,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private String fireButtonState = "fireButton";
 	
 	private Renderer2D renderer2D;
+	private boolean hasClickedWattson; 
 	
 	private DiscreteDynamicsWorld dynamicWorld;
 	private DefaultCollisionConfiguration collisionConfiguration;
@@ -75,12 +76,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	
 	private int fuelHeight = 0;
 	private int timeHeight;
+	private int arrowHeight;
+	private boolean isArrowAscending;
 	
 	private String bubbleTexture = "bubbleBlue";
 	private String pauseButtonState = "pauseButton";
 	
 	private String wattsonPhrases[][] = {
-			{"Welcome to the tutorial for Babble Bubbles!", "I'm Wattson, your personal guide!", ""},
+			{"Welcome to the tutorial for Babble Bubbles!", "I'm Wattson, your personal guide.", "Click me to begin!"},
 			{"Look around by sliding your finger on the screen.", "", ""},
 			{"To shoot a bubble, hold down the 'fire' button", "and swipe the screen up or down.", ""},
 			{"Swiping up shoots a masculine article, and down", "shoots a feminine article.", ""},
@@ -112,7 +115,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		if(roomNum == 0){
 			isTutorial = true;
-			
+			hasClickedWattson = false;
 			width = w;
 			height = h;
 			wattsonText.add(wattsonPhrases[0][0]);
@@ -121,6 +124,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			wattsonTextIterator = 0;
 		}
 		else{
+			hasClickedWattson = true;
 			isTutorial = false;
 		}
 		
@@ -138,31 +142,45 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			tm.addTexture("gui_font", text);
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubblered)), 256, 256);
 			tm.addTexture("bubbleRed", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.bubbleblue)), 256, 256);
 			tm.addTexture("bubbleBlue", new Texture(bitmap,true));
+			bitmap.recycle();
 			
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebutton)), 128, 128);
 			tm.addTexture("fireButton", new Texture(bitmap,true));
+			
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.firebuttonpressed)), 128, 128);
 			tm.addTexture("fireButtonPressed", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button)), 128, 128);
 			tm.addTexture("pauseButton", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pause_button_pressed)), 128, 128);
 			tm.addTexture("pauseButtonPressed", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.word_bar)), 16, 512);
 			tm.addTexture("FuelBar", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.time_bar)), 16, 512);
 			tm.addTexture("TimeBar", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.score_bars)), 128, 512);
 			tm.addTexture("ScoreBars", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.info_bar)), 128, 128);
 			tm.addTexture("InfoBar", new Texture(bitmap,true));
+			bitmap.recycle();
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.fuel_bar_arrow)), 32, 32);
 			tm.addTexture("ScoreArrow", new Texture(bitmap,true));
+			bitmap.recycle();
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.arrow_up)), 32, 64);
+			tm.addTexture("ArrowUp", new Texture(bitmap,true));
+			bitmap.recycle();
 			
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256);
 			tm.addTexture("Default", new Texture(bitmap,true));
-		      
+			bitmap.recycle();
 			}catch(Exception e){
 				
 			}
@@ -177,12 +195,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		try{
 		switch(roomNum){
 			case 0:
-				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256);
-				tm.addTexture("Escritorio", new Texture(bitmap,true));
-				bitmap.recycle();
-				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256);
-				tm.addTexture("Silla", new Texture(bitmap,true));
-				bitmap.recycle();
+				if(!tm.containsTexture("Escritorio")){
+					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256);
+					tm.addTexture("Escritorio", new Texture(bitmap,true));
+					bitmap.recycle();
+					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 256, 256);
+					tm.addTexture("Silla", new Texture(bitmap,true));
+					bitmap.recycle();
+				}
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialwall)), 512, 256);
 				tm.addTexture("TutorialWall", new Texture(bitmap,true));
 				bitmap.recycle();
@@ -211,12 +231,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				tm.addTexture("Paper", new Texture(bitmap,true));
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 128, 128);
-				tm.addTexture("Escritorio", new Texture(bitmap,true));
-				bitmap.recycle();
-				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 128, 128);
-				tm.addTexture("Silla", new Texture(bitmap,true));
-				bitmap.recycle();
+				if(!tm.containsTexture("Escritorio")){
+					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 128, 128);
+					tm.addTexture("Escritorio", new Texture(bitmap,true));
+					bitmap.recycle();
+					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.silla)), 128, 128);
+					tm.addTexture("Silla", new Texture(bitmap,true));
+					bitmap.recycle();
+				}
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.pizarra)), 128, 128);
 				tm.addTexture("Pizarra", new Texture(bitmap,true));
 				bitmap.recycle();
@@ -336,9 +358,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 		fb = new FrameBuffer(gl, w, h);
 
+		isArrowAscending = true;
+		arrowHeight = (int)(((float)height)/3.5f);
+		
 		renderer2D = new Renderer2D(fb);
 		clock = new Clock();
-		
+		setTextures();
 		world = new Room(roomNum, context, tm);
 		world.setAmbientLight(20, 20, 20);
 		
@@ -538,6 +563,24 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		if(!isPaused){
 			if(endTime - System.currentTimeMillis() > 0){
 				timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
+				if(isArrowAscending){
+					if(arrowHeight < height/3){
+						isArrowAscending = false;
+						arrowHeight++;
+					}
+					else{
+						arrowHeight--;
+					}
+				}
+				else{
+					if(arrowHeight > (int)(((float)height)/3.5f)){
+						isArrowAscending = true;
+						arrowHeight--;
+					}
+					else{
+						arrowHeight++;
+					}
+				}
 			}
 			else{
 				levelLose();
@@ -581,7 +624,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			renderer2D.blitText(string, width/6, height/30 + (letterWidth*2*iteration), letterWidth, letterWidth*2,RGBColor.WHITE);
 			iteration++;
 		}
-		
+		if(isTutorial && !hasClickedWattson){
+			renderer2D.blitImage(fb, "ArrowUp", width/11, arrowHeight, 32, 64, width/20, height/6, 100);
+		}
 		
 		fb.display();
 		
@@ -677,7 +722,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 							Log.i("olsontl", "Object is a WordObject!");
 							if(collisionObject.getArticle() == bubble.getArticle()){
 								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
-								collisionObject.scale(5.0f);
+								if(collisionObject.getName(Translator.ENGLISH) != "Plate"){
+									collisionObject.scale(5.0f);
+								}
 								collisionObject.setStatic(false);
 								bubble.setHeldObjectId(id);
 								//Object3D worldBubbleObject = world.getObject(bubble.getObjectId());
@@ -866,12 +913,20 @@ class MyRenderer implements GLSurfaceView.Renderer{
         });
 	}
 	
+	public void setHasClickedWattson(){
+		hasClickedWattson = true;
+	}
+	
 	public Vector3f toVector3f(SimpleVector vector){
 		return new Vector3f(vector.x,vector.y,vector.z);
 	}
 	
 	public SimpleVector toSimpleVector(Vector3f vector){
 		return new SimpleVector(vector.x,vector.y,vector.z);
+	}
+	
+	public void setRoomNum(int num){
+		roomNum = num;
 	}
 }
 

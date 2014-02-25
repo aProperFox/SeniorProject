@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.bulletphysics.dynamics.RigidBody;
 import com.threed.jpct.Camera;
@@ -58,6 +59,7 @@ public class GameScreen extends Activity {
 	
 	private int width;
 	private int height;
+	private Toast load;
 	
 	private Drawable icon;
 	
@@ -122,6 +124,8 @@ public class GameScreen extends Activity {
 		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
 		int levelNum = settings.getInt("loadLevel", 1);
 		Log.i("GameScreen", "Current level is: " + levelNum);
+		load = Toast.makeText(context, R.string.load_level, Toast.LENGTH_LONG);
+        load.show();
 		renderer = new MyRenderer(this, width, height, levelNum);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
@@ -174,13 +178,15 @@ public class GameScreen extends Activity {
 	}
 	*/
 	
-	
+	/*
+	 * Commenting out for non-dev version
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.menu, menu);
 	    return true;
 	}
+	*/
 	
 	@Override
 	protected void onPause() {
@@ -190,8 +196,10 @@ public class GameScreen extends Activity {
 	
 	@Override
 	protected void onResume(){
+		renderer.setRoomNum(getSharedPreferences(MenuScreen.PREFERENCES, 0).getInt("loadLevel", 1));
+		load.show();
 		super.onResume();
-		renderer.setTextures();
+		//renderer.setTextures();
 		mGLView.onResume();
 	}
 
@@ -347,6 +355,7 @@ public class GameScreen extends Activity {
 		return true;
 	}
 	
+	@SuppressLint("NewApi")
 	public void UiChangeListener() {
         final View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {

@@ -318,7 +318,7 @@ public class Room extends World {
 						context.getResources().getAssets().open("raw/room1/bill.mtl"), 1.0f)), new SimpleVector(-(float)Math.PI/2,0,0),"Bill",WordObject.FEMININE));
 				//Bread = 1
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/bread.obj"),
-						context.getResources().getAssets().open("raw/room1/bread.mtl"), 0.75f)), new SimpleVector((float)Math.PI,0,0),"Bread",WordObject.MASCULINE));
+						context.getResources().getAssets().open("raw/room1/bread.mtl"), 0.75f)), new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Bread",WordObject.MASCULINE));
 				//Cake = 2
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/cake.obj"),
 						context.getResources().getAssets().open("raw/room1/cake.mtl"), 1.0f)), new SimpleVector((float)Math.PI,0,0),"Cake",WordObject.MASCULINE));
@@ -337,8 +337,8 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/money.obj"),
 						context.getResources().getAssets().open("raw/room1/money.mtl"), 1.0f)), new SimpleVector(-(float)Math.PI/2,0,0),"Money",WordObject.MASCULINE));
 				//Plate = 7
-				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/plate1.obj"),
-						context.getResources().getAssets().open("raw/room1/plate1.mtl"), 1.0f)), new SimpleVector(0,0,0),"Plate",WordObject.MASCULINE));
+				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/plate.obj"),
+						context.getResources().getAssets().open("raw/room1/plate.mtl"), 1.0f)), new SimpleVector((float)Math.PI,0,0),"Plate",WordObject.MASCULINE));
 				//Spoon = 8
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/spoon.obj"),
 						context.getResources().getAssets().open("raw/room1/spoon.mtl"), 1.0f)), new SimpleVector(0,-(float)Math.PI/2,(float)Math.PI),"Spoon",WordObject.FEMININE));
@@ -357,9 +357,10 @@ public class Room extends World {
 			//Bread 1
 			addWordObject(-30,2,40, roomObjects.get(1), "Bread");
 			//Cake 2
-			addWordObject(25,3,-40,roomObjects.get(2), "Cake");
+			addWordObject(25,4,-40,roomObjects.get(2), "Cake");
 			//Cup 3
 			addWordObject(32,4,40,roomObjects.get(3), "Cup");
+			addWordObject(-34,4,-37,roomObjects.get(3), "Cup", new SimpleVector(0,(float)Math.PI/2,0));
 			//Fork 4
 			//addWordObject(60,-5,20,roomObjects.get(4), "Fork");
 			//Knife 5
@@ -371,17 +372,17 @@ public class Room extends World {
 			addWordObject(30,5,-40, roomObjects.get(4), "Knife");
 			//Money 6
 			addWordObject(25,1,0, roomObjects.get(5), "Money");
-			addWordObject(-10,-10,65, roomObjects.get(5), "Money", new SimpleVector((float)Math.PI/2,(float)Math.PI,(float)Math.PI/2));
+			addWordObject(10,-10,-65, roomObjects.get(5), "Money", new SimpleVector((float)Math.PI/2,0,-(float)Math.PI/2));
 			//Plate 7
-			//Plate scales strangely... leaving out until fixed
-			//addWordObject(50,2,0, roomObjects.get(6), "Plate");
+			addWordObject(26,5,40, roomObjects.get(6), "Plate");
+			addWordObject(-26,5,0, roomObjects.get(6), "Plate");
+			addWordObject(-26,5,-40, roomObjects.get(6), "Plate");
 			//Spoon 8
 			addWordObject(-23,5,40, roomObjects.get(7), "Spoon");
 			addWordObject(-23,5,0, roomObjects.get(7), "Spoon");
 			addWordObject(-23,5,-40, roomObjects.get(7), "Spoon");
 			addWordObject(23,5,40, roomObjects.get(7), "Spoon");
 			addWordObject(23,5,0, roomObjects.get(7), "Spoon");
-			addWordObject(23,5,-40, roomObjects.get(7), "Spoon");
 			//Table 9
 			addWordObject(-30,-4,40, roomObjects.get(8), "Table");
 			addWordObject(-30,-4,0, roomObjects.get(8), "Table");

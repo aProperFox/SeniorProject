@@ -99,6 +99,12 @@ public class SelectMap extends Activity {
 	}
 	
 	
-	
+	@Override
+	public void onBackPressed() {
+	   Log.d("SelectMap", "onBackPressed Called");
+	   Intent setIntent = new Intent(this, MenuScreen.class);
+	   setIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+	   startActivity(setIntent);
+	}
 	
 }
