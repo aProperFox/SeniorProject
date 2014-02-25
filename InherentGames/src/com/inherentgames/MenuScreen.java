@@ -169,7 +169,7 @@ public class MenuScreen extends Activity {
 		float xpos = me.getX();
 		float ypos = me.getY();
 		if(me.getAction() == MotionEvent.ACTION_DOWN){
-			if(xpos > width*.35 && xpos < width*.53 && ypos> height*.08 && ypos < height*.3){
+			if(xpos > width*.264 && xpos < width*.443 && ypos> height*.075 && ypos < height*.313){
 				easterEggCount++;
 			}
 		}
@@ -179,7 +179,7 @@ public class MenuScreen extends Activity {
 			mp = MediaPlayer.create(context, R.raw.fly_haircut);
             mp.start();
             canEasterEggPlay = false;
-            Toast toast = Toast.makeText(context, R.string.unavailable, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(context, R.string.easter_egg, Toast.LENGTH_LONG);
             toast.show();
 		}
 		return true;
@@ -248,12 +248,15 @@ public class MenuScreen extends Activity {
     	mp = null;
 	}
 	
+	/*
+	 * Commenting out for non-dev version
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.menu, menu);
 	    return true;
 	}
+	*/
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
