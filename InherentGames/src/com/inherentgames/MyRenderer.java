@@ -8,7 +8,6 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -644,7 +643,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				else{
 					/* Currently, the bubble pops but the next one shot breaks the physics engine.
 					if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
-						Log.i("olsontl", "I'm deleting the bubble!");
+						Log.i("MyRenderer", "I'm deleting the bubble!");
 						deleteBubble(bubble);
 						continue;
 					}*/
@@ -659,7 +658,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		if(id != -100){
 			WordObject wordObject = (WordObject)world.getObject(id);
 			if(wordObject.getStaticState()){
-			Log.i("olsontl", "Viewed object collision!");
+			Log.i("MyRenderer", "Viewed object collision!");
 				//wordObject.setAdditionalColor(255,255,0);
 			}
 		}
@@ -688,14 +687,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			if(System.currentTimeMillis() > lastShot + 500){
 				RigidBody body = world.addBubble(position);
 				if(body != null){
-					Log.i("olsontl", "Before adding bubble to physics world");
+					Log.i("MyRenderer", "Before adding bubble to physics world");
 					dynamicWorld.addRigidBody(body);
 					int size = dynamicWorld.getCollisionObjectArray().size();
 					body = (RigidBody) dynamicWorld.getCollisionObjectArray().get(size-1);
 					body.setGravity(new Vector3f(0,0,0));
 					world.getLastBubble().setBodyIndex(size-1);
 					lastShot = System.currentTimeMillis();
-					Log.i("olsontl", "After adding bubble to physics world: " );
+					Log.i("MyRenderer", "After adding bubble to physics world: " );
 					return body;
 				}
 			}
@@ -714,12 +713,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 					Vector3f linearVelocity = new Vector3f(0,0,0);
 					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
 					SimpleVector motion = new SimpleVector(linearVelocity.x,-linearVelocity.y,-linearVelocity.z);
-					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
+					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
 					WordObject collisionObject;
-					if(id != -100) Log.i("olsontl", "Checking object with id: " + id);
+					if(id != -100) Log.i("MyRenderer", "Checking object with id: " + id);
 					if(id >= 0){
 						if((collisionObject = world.getWordObject(id)) != null){
-							Log.i("olsontl", "Object is a WordObject!");
+							Log.i("MyRenderer", "Object is a WordObject!");
 							if(collisionObject.getArticle() == bubble.getArticle()){
 								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
 								if(collisionObject.getName(Translator.ENGLISH) != "Plate"){
@@ -741,7 +740,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 							}
 						}
 						else if(world.isBubbleType(id)){
-							Log.i("olsontl", "Object is a bubble!");
+							Log.i("MyRenderer", "Object is a bubble!");
 							Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
 							world.removeObject(bubbleCollisionObject.getHeldObjectId());
 							deleteBubble(bubbleCollisionObject);
@@ -854,7 +853,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	
 	public void levelWin(){
 		bubbleTexture = "bubbleBlue";
-    	if(isTutorial)
+    	if(isTutorial){
+    		Log.d("MyRenderer", "Setting hasBeatenTutorial");
+    		context.getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putBoolean("hasBeatenTutorial", true).commit();
     		handler.post(new Runnable(){
                 public void run(){
                 	Toast toast = Toast.makeText(context, "Looks like you've got it!", Toast.LENGTH_LONG);
@@ -866,6 +867,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
             	    world.dispose();
                 }
             });
+    	}
     	else{
     		  roomNum++;
     		  context.getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("nextLevel", roomNum).commit();
