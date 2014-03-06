@@ -178,15 +178,16 @@ public class GameScreen extends Activity {
 	}
 	*/
 	
-	/*
-	 * Commenting out for non-dev version
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.menu, menu);
+		if(MenuScreen.isDevMode){
+		    MenuInflater inflater = getMenuInflater();
+		    inflater.inflate(R.menu.menu, menu);
+		}
 	    return true;
 	}
-	*/
+	
 	
 	@Override
 	protected void onPause() {
@@ -226,8 +227,8 @@ public class GameScreen extends Activity {
 		switch(me.getAction() & MotionEvent.ACTION_MASK){
 	    	
     		case MotionEvent.ACTION_DOWN:
-				xpos = me.getX();
-				ypos = me.getY();
+				xpos = me.getX(0);
+				ypos = me.getY(0);
 				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16){
 					isViewMode = false;
 					isShootMode = true;
@@ -272,13 +273,13 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_DOWN:
-				xpos = me.getX(1);
-				ypos = me.getY(1);
-				firstX = xpos;
-				firstY = ypos;
+				firstX = me.getX(1);
+				firstY = me.getY(1);
+				isViewMode = false;
 				return true;
 			
     		case MotionEvent.ACTION_UP:
+    			Log.d("GameScreen", "Action Up");
 				xpos = -1;
 				ypos = -1;
 				renderer.setTouchTurn(0);
@@ -289,6 +290,7 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
+    			Log.d("GameScreen", "Action Pointer Up");
 				xpos = -1;
 				ypos = -1;
 				renderer.setTouchTurn(0);
@@ -316,14 +318,18 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_MOVE:
-				xd = me.getX() - xpos;
-				yd = me.getY() - ypos;
-				if(isViewMode){
-					renderer.setTouchTurn(xd / -(width/8f));
-					renderer.setTouchTurnUp(yd / -(height/8f));
-				}
-				xpos = me.getX();
-				ypos = me.getY();
+    			if(isViewMode){
+    				xd = me.getX() - xpos;
+    				yd = me.getY() - ypos;
+
+    				if(isViewMode){
+    					renderer.setTouchTurn(xd / -(width/5f));
+    					renderer.setTouchTurnUp(yd / -(height/5f));
+    				}
+    				xpos = me.getX();
+    				ypos = me.getY();
+    			}
+
 				return true;
 		
 		}
@@ -338,13 +344,8 @@ public class GameScreen extends Activity {
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.lighting:
-        	renderer.cycleLighting();
-            return true;
-        case R.id.change_level:
-        	renderer.levelWin();
-        	return true;
         case R.id.delete_data:
+        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("hasBeatenTutorial").commit();
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
         	return true;
         }

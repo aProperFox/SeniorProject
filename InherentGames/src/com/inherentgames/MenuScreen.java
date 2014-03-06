@@ -50,20 +50,17 @@ public class MenuScreen extends Activity {
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	public static final String PREFERENCES = "BABBLE_PREF";
+	public static boolean isDevMode = true;
+	private Button playButton;
+	
 	
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
-            
-            SharedPreferences settings = getSharedPreferences(PREFERENCES, 0);
-
-            if (settings.getBoolean("my_first_time", true)) {
-                //the app is being launched for first time, do something        
-                Log.i("Comments", "First time");
-                settings.edit().putBoolean("my_first_time", false).commit(); 
-            }
+       
+            Log.d("MenuScreen", "onCreate called");
             
             context = this;
             easterEggCount = 0;
@@ -102,8 +99,23 @@ public class MenuScreen extends Activity {
             
             typeface = Typeface.createFromAsset(getAssets(), "futura-normal.ttf"); 
             // click-handler for buttons
-            Button playButton = (Button) findViewById(R.id.playbutton);
+            playButton = (Button) findViewById(R.id.playbutton);
             setButtonConfig(playButton, getString(R.string.play_button));
+            
+            SharedPreferences settings = getSharedPreferences(PREFERENCES, 0);
+
+            if (settings.getBoolean("my_first_time", true)) {
+                //the app is being launched for first time, do something        
+                Log.i("Comments", "First time");
+                settings.edit().putBoolean("hasBeatenTutorial", false).commit(); 
+                settings.edit().putBoolean("my_first_time", false).commit(); 
+                playButton.setEnabled(false);
+                Log.d("MenuScreen", "Disabling button");
+            }
+            else{
+            	playButton.setEnabled(true);
+            	Log.d("MenuScreen", "Enabling button");
+            }
             
             sound1 = (Button) playButton;
             playButton.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +212,19 @@ public class MenuScreen extends Activity {
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onResume(){
+		
+		Log.d("MenuScreen", "Resuming Menu screen");
+		
+		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)){
+			playButton.setEnabled(true);
+			Log.d("MenuScreen", "Enabling button");
+		}
+		else{
+			playButton.setEnabled(false);
+			Log.d("MenuScreen", "Disabling button");
+		}
 		super.onResume();
+
 		
 		// Enable Immersive mode (hides status and nav bar)
 		View currentView = getWindow().getDecorView();
@@ -228,6 +252,23 @@ public class MenuScreen extends Activity {
 	}
 	
 	@Override
+	public void onStart(){
+		Log.d("MenuScreen", "onStart");
+		
+		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)){
+			playButton.setEnabled(true);
+			Log.d("MenuScreen", "Enabling button");
+
+		}
+		else{
+			playButton.setEnabled(false);
+			Log.d("MenuScreen", "Disabling button");
+		}
+		super.onStart();
+	
+	}
+	
+	@Override
 	public void onStop(){
 		super.onStop();
 		try {
@@ -248,21 +289,22 @@ public class MenuScreen extends Activity {
     	mp = null;
 	}
 	
-	/*
-	 * Commenting out for non-dev version
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.menu, menu);
+		if(MenuScreen.isDevMode){
+		    MenuInflater inflater = getMenuInflater();
+		    inflater.inflate(R.menu.menu, menu);
+		}
 	    return true;
 	}
-	*/
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.delete_data:
+        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("hasBeatenTutorial").commit();
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
+        	playButton.setEnabled(false);
         	return true;
         }
         return super.onOptionsItemSelected(item);
