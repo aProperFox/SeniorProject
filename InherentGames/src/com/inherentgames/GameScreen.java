@@ -344,12 +344,6 @@ public class GameScreen extends Activity {
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.lighting:
-        	renderer.cycleLighting();
-            return true;
-        case R.id.change_level:
-        	renderer.levelWin();
-        	return true;
         case R.id.delete_data:
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("hasBeatenTutorial").commit();
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();

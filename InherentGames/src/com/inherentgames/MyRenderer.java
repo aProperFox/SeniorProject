@@ -1,6 +1,7 @@
 package com.inherentgames;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -63,7 +64,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private String fireButtonState = "fireButton";
 	
 	private Renderer2D renderer2D;
-	private boolean hasClickedWattson; 
 	
 	private DiscreteDynamicsWorld dynamicWorld;
 	private DefaultCollisionConfiguration collisionConfiguration;
@@ -78,15 +78,27 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private int arrowHeight;
 	private boolean isArrowAscending;
 	
+	private int letterWidth;
+	
 	private String bubbleTexture = "bubbleBlue";
 	private String pauseButtonState = "pauseButton";
 	
 	private String wattsonPhrases[][] = {
-			{"Welcome to the tutorial for Babble Bubbles!", "I'm Wattson, your personal guide.", "Click me to begin!"},
-			{"Look around by sliding your finger on the screen.", "", ""},
-			{"To shoot a bubble, hold down the 'fire' button", "and swipe the screen up or down.", ""},
-			{"Swiping up shoots a masculine article, and down", "shoots a feminine article.", ""},
-			{"Try to capture the two objects in the room. The", "desk is masculine (el escritorio) and the chair", "is feminine (la silla)"}
+			{"Hi, Hopscotch! I'm your translator, Wattson.", "I'm here to show you how to travel through time.", "Click me to begin!"},
+			{"This is your Chronopsyonic Quantum Destabilizer.", "It shoots bubbles that capture objects in a quantum field", "to propel you back in time."},
+			{"While holding down the fire button, you enable", "the destabilizer's charge sequence, allowing it to fire.", "Try holding the button!"},
+			{"It's an incredible piece of technology!", "But it's uh... not exactly umm...",  ""},
+			{".....legal.","",""},
+			{"But not to worry! I'm sure you'll be fine", "so long as the cops don't see you use it.", ""},
+			{"Holding the fire button and swiping up shoots", "a blue bubble. Try it now!", ""},
+			{"Good show! Now try firing a red bubble by", "holding the fire button and swiping down", ""},
+			{"Excellent! Now shoot a bubble at the desk to capture it", "but be careful! If you shoot the wrong bubble you risk", "getting teleported back to the future at 88 mph!"},
+			{"You got it! Just two more pieces of advice", "till you're off to save the world!", ""},
+			{"This is your fuel gauge. It fills up with every", "object you capture. Once it's full, you can time travel!", ""},
+			{"The Chronospyonic Quantum Destabilizer can only", "keep you in quantum stasis for a limited time so be quick!", ""},
+			{"The further you travel back in time,the harder", "it will be for the CQD to hold you in stasis.", "In the present there is no time limit."},
+			{"You're the only one who can retrieve all the universal", "translators that are being sent to the past.", ""},
+			{"Help us Hopscotch Krono, you're language's", "only hope.", ""}
 	};
 	
 	private ArrayList<String> wattsonText = new ArrayList<String>();
@@ -106,29 +118,43 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	
 	private boolean isPaused;
 	private boolean isTutorial;
+	private boolean hasCompletedSteps = false;
+	private int[] screenItems = {0,5,4,4,3,5,-3,-2,-1,5,5,5,2,2,5};
+	
+	private int arrowX, arrowY, arrowImageWidth, arrowImageHeight, arrowScreenWidth, arrowScreenHeight;
+	private String arrowState = "ArrowUp";
 	
 	public MyRenderer(Context c, int w, int h, int roomNum) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
 		this.roomNum = roomNum;
 		
+		width = w;
+		height = h;
+		
 		if(roomNum == 0){
 			isTutorial = true;
-			hasClickedWattson = false;
 			width = w;
 			height = h;
 			wattsonText.add(wattsonPhrases[0][0]);
 			wattsonText.add(wattsonPhrases[0][1]);
 			wattsonText.add(wattsonPhrases[0][2]);
 			wattsonTextIterator = 0;
+			
+			arrowX = width/12;
+			arrowY = height/10 + width/6;
+			arrowImageWidth = 32;
+			arrowImageHeight = 64;
+			arrowScreenWidth = width/12;
+			arrowScreenHeight = width/6;
+			
 		}
 		else{
-			hasClickedWattson = true;
 			isTutorial = false;
 		}
 		
-		width = w;
-		height = h;
+		letterWidth = width/96;
+		
 		Bitmap bitmap;
 	      if(tm.containsTexture("gui_font")){
 	    	  
@@ -176,6 +202,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.arrow_up)), 32, 64);
 			tm.addTexture("ArrowUp", new Texture(bitmap,true));
 			bitmap.recycle();
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.arrow_right)), 64, 32);
+			tm.addTexture("ArrowRight", new Texture(bitmap,true));
+			bitmap.recycle();
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.arrow_left)), 64, 32);
+			tm.addTexture("ArrowLeft", new Texture(bitmap,true));
+			bitmap.recycle();
+			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.filter)), 64, 64);
+			tm.addTexture("Filter", new Texture(bitmap,true));
+			bitmap.recycle();
 			
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256);
 			tm.addTexture("Default", new Texture(bitmap,true));
@@ -192,8 +227,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	public void setTextures(){
 		Bitmap bitmap;
 		try{
+			long startTime = System.currentTimeMillis();
 		switch(roomNum){
 			case 0:
+				
+				//Can probably delete if, since tutorial now mandatory
 				if(!tm.containsTexture("Escritorio")){
 					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256);
 					tm.addTexture("Escritorio", new Texture(bitmap,true));
@@ -213,6 +251,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.tutorialceiling)), 512, 512);
 				tm.addTexture("TutorialCeiling", new Texture(bitmap,true));
 				bitmap.recycle();
+				
+				Log.d("MyRenderer", "Loading textures took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				
 				break;
 			case 1:
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.chalkboard)), 256, 256);
@@ -230,6 +271,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				tm.addTexture("Paper", new Texture(bitmap,true));
 				bitmap.recycle();
 				
+				//Can probably delete if, since tutorial now mandatory
 				if(!tm.containsTexture("Escritorio")){
 					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 128, 128);
 					tm.addTexture("Escritorio", new Texture(bitmap,true));
@@ -283,8 +325,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.room0ceiling)), 1024, 1024);
 				tm.addTexture("Room0Ceiling", new Texture(bitmap,true));
 				bitmap.recycle();
+				
+				Log.d("MyRenderer", "Loading textures took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				
 				break;
 			case 2:
+				
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.money1)), 512, 256);
 				tm.addTexture("Money", new Texture(bitmap,true));
 				bitmap.recycle();
@@ -343,6 +389,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mesa)), 128, 128);
 				tm.addTexture("Mesa", new Texture(bitmap,true));
 				bitmap.recycle();
+				
+				Log.d("MyRenderer", "Loading textures took " + (System.currentTimeMillis() - startTime) + " milliseconds");
 				break;
 			}
 		
@@ -365,8 +413,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		setTextures();
 		world = new Room(roomNum, context, tm);
 		world.setAmbientLight(20, 20, 20);
-		
-		
+
 		sun = new Light(world);
 		sun.setPosition(world.getLightLocation(0));
 		sun.setIntensity(250, 250, 250);
@@ -375,6 +422,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		cam = world.getCamera();
 		cam.setPosition(new SimpleVector(0,0,0));
 		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
+		cam.lookAt(new SimpleVector(0,-0.1,1));
 		MemoryHelper.compact();
 		
 		collisionConfiguration = new DefaultCollisionConfiguration();
@@ -426,100 +474,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
         soundPoolMap.put(18, soundPool.load(context, R.raw.cuchara, 1));
         soundPoolMap.put(19, soundPool.load(context, R.raw.mesa, 1));
         isPaused = false;
-        
+		
+		
 	}
-	
-	
-	public void changeLevel(){
-		if (fb != null) {
-			fb.dispose();
-		}
-		roomNum++;
-		renderer2D = new Renderer2D(fb);
-		clock = new Clock();
-		
-		world = new Room(roomNum, context, tm);
-		world.setAmbientLight(20, 20, 20);
-		
-		
-		sun = new Light(world);
-		sun.setPosition(world.getLightLocation(0));
-		sun.setIntensity(250, 250, 250);
-		
-		
-		cam = world.getCamera();
-		cam.setPosition(new SimpleVector(0,0,0));
-		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
-		MemoryHelper.compact();
-		
-		collisionConfiguration = new DefaultCollisionConfiguration();
-		dispatcher = new CollisionDispatcher(collisionConfiguration);
-		Vector3f worldAabbMin = new Vector3f(-1000,-1000,-1000);
-		Vector3f worldAabbMax = new Vector3f(1000,1000,1000);
-		
-		AxisSweep3 overlappingPairCache = new AxisSweep3(worldAabbMin, worldAabbMax, world.getNumWordObjects() + 50);
-		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
-		
-		dynamicWorld.destroy();
-		dynamicWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-		dynamicWorld.setGravity(new Vector3f(0,-10,0));
-		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
-	
-		for(int i = 0; i < world.getNumBodies(); i++){
-			dynamicWorld.addCollisionObject(world.getBody(i));
-		}
-	
-		dynamicWorld.clearForces();
 
-		for(int i = 5; i < world.getNumBodies(); i++){
-			dynamicWorld.addRigidBody(world.getBody(i));
-		}
-	
-		timeHeight = (int)(height*0.76);
-		endTime = System.currentTimeMillis() + 100000;
-		fuelHeight = 0;
-		
-		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
-        //soundPoolMap = new HashMap<Integer, Integer>();
-        soundPoolMap = new SparseIntArray();
-        soundPoolMap.put(1, soundPool.load(context, R.raw.escritorio, 1));
-        soundPoolMap.put(2, soundPool.load(context, R.raw.silla, 1));
-        soundPoolMap.put(3, soundPool.load(context, R.raw.pizarra, 1));
-        soundPoolMap.put(4, soundPool.load(context, R.raw.mochila, 1));
-        soundPoolMap.put(5, soundPool.load(context, R.raw.calendario, 1));
-        soundPoolMap.put(6, soundPool.load(context, R.raw.reloj, 1));
-        soundPoolMap.put(7, soundPool.load(context, R.raw.puerta, 1));
-        soundPoolMap.put(8, soundPool.load(context, R.raw.libro, 1));
-        soundPoolMap.put(9, soundPool.load(context, R.raw.papel, 1));
-        soundPoolMap.put(10, soundPool.load(context, R.raw.ventana, 1));
-        isPaused = false;
-	}
 	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-	}
-	
-	public void cycleLighting(){
-		lightCycle++;
-		if(lightCycle > 4)
-			lightCycle = 0;
-		switch(lightCycle){
-		case 0:
-			sun.enable();
-			sun.setIntensity(250,250,250);
-			break;
-		case 1:
-			sun.setIntensity(180,180,180);
-			break;
-		case 2:
-			sun.setIntensity(100,100,100);
-			break;
-		case 3:
-			sun.setIntensity(50,50,50);
-			break;
-		case 4:
-			sun.disable();
-			break;
-		}
 	}
 
 	public void onDrawFrame(GL10 gl) {
@@ -544,90 +504,18 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		world.renderScene(fb);
 		world.draw(fb);
-		renderer2D.blitCrosshair(fb, width, height);
-		//Bubble image
-		renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
-		//Bubble text
-		renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
-		//Fire Button
-		renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
-		//Pause Button
-		renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
-		//Info Bar
-		//Has extra 1 px hang if using real size? Decremented to 255x255
-		renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 127, 127, width/5, width/5, 100);
-		//Dynamic fuel/time bars
 
 		//Only called for 
 		if(!isPaused){
 			if(endTime - System.currentTimeMillis() > 0){
 				timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
-				if(isArrowAscending){
-					if(arrowHeight < height/3){
-						isArrowAscending = false;
-						arrowHeight++;
-					}
-					else{
-						arrowHeight--;
-					}
-				}
-				else{
-					if(arrowHeight > (int)(((float)height)/3.5f)){
-						isArrowAscending = true;
-						arrowHeight--;
-					}
-					else{
-						arrowHeight++;
-					}
-				}
 			}
-			else{
+			else if(isTutorial == false){
 				levelLose();
 			}
 		}
 
-		renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 16, 512, width/38, fuelHeight, (int)(height*0.76), 100);
-		renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 16, 512, width/38, timeHeight, (int)(height*0.76), 100);
-		//Score bars
-		renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
-		renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
-	
-		//Wattson help text
-		int letterWidth = width/96;
-		/*
-		 * TODO Fix text wrap for Wattson text
-		if(wattsonText.length() > 50){
-			letterWidth = (int)(width*0.01);
-			ArrayList<String> wattsonStrings = new ArrayList<String>();
-			for(int i = 0; i < ((wattsonText.length() - 1)/50) + 1; i++){
-				int lastSpace = i*50;
-				int max = 0;
-				if((i*50 + 50) > wattsonText.length())
-					max = wattsonText.length();
-				else
-					max = (i*50 + 50);
-				for(int j = i*50; j < max; j++){
-					if(wattsonText.charAt(j) == ' '){
-						lastSpace = j;
-					}
-				}
-				if(i < ((wattsonText.length() - 1)/50))
-					renderer2D.blitText(wattsonText.substring(i*50, lastSpace + 1), width/5, (int)((i/((wattsonText.length() - 1)/50) + 1)*(width/7.5)), letterWidth, letterWidth*2,RGBColor.WHITE);
-				else
-					renderer2D.blitText(wattsonText.substring(i*50, wattsonText.length()), width/5, (int)((i/((wattsonText.length() - 1)/50) + 1)*(width/7.5)), letterWidth, letterWidth*2,RGBColor.WHITE);
-			}
-			
-		}*/
-		int iteration = 0;
-		for(String string : wattsonText){
-			renderer2D.blitText(string, width/6, height/30 + (letterWidth*2*iteration), letterWidth, letterWidth*2,RGBColor.WHITE);
-			iteration++;
-		}
-		if(isTutorial && !hasClickedWattson){
-			renderer2D.blitImage(fb, "ArrowUp", width/11, arrowHeight, 32, 64, width/20, height/6, 100);
-		}
-		
-		fb.display();
+		display2DGameInfo(fb);
 		
 		if(lastRotateTime < (System.currentTimeMillis() - 15)){
 			lastRotateTime = System.currentTimeMillis();
@@ -718,7 +606,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 					if(id != -100) Log.i("MyRenderer", "Checking object with id: " + id);
 					if(id >= 0){
 						if((collisionObject = world.getWordObject(id)) != null){
-							Log.i("MyRenderer", "Object is a WordObject!");
+							if(world.isBubbleType(id)){
+								Log.d("MyRenderer", "That doesn't make sense... Collision object is a bubble.");
+							}
+							else{
+								Log.i("MyRenderer", "Object is a WordObject!");
+							}
 							if(collisionObject.getArticle() == bubble.getArticle()){
 								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
 								if(collisionObject.getName(Translator.ENGLISH) != "Plate"){
@@ -783,16 +676,205 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 	}
 	
-	public void iterateWattson(){
+	public int iterateWattson(){
 		wattsonText.clear();
-		wattsonTextIterator ++;
-		if(wattsonTextIterator > 4){
-			wattsonTextIterator = 0;
+		if(!hasCompletedSteps){
+			wattsonTextIterator ++;
+			if(wattsonTextIterator > screenItems.length -1){
+				wattsonTextIterator = 0;
+			}
+			wattsonText.add(wattsonPhrases[wattsonTextIterator][0]);
+			wattsonText.add(wattsonPhrases[wattsonTextIterator][1]);
+			wattsonText.add(wattsonPhrases[wattsonTextIterator][2]);
+			
+			int lastItem = screenItems[screenItems.length - 1];
+			for(int i = screenItems.length - 1; i > 0; i--){
+				screenItems[i] = screenItems[i-1];
+			}
+			screenItems[0] = lastItem;
+			lastItem = screenItems[screenItems.length-1];
+			if(lastItem == 0)
+				hasCompletedSteps = true;
+			if(lastItem == -3)
+				lastItem = -1;
+			Log.d("MyRenderer", "Iterating Wattson, and return value of: " + lastItem);
+			return lastItem;
 		}
-		wattsonText.add(wattsonPhrases[wattsonTextIterator][0]);
-		wattsonText.add(wattsonPhrases[wattsonTextIterator][1]);
-		wattsonText.add(wattsonPhrases[wattsonTextIterator][2]);
+		return 0;
 	}
+	
+	public void display2DGameInfo(FrameBuffer fb){
+		
+		if(isTutorial){
+			//CrossHair
+			renderer2D.blitCrosshair(fb, width, height);
+			
+			if(hasCompletedSteps){
+				//Bubble image
+				renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
+				//Bubble text
+				renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
+				//Fire Button
+				renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
+				//Pause Button
+				renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
+				//Dynamic fuel/time bars
+				renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 16, 512, width/38, fuelHeight, (int)(height*0.76), 100);
+				renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 16, 512, width/38, (int)(height*0.76), (int)(height*0.76), 100);
+				//Score bars 
+				renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
+				renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
+			}
+			
+			else{
+				//Pause Button
+				renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
+				
+				int iterator = 0, size = screenItems.length - 1;
+				for(int i : screenItems){
+					if(iterator < size)
+						displayScreenItem(fb, i);
+					iterator++;
+				}
+				if(screenItems[screenItems.length - 1] <= 0){
+				}
+				else{
+					renderer2D.blitImage(fb, "Filter", width/2, height/2, 64, 64, width, height, 10);
+				}
+				displayScreenItem(fb, screenItems[size]);
+			}
+			if(screenItems[screenItems.length-1] > 0)
+				renderer2D.blitImage(fb, arrowState, arrowX, arrowY, arrowImageWidth, arrowImageHeight, arrowScreenWidth, arrowScreenHeight, 100);
+			//Info Bar
+			//Has extra 1 px hang if using real size? Decremented to 127x127
+			renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 127, 127, width/5, width/5, 100);
+
+			try{
+				//Wattson help text
+				int iteration = 0;
+				for(String string : wattsonText){
+					renderer2D.blitText(string, width/6, height/30 + (letterWidth*2*iteration), letterWidth, letterWidth*2,RGBColor.WHITE);
+					iteration++;
+				}
+			}catch (ConcurrentModificationException e){
+				Log.e("Myrenderer", "display2DGameInfo got ConcurrentModificationError: " + e);
+			}
+			
+		}
+		
+		//Not tutorial displays
+		else{
+			
+			renderer2D.blitCrosshair(fb, width, height);
+			//Bubble image
+			renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
+			//Bubble text
+			renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
+			//Fire Button
+			renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
+			//Pause Button
+			renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
+			//Info Bar
+			//Has extra 1 px hang if using real size? Decremented to 255x255
+			renderer2D.blitImage(fb, "InfoBar", width/10, width/10, 127, 127, width/5, width/5, 100);
+			
+			//Dynamic fuel/time bars
+			renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 16, 512, width/38, fuelHeight, (int)(height*0.76), 100);
+			renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 16, 512, width/38, timeHeight, (int)(height*0.76), 100);
+			//Score bars
+			renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
+			renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
+		
+		}
+		
+		fb.display();
+	}
+	
+	private void displayScreenItem(FrameBuffer fb, int itemNum){
+		boolean isLastItem;
+		if(screenItems[screenItems.length-1] == itemNum)
+			isLastItem = true;
+		else
+			isLastItem = false;
+		switch(itemNum){
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			//Fire Button
+			renderer2D.blitImage(fb, fireButtonState, width/8, height-(width/8), 128, 128, width/8, width/8, 10);
+			//Bubble image
+			renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
+			//Bubble text
+			renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
+			
+			if(isLastItem){
+				arrowX = (int)(width/3.5f);
+				arrowY = height - (width/8);
+				arrowImageWidth = 64;
+				arrowImageHeight = 32;
+				arrowScreenWidth = width/6;
+				arrowScreenHeight = width/12;
+				arrowState = "ArrowLeft";
+			}
+			break;
+		case 3:
+			//Dynamic fuel bar
+			renderer2D.blitImageBottomUp(fb, "FuelBar", (int)(width*0.909), height/2, 16, 512, width/38, fuelHeight, (int)(height*0.76), 100);
+			renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
+			renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
+			
+			if(isLastItem){
+				arrowX = 4*width/5;
+				arrowY = height/2;
+				arrowImageWidth = 64;
+				arrowImageHeight = 32;
+				arrowScreenWidth = width/6;
+				arrowScreenHeight = width/12;
+				arrowState = "ArrowRight";
+			}
+			break;
+		case 4:
+			//Dynamic time bar
+			
+			renderer2D.blitImageBottomUp(fb, "TimeBar", (int)(width*0.966), height/2, 16, 512, width/38, (int)(height*0.76), (int)(height*0.76), 100);
+			//Score bars 
+			renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
+			renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
+			
+			if(isLastItem){
+				arrowX = 7*width/8;
+				arrowY = height/2;
+				arrowImageWidth = 64;
+				arrowImageHeight = 32;
+				arrowScreenWidth = width/6;
+				arrowScreenHeight = width/12;
+				arrowState = "ArrowRight";
+			}
+			
+			break;
+		case 5:
+			arrowX = width/12;
+			arrowY = height/10 + width/6;
+			arrowImageWidth = 32;
+			arrowImageHeight = 64;
+			arrowScreenWidth = width/12;
+			arrowScreenHeight = width/6;
+			arrowState = "ArrowUp";
+			break;
+		case -3:
+			if(screenItems[0] == itemNum)
+				cam.lookAt(new SimpleVector(0,0,1));
+			if(isLastItem)
+				cam.lookAt(new SimpleVector(-.358, 0.174, 0.917));
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
 	
 	public void setPauseButtonState(){
 		if(pauseButtonState == "pauseButton"){
@@ -826,6 +908,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		levelWin();
 		return true;
 	}
+	
 	
 	public Vector3f getDimensions(Object3D obj){
 		PolygonManager polyMan = obj.getPolygonManager();
@@ -887,8 +970,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
     	}
 
 	}
-	
-	
+
 	public void levelLose(){
 		handler.post(new Runnable(){
             public void run(){
@@ -915,9 +997,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
         });
 	}
 	
-	public void setHasClickedWattson(){
-		hasClickedWattson = true;
-	}
 	
 	public Vector3f toVector3f(SimpleVector vector){
 		return new Vector3f(vector.x,vector.y,vector.z);

@@ -304,6 +304,7 @@ public class MenuScreen extends Activity {
         case R.id.delete_data:
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("hasBeatenTutorial").commit();
         	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
+        	playButton.setEnabled(false);
         	return true;
         }
         return super.onOptionsItemSelected(item);

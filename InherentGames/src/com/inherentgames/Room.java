@@ -312,16 +312,23 @@ public class Room extends World {
 			break;
 		case 2:
 			try {
+				long startTime = System.currentTimeMillis();
 				
 				//Bill = 0
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/bill.obj"),
 						context.getResources().getAssets().open("raw/room1/bill.mtl"), 1.0f)), new SimpleVector(-(float)Math.PI/2,0,0),"Bill",WordObject.FEMININE));
+				Log.d("Room", "Loading object 'bill' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				//Bread = 1
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/bread.obj"),
 						context.getResources().getAssets().open("raw/room1/bread.mtl"), 0.75f)), new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Bread",WordObject.MASCULINE));
+				Log.d("Room", "Loading object 'bread' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				//Cake = 2
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/cake.obj"),
 						context.getResources().getAssets().open("raw/room1/cake.mtl"), 1.0f)), new SimpleVector((float)Math.PI,0,0),"Cake",WordObject.MASCULINE));
+				Log.d("Room", "Loading object 'cake' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				//Cup = 3
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/cup.obj"),
 						context.getResources().getAssets().open("raw/room1/cup.mtl"), 0.5f)), new SimpleVector(0,0,0),"Cup",WordObject.FEMININE));
@@ -331,20 +338,31 @@ public class Room extends World {
 						context.getResources().getAssets().open("raw/room1/fork.mtl"), 1.0f)), new SimpleVector(0,0,0),"Table",WordObject.MASCULINE));
 						*/
 				//Knife = 5
+				Log.d("Room", "Loading object 'cup' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/knife.obj"),
 						context.getResources().getAssets().open("raw/room1/knife.mtl"), 0.3f)), new SimpleVector((float)Math.PI,0,0),"Knife",WordObject.MASCULINE));
 				//Money = 6
+				Log.d("Room", "Loading object 'knife' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/money.obj"),
 						context.getResources().getAssets().open("raw/room1/money.mtl"), 1.0f)), new SimpleVector(-(float)Math.PI/2,0,0),"Money",WordObject.MASCULINE));
 				//Plate = 7
+				Log.d("Room", "Loading object 'money' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/plate.obj"),
 						context.getResources().getAssets().open("raw/room1/plate.mtl"), 1.0f)), new SimpleVector((float)Math.PI,0,0),"Plate",WordObject.MASCULINE));
 				//Spoon = 8
+				Log.d("Room", "Loading object 'plate' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/spoon.obj"),
 						context.getResources().getAssets().open("raw/room1/spoon.mtl"), 1.0f)), new SimpleVector(0,-(float)Math.PI/2,(float)Math.PI),"Spoon",WordObject.FEMININE));
 				//Table = 9
+				Log.d("Room", "Loading object 'spoon' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room1/table.obj"),
 						context.getResources().getAssets().open("raw/room1/table.mtl"), 1.5f)), new SimpleVector((float)Math.PI,0,0),"Table",WordObject.FEMININE));
+				Log.d("Room", "Loading object 'table' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
