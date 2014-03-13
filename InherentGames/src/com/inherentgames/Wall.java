@@ -26,6 +26,12 @@ public class Wall extends Surface{
 	private CollisionShape groundShape;
 	Context context;
 
+	/**
+	 * @param origin
+	 * @param width
+	 * @param height
+	 * @param textureName
+	 */
 	public Wall(SimpleVector origin, float width, float height, String textureName){
 		super(origin, width, height, 0);
 		this.width = width;
@@ -53,10 +59,16 @@ public class Wall extends Surface{
 		
 	}
 	
+	/**
+	 * @return
+	 */
 	public Object3D getWall(){
 		return wall;
 	}
 	
+	/**
+	 * 
+	 */
 	private void setCoordinates(){
 		if(origin.x == 0 && origin.z > 0){
 			coordinates[0] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
@@ -88,6 +100,9 @@ public class Wall extends Surface{
 		}
 	}
 
+	/**
+	 * @return
+	 */
 	public RigidBody getBody(){
 		return body;
 	}

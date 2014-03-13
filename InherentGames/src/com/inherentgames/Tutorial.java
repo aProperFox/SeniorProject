@@ -61,6 +61,9 @@ public class Tutorial extends Activity{
 	
 	private Drawable icon;
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
 	// Stops Eclipse from complaining about new API calls
 	@SuppressWarnings("deprecation")
 	@SuppressLint({ "InlinedApi", "NewApi" })
@@ -169,6 +172,9 @@ public class Tutorial extends Activity{
 	*/
 	
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
@@ -176,23 +182,35 @@ public class Tutorial extends Activity{
 	    return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPause()
+	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
 		mGLView.onPause();
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
 	@Override
 	protected void onResume(){
 		super.onResume();
 		mGLView.onResume();
 	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onStop()
+	 */
 	@Override
 	protected void onStop(){
 		super.onStop();
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onTouchEvent(android.view.MotionEvent)
+	 */
 	public boolean onTouchEvent(MotionEvent me){
 		if(me.getAction() == MotionEvent.ACTION_DOWN && moveProperties > 0){
 			xpos = me.getX();
@@ -351,10 +369,16 @@ public class Tutorial extends Activity{
 	}
 	
 	
+	/**
+	 * @return
+	 */
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
 	
+	/**
+	 * 
+	 */
 	public void UiChangeListener() {
         final View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {

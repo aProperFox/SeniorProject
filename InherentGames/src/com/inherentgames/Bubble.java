@@ -19,6 +19,11 @@ public class Bubble extends WordObject{
 	private int article;
 	private long timeCreated;
 	
+	/**
+	 * @param translation
+	 * @param article
+	 * @param timeInMillis
+	 */
 	public Bubble(SimpleVector translation, int article, long timeInMillis){
 		super(Primitives.getSphere(5.0f),new SimpleVector(0,0,0),"Bubble", article);
 		
@@ -35,47 +40,80 @@ public class Bubble extends WordObject{
 		heldObjectId = -1;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isHolding(){
 		return isHolding;
 	}
 	
+	/**
+	 * @param id
+	 */
 	public void setHeldObjectId(int id){
 		heldObjectId = id;
 		isHolding = true;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getHeldObjectId(){
 		return heldObjectId;
 	}
 	
+	/**
+	 * @param index
+	 */
 	public void setLocalBodyIndex(int index){
 		localBodyIndex = index;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getLocalBodyIndex(){
 		return localBodyIndex;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.inherentgames.WordObject#getArticle()
+	 */
 	public int getArticle(){
 		return article;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getBodyIndex(){
 		return bodyIndex;
 	}
 	
+	/**
+	 * @param index
+	 */
 	public void setBodyIndex(int index){
 		bodyIndex = index;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.inherentgames.WordObject#getObjectId()
+	 */
 	public int getObjectId(){
 		return objectId;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.inherentgames.WordObject#setObjectId(int)
+	 */
 	public void setObjectId(int id){
 		objectId = id;
 	}
 	
+	/**
+	 * @return
+	 */
 	public long getTimeCreated(){
 		return timeCreated;
 	}
