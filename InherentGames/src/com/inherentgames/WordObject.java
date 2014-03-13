@@ -19,6 +19,9 @@ public class WordObject extends Object3D {
 	private String names[] = new String[2];
 	
 	
+	/**
+	 * @param obj
+	 */
 	public WordObject(WordObject obj){
 		super(obj.toObject3D());
 		isStatic = true;
@@ -27,6 +30,12 @@ public class WordObject extends Object3D {
 		this.article = obj.getArticle();
 	}
 	
+	/**
+	 * @param obj
+	 * @param rotationAxis
+	 * @param name
+	 * @param article
+	 */
 	public WordObject(Object3D obj, SimpleVector rotationAxis, String name, int article){
 		super(obj);
 		isStatic = true;
@@ -36,14 +45,23 @@ public class WordObject extends Object3D {
 		setMaxDimension();
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean getStaticState(){
 		return isStatic;
 	}
 	
+	/**
+	 * @param state
+	 */
 	public void setStatic(boolean state){
 		isStatic = state;
 	}
 	
+	/**
+	 * 
+	 */
 	public void setMaxDimension(){
 		PolygonManager polyMan = this.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
@@ -74,22 +92,37 @@ public class WordObject extends Object3D {
 			maxDimension = dimensions.y;
 	}
 	
+	/**
+	 * @return
+	 */
 	public float getMaxDimension(){
 		return maxDimension;
 	}
 	
+	/**
+	 * @param id
+	 */
 	public void setObjectId(int id){
 		this.objectId = id;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getObjectId(){
 		return objectId;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getArticle(){
 		return article;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.threed.jpct.Object3D#setName(java.lang.String)
+	 */
 	@Override
 	public void setName(String name){
 		/**
@@ -100,25 +133,41 @@ public class WordObject extends Object3D {
 		names[Translator.SPANISH] = Translator.translateToLanguage(name,Translator.SPANISH);
 	}
 	
+	/**
+	 * @param language
+	 * @return
+	 */
 	public String getName(int language){
 		return names[language];
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.threed.jpct.Object3D#scale(float)
+	 */
 	@Override
 	public void scale(float scaleTo){
 		super.scale(scaleTo/maxDimension);
 	}
 	
+	/**
+	 * @param room
+	 */
 	public void removeObject(Room room){
 		room.removeObject(objectId);
 	}
 	
+	/**
+	 * @param axes
+	 */
 	public void rotateBy(SimpleVector axes){
 		this.rotateX(axes.x);
 		this.rotateY(axes.y);
 		this.rotateZ(axes.z);
 	}
 	
+	/**
+	 * @return
+	 */
 	public Object3D toObject3D(){
 		return (Object3D)this;
 	}

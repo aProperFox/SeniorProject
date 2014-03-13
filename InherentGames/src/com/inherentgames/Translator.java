@@ -29,6 +29,11 @@ public class Translator {
 		{"Table", "Mesa"},
 	};
 
+	/**
+	 * @param word
+	 * @param language
+	 * @return
+	 */
 	public static String translateToLanguage(String word, int language){
 		Log.i("THE LENGTH OF THE ARRAY IS:", " " + wordList.length);
 		for(int i = 0; i < wordList.length; i++){
@@ -39,6 +44,10 @@ public class Translator {
 		return null;
 	}
 	
+	/**
+	 * @param word
+	 * @return
+	 */
 	public static int getIndexByWord(String word){
 		for(int i = 0; i < wordList.length; i++){
 			for(int j = 0; j < wordList[0].length; j++){

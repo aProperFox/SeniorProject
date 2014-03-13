@@ -40,6 +40,8 @@ public class Room extends World {
 	private ArrayList<WordObject> roomObjects;
 	private ArrayList<String> roomObjectWords;
 	
+	private float height, width, length;
+	
 	TextureManager tm;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
@@ -48,6 +50,11 @@ public class Room extends World {
 	
 	private RGBColor bubbleColor;
 	
+	/**
+	 * @param roomId
+	 * @param context
+	 * @param tm
+	 */
 	public Room(int roomId, Context context, TextureManager tm) {
 		this.context = context.getApplicationContext();
 		
@@ -72,6 +79,10 @@ public class Room extends World {
 		
 	}
 	
+	/**
+	 * @param roomNum
+	 * @return
+	 */
 	public SimpleVector getLightLocation(int roomNum){
 		//Get light location vector based on Room Id
 		switch(roomNum){
@@ -82,24 +93,40 @@ public class Room extends World {
 		return new SimpleVector(0,-20,0);
 	}
 	
+	/**
+	 * @param id
+	 * @return
+	 */
 	public RigidBody getBody(int id){
 		return bodies.get(id);
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getNumBubbles(){
 		return bubbles.size();
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getNumBodies(){
 		return bodies.size();
 	}
 	
+	/**
+	 * @param bubble
+	 */
 	public void removeBubble(Bubble bubble){
 		bubbleObjects.remove(bubble);
 		bubbles.remove(bubble.getLocalBodyIndex());
 		removeObject(bubble);
 	}
 	
+	/**
+	 * @param room
+	 */
 	public void setSurfaces(int room){
 		//If room id is not defined in getWallNumByRoom, returns an error
 		if(getWallNumByRoomId(room) == -1){
@@ -110,6 +137,7 @@ public class Room extends World {
 		switch(room){
 
 		case 0:
+			
 			//First wall
 			wall = new Wall(new SimpleVector(0,0,75), 80, 50,"TutorialWall");
 			walls.add(wall.getWall());
@@ -142,38 +170,44 @@ public class Room extends World {
 			bodies.add(ceiling.getBody());
 			addObject(ceiling.getFloor());
 			
+			
+			
 			break;
 			
 			
 		case 1:		
 
+			height = 60;
+			length = 180;
+			width = 156;
+			
 			//First wall
-			wall = new Wall(new SimpleVector(0,0,75), 130, 50,"Room0Wall0");
+			wall = new Wall(new SimpleVector(0,0,length/2), width, height,"Room0Wall0");
 			walls.add(wall.getWall());
 			walls.get(0).setTexture("Room0Wall0");
 			bodies.add(wall.getBody());
 			//Second wall
-			wall = new Wall(new SimpleVector(65,0,0), 150, 50,"Room0Wall1");
+			wall = new Wall(new SimpleVector(width/2,0,0), length, height,"Room0Wall1");
 			walls.add(wall.getWall());
 			walls.get(1).setTexture("Room0Wall1");
 			bodies.add(wall.getBody());
 			//Third wall
-			wall = new Wall(new SimpleVector(0,0,-75), 130, 50,"Room0Wall2");
+			wall = new Wall(new SimpleVector(0,0,-length/2), width, height,"Room0Wall2");
 			walls.add(wall.getWall());
 			walls.get(2).setTexture("Room0Wall2");
 			bodies.add(wall.getBody());
 			//Fourth wall
-			wall = new Wall(new SimpleVector(-65,0,0), 150, 50,"Room0Wall3");
+			wall = new Wall(new SimpleVector(-width/2,0,0), length, height,"Room0Wall3");
 			walls.add(wall.getWall());
 			walls.get(3).setTexture("Room0Wall3");
 			bodies.add(wall.getBody());
 			
 			//Wall class and floor class to be changed to extend surface class
-			floor = new Floor(new SimpleVector(130,25,150),0);
+			floor = new Floor(new SimpleVector(width,height/2,length),0);
 			floor.setTexture("Room0Floor");
 			bodies.add(floor.getBody());
 			addObject(floor.getFloor());
-			ceiling = new Floor(new SimpleVector(130,-25,150),0);
+			ceiling = new Floor(new SimpleVector(width,-height/2,length),0);
 			ceiling.setTexture("Room0Ceiling");
 			bodies.add(ceiling.getBody());
 			addObject(ceiling.getFloor());
@@ -218,6 +252,9 @@ public class Room extends World {
 		
 	}
 	
+	/**
+	 * @param roomId
+	 */
 	public void setObjects(int roomId){
 		/*
 		 * TODO: add color to WordObjects when camera is aimed at them
@@ -274,25 +311,25 @@ public class Room extends World {
 				e.printStackTrace();
 			}
 			//Desks 0
-			addWordObject(-35,-6,25, roomObjects.get(0), "Desk");
-			addWordObject(-35,-6,-10, roomObjects.get(0), "Desk");
-			addWordObject(35,-6,25, roomObjects.get(0), "Desk");
-			addWordObject(35,-6,-10, roomObjects.get(0), "Desk");
+			addWordObject(-50,-1,30, roomObjects.get(0), "Desk");
+			addWordObject(-50,-1,-15, roomObjects.get(0), "Desk");
+			addWordObject(50,-1,30, roomObjects.get(0), "Desk");
+			addWordObject(50,-1,-15, roomObjects.get(0), "Desk");
 			//Chairs 1
-			addWordObject(-35,2,5, roomObjects.get(1), "Chair");
-			addWordObject(-35,2,-30, roomObjects.get(1), "Chair");
-			addWordObject(35,2,5, roomObjects.get(1), "Chair");
-			addWordObject(35,2,-30, roomObjects.get(1), "Chair");
+			addWordObject(-50,7,10, roomObjects.get(1), "Chair");
+			addWordObject(-50,7,-35, roomObjects.get(1), "Chair");
+			addWordObject(50,7,10, roomObjects.get(1), "Chair");
+			addWordObject(50,7,-35, roomObjects.get(1), "Chair");
 			//Chalk board 2
-			addWordObject(0,-13,65,roomObjects.get(2), "Chalkboard");
+			addWordObject(0,-10,80,roomObjects.get(2), "Chalkboard");
 			//BackPacks 3
-			addWordObject(-15,15,25,roomObjects.get(3), "Backpack");
-			addWordObject(35,4,20,roomObjects.get(3), "Backpack");
-			addWordObject(17,15,-25,roomObjects.get(3), "Backpack");
+			addWordObject(-30,20,30,roomObjects.get(3), "Backpack");
+			addWordObject(50,9,25,roomObjects.get(3), "Backpack");
+			addWordObject(32,20,-30,roomObjects.get(3), "Backpack");
 			//Calendar 4
-			addWordObject(60,-5,20,roomObjects.get(4), "Calendar");
+			addWordObject(73,-10,35,roomObjects.get(4), "Calendar");
 			//Clock 5
-			addWordObject(61,-20,-45, roomObjects.get(5), "Clock");
+			addWordObject(74,-25,-60, roomObjects.get(5), "Clock");
 			//Door 6
 			addWordObject(-37,-16,-74, roomObjects.get(6), "Door");
 			//Book 7
@@ -300,14 +337,14 @@ public class Room extends World {
 			addWordObject(19,9,-74, roomObjects.get(7), "Book", new SimpleVector(0,(float)Math.PI/2,0));
 			addWordObject(32,20,-74, roomObjects.get(7), "Book", new SimpleVector(0,(float)Math.PI/2,0));
 			//Paper 8
-			addWordObject(27,10.5f,-15, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.1,0));
-			addWordObject(-25,10.25f,20, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.075,0));
-			addWordObject(-25,10.5f,20, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.2,0));
-			addWordObject(27,10.25f,-15, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.15,0));
+			addWordObject(42,15.5f,-20, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.1,0));
+			addWordObject(-40,15.25f,25, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.075,0));
+			addWordObject(-40,15.5f,25, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.2,0));
+			addWordObject(42,15.25f,-20, roomObjects.get(8), "Paper", new SimpleVector(0,(float)Math.PI*0.15,0));
 			//Window 9
-			addWordObject(-64,-8,0, roomObjects.get(9), "Window");
-			addWordObject(-64,-8,40, roomObjects.get(9), "Window");
-			addWordObject(-64,-8,-40, roomObjects.get(9), "Window");
+			addWordObject(-77,-13,0, roomObjects.get(9), "Window");
+			addWordObject(-77,-13,47.5f, roomObjects.get(9), "Window");
+			addWordObject(-77,-13,-47.5f, roomObjects.get(9), "Window");
 			
 			break;
 		case 2:
@@ -411,6 +448,7 @@ public class Room extends World {
 
 			break;
 		}
+		Loader.clearCache();
 		roomObjects.clear();
 	}
 	
@@ -421,10 +459,25 @@ public class Room extends World {
 	}
 	*/
 	
+	/**
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param wordObject
+	 * @param name
+	 */
 	private void addWordObject(float x, float y, float z, WordObject wordObject, String name){
 		addWordObject(x, y, z, wordObject, name, new SimpleVector(0,0,0));
 	}
 	
+	/**
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param wordObject
+	 * @param name
+	 * @param rotateBy
+	 */
 	private void addWordObject(float x, float y, float z, WordObject wordObject, String name, SimpleVector rotateBy){
 		//Creates a new WordObject from the generic roomObject
 		//and adds it to the Room and wordObjects ArrayList
@@ -443,12 +496,20 @@ public class Room extends World {
 			roomObjectWords.add(name);
 		}
 		object.build();
+		if(object.getArticle() == WordObject.FEMININE)
+			object.setAdditionalColor(200, 0, 0);
+		else
+			object.setAdditionalColor(0, 0, 200);
 		//object.setRotationPivot(pivot);
 		addObject(object);
 		Log.i("olsontl", "Object " + name + " added");
 	}
 	
 	
+	/**
+	 * @param position
+	 * @return
+	 */
 	public RigidBody addBubble(SimpleVector position) {
 		//Creates a new bubble Object and adds it to the room
 		SphereShape shape = new SphereShape(5.0f);
@@ -483,6 +544,9 @@ public class Room extends World {
 		return body;
 	}
 	
+	/**
+	 * @param state
+	 */
 	public void setBubbleColor(int state){
 		if(state == Bubble.MASCULINE){
 			bubbleColor = bubbleBlue;
@@ -492,14 +556,24 @@ public class Room extends World {
 		}
 	}
 	
+	/**
+	 * @param index
+	 * @return
+	 */
 	public Bubble getBubble(int index){
 		return bubbleObjects.get(index);
 	}
 	
+	/**
+	 * @return
+	 */
 	public ArrayList<Bubble> getBubbleObjects(){
 		return bubbleObjects;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getBubbleArticle(){
 		if(bubbleColor == bubbleBlue)
 			return "El";
@@ -508,14 +582,45 @@ public class Room extends World {
 		return "Nada";
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getBubbleCounter(){
 		return bubbles.size();
 	}
 	
+	/**
+	 * @return
+	 */
 	public RGBColor getBubbleColor(){
 		return bubbleColor;
 	}
 	
+	/**
+	 * @return
+	 */
+	public float getHeight(){
+		return height;
+	}
+	
+	/**
+	 * @return
+	 */
+	public float getWidth(){
+		return width;
+	}
+	
+	/**
+	 * @return
+	 */
+	public float getLength(){
+		return length;
+	}
+	
+	/**
+	 * @param wordObject
+	 * @return
+	 */
 	public int addObject(WordObject wordObject){
 		//Extra function for adding an object to the Room class that also adds
 		//information for the WordObject in the wordObjects ArrayList
@@ -525,6 +630,10 @@ public class Room extends World {
 		return objectId;
 	}
 	
+	/**
+	 * @param bubble
+	 * @return
+	 */
 	public int addObject(Bubble bubble){
 		//Extra function for adding a bubble to the Room
 		int objectId = super.addObject((Object3D) bubble);
@@ -533,6 +642,10 @@ public class Room extends World {
 		return objectId;
 	}
 	
+	/**
+	 * @param id
+	 * @return
+	 */
 	public WordObject getWordObject(int id){
 		for(WordObject wordObject : wordObjects){
 			if(wordObject.getObjectId() == id)
@@ -541,14 +654,24 @@ public class Room extends World {
 		return null;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getNumWordObjects(){
 		return wordObjects.size();
 	}
 	
+	/**
+	 * @return
+	 */
 	public ArrayList<WordObject> getWordObjects(){
 		return wordObjects;
 	}
 	
+	/**
+	 * @param id
+	 * @return
+	 */
 	public boolean isBubbleType(int id){
 		for(Bubble bubble : bubbleObjects){
 			if(bubble.getObjectId() == id){
@@ -558,20 +681,35 @@ public class Room extends World {
 		return false;
 	}
 	
+	/**
+	 * @return
+	 */
 	public Bubble getLastBubble(){
 		return bubbleObjects.get(bubbleObjects.size()-1);
 	}
 	
+	/**
+	 * @param vector
+	 * @return
+	 */
 	public Vector3f toVector3f(SimpleVector vector){
 		//Converts a SimpleVector to a Vector3f
 		return new Vector3f(vector.x,vector.y,vector.z);
 	}
 	
+	/**
+	 * @param vector
+	 * @return
+	 */
 	public SimpleVector toSimpleVector(Vector3f vector){
 		//Converts a Vector3f to a SimpleVector
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
 	
+	/**
+	 * @param room
+	 * @return
+	 */
 	public int getWallNumByRoomId(int room){
 		//Returns the number of walls defined per room (Currently only
 		//implementable with 4)
@@ -584,10 +722,16 @@ public class Room extends World {
 		return num;
 	}
 	
+	/**
+	 * @return
+	 */
 	public ArrayList<String> getRoomObjectWords(){
 		return roomObjectWords;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.threed.jpct.World#dispose()
+	 */
 	@Override
 	public void dispose(){
 		roomObjectWords.clear();

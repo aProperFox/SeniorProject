@@ -9,6 +9,7 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -54,7 +55,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private Camera cam;
 	
 	private int lightCycle = 0;
-	private Light sun = null;
+	private Light sun1 = null, sun2 = null;
+	
 	Context context;
 	
 	private int roomNum = 1;
@@ -124,6 +126,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private int arrowX, arrowY, arrowImageWidth, arrowImageHeight, arrowScreenWidth, arrowScreenHeight;
 	private String arrowState = "ArrowUp";
 	
+	/**
+	 * @param c
+	 * @param w
+	 * @param h
+	 * @param roomNum
+	 */
 	public MyRenderer(Context c, int w, int h, int roomNum) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
@@ -224,6 +232,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 	}
 
+	/**
+	 * 
+	 */
 	public void setTextures(){
 		Bitmap bitmap;
 		try{
@@ -399,6 +410,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceChanged(javax.microedition.khronos.opengles.GL10, int, int)
+	 */
 	public void onSurfaceChanged(GL10 gl, int w, int h) {
 		if (fb != null) {
 			fb.dispose();
@@ -414,15 +428,18 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		world = new Room(roomNum, context, tm);
 		world.setAmbientLight(20, 20, 20);
 
-		sun = new Light(world);
-		sun.setPosition(world.getLightLocation(0));
-		sun.setIntensity(250, 250, 250);
+		sun1 = new Light(world);
+		sun1.setPosition(new SimpleVector(0,-world.getHeight()/2, world.getLength()/2));
+		sun1.setIntensity(250, 250, 250);
 		
+		sun2 = new Light(world);
+		sun2.setPosition(new SimpleVector(0,-world.getHeight()/2, -world.getLength()/2));
+		sun2.setIntensity(250, 250, 250);
 		
 		cam = world.getCamera();
 		cam.setPosition(new SimpleVector(0,0,0));
 		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
-		cam.lookAt(new SimpleVector(0,-0.1,1));
+		//cam.lookAt(new SimpleVector(0,-0.1,1));
 		MemoryHelper.compact();
 		
 		collisionConfiguration = new DefaultCollisionConfiguration();
@@ -479,9 +496,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated(javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig)
+	 */
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 	}
 
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onDrawFrame(javax.microedition.khronos.opengles.GL10)
+	 */
 	public void onDrawFrame(GL10 gl) {
 		
 		if ( touchTurn != 0 || touchTurnUp != 0 ) {
@@ -517,6 +540,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 
 		display2DGameInfo(fb);
 		
+		try{
+		
 		if(lastRotateTime < (System.currentTimeMillis() - 15)){
 			lastRotateTime = System.currentTimeMillis();
 			ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
@@ -538,6 +563,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				}
 			}
 		}
+		}catch(ConcurrentModificationException e){
+			Log.e("MyRenderer", "Concurrent Modification error occured");
+		}
 		
 		checkBubble();
 		/*
@@ -554,22 +582,38 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			
 	}
 	
+	/**
+	 * @param value
+	 */
 	public void setTouchTurnUp(float value){
 		touchTurnUp = value;
 	}
 	
+	/**
+	 * @return
+	 */
 	public Room getWorld(){
 		return world;
 	}
 	
+	/**
+	 * @return
+	 */
 	public FrameBuffer getFrameBuffer(){
 		return fb;
 	}
 	
+	/**
+	 * @param value
+	 */
 	public void setTouchTurn(float value){
 		touchTurn = value;
 	}
 	
+	/**
+	 * @param position
+	 * @return
+	 */
 	public RigidBody shoot(SimpleVector position){
 		if(!isPaused){
 			if(System.currentTimeMillis() > lastShot + 500){
@@ -590,11 +634,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		return null;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int checkBubble(){
+		int i = 0;
 		//Checks bubble collision and if a collision occurs, it shrinks the object down
 		//and sets it in the state to stay inside the bubble object
 		try {
-			for(int i = 0; i < world.getNumBubbles(); i++) {
+			for(i = 0; i < world.getNumBubbles(); i++) {
 				Bubble bubble = world.getBubble(i);
 				if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
 					RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
@@ -605,6 +653,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 					WordObject collisionObject;
 					if(id != -100) Log.i("MyRenderer", "Checking object with id: " + id);
 					if(id >= 0){
+						Log.d("MyRenderer", "That doesn't make sense... id != 0, but not bubble nor wordObject");
 						if((collisionObject = world.getWordObject(id)) != null){
 							if(world.isBubbleType(id)){
 								Log.d("MyRenderer", "That doesn't make sense... Collision object is a bubble.");
@@ -644,20 +693,29 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				}
 			}
 		} catch (IndexOutOfBoundsException e) {
-			Log.e("MyRenderer", "Index is out of bounds: " + e.getMessage());
+			Log.e("MyRenderer", "Index is out of bounds for index " + i + " and array size " + world.getNumBubbles());
 		}
 		return 0;
 	}
 	
+	/**
+	 * @return
+	 */
 	public Camera getCam(){
 		return cam;
 	}
 	
+	/**
+	 * @param bubble
+	 */
 	public void deleteBubble(Bubble bubble){
 		dynamicWorld.removeRigidBody((RigidBody)dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex()));
 		world.removeBubble(bubble);
 	}
 	
+	/**
+	 * @param state
+	 */
 	public void loadBubble(int state){
 		//Put 2D bubble image on screen with 2D renderer
 		world.setBubbleColor(state);
@@ -667,6 +725,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			bubbleTexture = "bubbleBlue";
 	}
 	
+	/**
+	 * @param isPressed
+	 */
 	public void setFireButtonState(boolean isPressed){
 		if(isPressed){
 			fireButtonState = "fireButtonPressed";
@@ -676,6 +737,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 	}
 	
+	/**
+	 * @return
+	 */
 	public int iterateWattson(){
 		wattsonText.clear();
 		if(!hasCompletedSteps){
@@ -703,6 +767,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		return 0;
 	}
 	
+	/**
+	 * @param fb
+	 */
 	public void display2DGameInfo(FrameBuffer fb){
 		
 		if(isTutorial){
@@ -790,6 +857,10 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		fb.display();
 	}
 	
+	/**
+	 * @param fb
+	 * @param itemNum
+	 */
 	private void displayScreenItem(FrameBuffer fb, int itemNum){
 		boolean isLastItem;
 		if(screenItems[screenItems.length-1] == itemNum)
@@ -876,6 +947,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 	
 	
+	/**
+	 * 
+	 */
 	public void setPauseButtonState(){
 		if(pauseButtonState == "pauseButton"){
 			isPaused = true;
@@ -889,6 +963,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean hasWonGame(){
 		ArrayList<String> tempWords = world.getRoomObjectWords();
 		int listLength = tempWords.size();
@@ -906,10 +983,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			return false;
 		}
 		levelWin();
+		System.gc();
 		return true;
 	}
 	
 	
+	/**
+	 * @param obj
+	 * @return
+	 */
 	public Vector3f getDimensions(Object3D obj){
 		PolygonManager polyMan = obj.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
@@ -934,11 +1016,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		return new Vector3f(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
 	}
 	
+	/**
+	 * 
+	 */
 	public void levelWin(){
+		SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
 		bubbleTexture = "bubbleBlue";
     	if(isTutorial){
     		Log.d("MyRenderer", "Setting hasBeatenTutorial");
-    		context.getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putBoolean("hasBeatenTutorial", true).commit();
+    		settings.edit().putBoolean("hasBeatenTutorial", true).commit();
     		handler.post(new Runnable(){
                 public void run(){
                 	Toast toast = Toast.makeText(context, "Looks like you've got it!", Toast.LENGTH_LONG);
@@ -953,7 +1039,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
     	}
     	else{
     		  roomNum++;
-    		  context.getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("nextLevel", roomNum).commit();
+    		  
+    		  if(settings.getInt("nextLevel", 0) < roomNum)
+    			  settings.edit().putInt("nextLevel", roomNum).commit();
     	      
 	        handler.post(new Runnable(){
 	            public void run(){
@@ -971,6 +1059,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 
 	}
 
+	/**
+	 * 
+	 */
 	public void levelLose(){
 		handler.post(new Runnable(){
             public void run(){
@@ -985,6 +1076,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
         });
 	}
 	
+	/**
+	 * 
+	 */
 	public void restart(){
 		handler.post(new Runnable(){
             public void run(){
@@ -998,14 +1092,25 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 	
 	
+	/**
+	 * @param vector
+	 * @return
+	 */
 	public Vector3f toVector3f(SimpleVector vector){
 		return new Vector3f(vector.x,vector.y,vector.z);
 	}
 	
+	/**
+	 * @param vector
+	 * @return
+	 */
 	public SimpleVector toSimpleVector(Vector3f vector){
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
 	
+	/**
+	 * @param num
+	 */
 	public void setRoomNum(int num){
 		roomNum = num;
 	}

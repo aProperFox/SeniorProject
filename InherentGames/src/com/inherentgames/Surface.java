@@ -12,6 +12,12 @@ public class Surface{
 	private float height;
 	private Object3D surface = new Object3D(2);
 
+	/**
+	 * @param origin
+	 * @param width
+	 * @param height
+	 * @param textureId
+	 */
 	public Surface(SimpleVector origin, float width, float height, int textureId){
 		
 		//Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
@@ -30,10 +36,16 @@ public class Surface{
 		
 	}
 	
+	/**
+	 * @return
+	 */
 	public Object3D getSurface(){
 		return surface;
 	}
 	
+	/**
+	 * 
+	 */
 	private void setCoordinates(){
 		if(origin.x == 0 && origin.z > 0){
 			coordinates[0] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
