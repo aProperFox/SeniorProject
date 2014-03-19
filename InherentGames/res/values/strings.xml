@@ -25,4 +25,12 @@
     <string name="c_exit">Exit to Menu</string>
     <string name="unavailable">Level still in development!</string>
     <string name="load_level">Loading... (this may take a while)</string>
+    <string name="inc_object_x">Inc Obj x</string>
+    <string name="inc_object_z">Inc Obj z</string>
+    <string name="dec_object_x">Dec Obj x</string>
+    <string name="dec_object_z">Dec Obj z</string>
+    <string name="inc_object_y">Inc Obj y</string>
+    <string name="dec_object_y">Dec Obj y</string>
+    <string name="inc_obj">Inc Obj</string>
+    <string name="dec_obj">Dec Obj</string>
 </resources>

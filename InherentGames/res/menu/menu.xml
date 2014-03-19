@@ -2,4 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/delete_data"
           android:title="@string/delete_data" />
+    <item android:id="@+id/inc_object_x"
+          android:title="@string/inc_object_x" />
+    <item android:id="@+id/inc_object_z"
+          android:title="@string/inc_object_z" />
+    <item android:id="@+id/dec_object_x"
+          android:title="@string/dec_object_x" />
+    <item android:id="@+id/dec_object_z"
+          android:title="@string/dec_object_z" />
+    <item android:id="@+id/inc_object_y"
+          android:title="@string/inc_object_y" />
+    <item android:id="@+id/dec_object_y"
+          android:title="@string/dec_object_y" />
+    <item android:id="@+id/inc_obj"
+          android:title="@string/inc_obj"/>
 </menu>

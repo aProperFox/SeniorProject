@@ -1,7 +1,9 @@
 package com.inherentgames;
 
+import android.util.Log;
+
+import com.threed.jpct.Mesh;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.PolygonManager;
 import com.threed.jpct.SimpleVector;
 
 public class WordObject extends Object3D {
@@ -63,6 +65,8 @@ public class WordObject extends Object3D {
 	 * 
 	 */
 	public void setMaxDimension(){
+		long startTime = System.currentTimeMillis();
+		/*
 		PolygonManager polyMan = this.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
 		SimpleVector minVerts = new SimpleVector(1000,1000,1000);
@@ -90,6 +94,10 @@ public class WordObject extends Object3D {
 			maxDimension = dimensions.z;
 		else
 			maxDimension = dimensions.y;
+			*/
+		Mesh mesh = this.getMesh();
+		maxDimension = getMax(mesh.getBoundingBox());
+		Log.d("WordObject", "Checking dimensions took " + (System.currentTimeMillis()-startTime) + " milliseconds.");
 	}
 	
 	/**
@@ -172,4 +180,14 @@ public class WordObject extends Object3D {
 		return (Object3D)this;
 	}
 
+	public float getMax(float[] vertices){
+		float max = 0;
+		for(float vertex: vertices){
+			if(Math.abs(vertex) > max){
+				max = Math.abs(vertex);
+			}
+		}
+		return max*1.1f;
+	}
+	
 }

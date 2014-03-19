@@ -2,6 +2,7 @@ package com.inherentgames;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Enumeration;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -45,14 +46,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private Room world = null;
 	private RGBColor back = new RGBColor(50,50,100);
 	
-	private float touchTurn = 0;
-	private float touchTurnUp = 0;
+	public float horizontalSwipe = 0;
+	public float verticalSwipe = 0;
 	
 	private long lastRotateTime = 0;
 	
 	private SimpleVector V;
 	
-	private Camera cam;
+	public Camera cam;
 	
 	private int lightCycle = 0;
 	private Light sun1 = null, sun2 = null;
@@ -70,6 +71,10 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	private DiscreteDynamicsWorld dynamicWorld;
 	private DefaultCollisionConfiguration collisionConfiguration;
 	private CollisionDispatcher dispatcher;
+	
+	public int currentObjectId;
+	public Enumeration<Object3D> objects;
+	
 	private Clock clock;
 
 	private int width = 0;
@@ -140,10 +145,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		width = w;
 		height = h;
 		
+		//is tutorial?
 		if(roomNum == 0){
 			isTutorial = true;
-			width = w;
-			height = h;
 			wattsonText.add(wattsonPhrases[0][0]);
 			wattsonText.add(wattsonPhrases[0][1]);
 			wattsonText.add(wattsonPhrases[0][2]);
@@ -162,6 +166,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 		
 		letterWidth = width/96;
+
 		
 		Bitmap bitmap;
 	      if(tm.containsTexture("gui_font")){
@@ -403,6 +408,39 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				
 				Log.d("MyRenderer", "Loading textures took " + (System.currentTimeMillis() - startTime) + " milliseconds");
 				break;
+				
+			case 3:
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.map)), 256, 512);
+				tm.addTexture("Map", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.streetsign)), 256, 512);
+				tm.addTexture("StreetSign", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.streetsign_back)), 256, 512);
+				tm.addTexture("StreetSign_Back", new Texture(bitmap,true));
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.direccion)), 256, 256);
+				tm.addTexture("Direccion", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.autobus)), 256, 256);
+				tm.addTexture("Autobus", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.coche)), 256, 256);
+				tm.addTexture("Coche", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.mapa)), 256, 256);
+				tm.addTexture("Mapa", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.senal)), 256, 256);
+				tm.addTexture("Senal", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.taxi)), 256, 256);
+				tm.addTexture("Taxi", new Texture(bitmap,true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.semaforo)), 256, 256);
+				tm.addTexture("Semaforo", new Texture(bitmap,true));
+				bitmap.recycle();
 			}
 		
 		} catch(Exception e){
@@ -427,19 +465,24 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		setTextures();
 		world = new Room(roomNum, context, tm);
 		world.setAmbientLight(20, 20, 20);
-
+		
 		sun1 = new Light(world);
-		sun1.setPosition(new SimpleVector(0,-world.getHeight()/2, world.getLength()/2));
+		sun1.setPosition(new SimpleVector(0,-20, world.getLength()/2));
 		sun1.setIntensity(250, 250, 250);
 		
 		sun2 = new Light(world);
-		sun2.setPosition(new SimpleVector(0,-world.getHeight()/2, -world.getLength()/2));
+		sun2.setPosition(new SimpleVector(0,-20, -world.getLength()/2));
 		sun2.setIntensity(250, 250, 250);
 		
 		cam = world.getCamera();
 		cam.setPosition(new SimpleVector(0,0,0));
+		cam.lookAt(new SimpleVector(0,0.1,0));
 		cam.setOrientation(new SimpleVector(0,0,1), new SimpleVector(0,-1,0));
 		//cam.lookAt(new SimpleVector(0,-0.1,1));
+		
+		objects = world.getObjects();
+		currentObjectId = objects.nextElement().getID();
+		
 		MemoryHelper.compact();
 		
 		collisionConfiguration = new DefaultCollisionConfiguration();
@@ -507,13 +550,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 */
 	public void onDrawFrame(GL10 gl) {
 		
-		if ( touchTurn != 0 || touchTurnUp != 0 ) {
+		if ( horizontalSwipe != 0 || verticalSwipe != 0 ) {
 			V.set(cam.getDirection());
-			V.rotateY(touchTurn);
+			Log.d("MyRenderer", "Cam direction: " + V);
+			V.rotateY(horizontalSwipe);
 			cam.lookAt(V);
-			cam.rotateCameraX(-touchTurnUp/1.5f);
-			touchTurn = 0;
-			touchTurnUp = 0;
+			cam.rotateCameraX(-verticalSwipe/1.5f);
+			horizontalSwipe = 0;
+			verticalSwipe = 0;
+			
 		}
 		
 		float ms = clock.getTimeMicroseconds();
@@ -525,19 +570,25 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		}
 		fb.clear(back);
 		
+		if(world.skybox != null)
+			world.skybox.render(world, fb);
+	    
+	    
 		world.renderScene(fb);
 		world.draw(fb);
 
-		//Only called for 
-		if(!isPaused){
-			if(endTime - System.currentTimeMillis() > 0){
-				timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
-			}
-			else if(isTutorial == false){
-				levelLose();
+		//Only called for
+		if(isTutorial == false && MenuScreen.isDevMode == false){
+			if(!isPaused){
+				if(endTime - System.currentTimeMillis() > 0){
+					timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
+				}
+				else {
+					levelLose();
+				}
 			}
 		}
-
+		
 		display2DGameInfo(fb);
 		
 		try{
@@ -583,13 +634,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	}
 	
 	/**
-	 * @param value
-	 */
-	public void setTouchTurnUp(float value){
-		touchTurnUp = value;
-	}
-	
-	/**
 	 * @return
 	 */
 	public Room getWorld(){
@@ -601,13 +645,6 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 */
 	public FrameBuffer getFrameBuffer(){
 		return fb;
-	}
-	
-	/**
-	 * @param value
-	 */
-	public void setTouchTurn(float value){
-		touchTurn = value;
 	}
 	
 	/**
@@ -649,7 +686,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 					Vector3f linearVelocity = new Vector3f(0,0,0);
 					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
 					SimpleVector motion = new SimpleVector(linearVelocity.x,-linearVelocity.y,-linearVelocity.z);
-					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 10);
+					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
 					WordObject collisionObject;
 					if(id != -100) Log.i("MyRenderer", "Checking object with id: " + id);
 					if(id >= 0){

@@ -50,7 +50,7 @@ public class MenuScreen extends Activity {
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	public static final String PREFERENCES = "BABBLE_PREF";
-	public static boolean isDevMode = true;
+	public static final boolean isDevMode = true;
 	private Button playButton;
 	
 	
@@ -104,11 +104,7 @@ public class MenuScreen extends Activity {
             
             SharedPreferences settings = getSharedPreferences(PREFERENCES, 0);
 
-            if (settings.getBoolean("my_first_time", true)) {
-                //the app is being launched for first time, do something        
-                Log.i("Comments", "First time");
-                settings.edit().putBoolean("hasBeatenTutorial", false).commit(); 
-                settings.edit().putBoolean("my_first_time", false).commit(); 
+            if (settings.getBoolean("hasBeatenTutorial", false)) {     
                 playButton.setEnabled(false);
                 Log.d("MenuScreen", "Disabling button");
             }

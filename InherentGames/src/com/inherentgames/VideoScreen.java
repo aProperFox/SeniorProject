@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.VideoView;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class VideoScreen extends Activity{
 	VideoView videoView;
 	
@@ -62,6 +63,7 @@ public class VideoScreen extends Activity{
             {
             	if(shouldLoadMap){
             		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
+            		intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                     finish();
             	}
@@ -96,6 +98,7 @@ public class VideoScreen extends Activity{
 		return true;
 	}
 	
+	@SuppressLint("NewApi")
 	public void UiChangeListener() {
         final View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {

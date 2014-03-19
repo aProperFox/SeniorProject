@@ -88,8 +88,10 @@ public class SelectMap extends Activity {
 			
 			else if(xpos > width*.675 && xpos < width*.88 && ypos > height*0.176 && ypos < height*0.44){
 				if(levelNum > 2){
-					Toast toast = Toast.makeText(this, R.string.unavailable, Toast.LENGTH_LONG);
-		            toast.show();
+					getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("loadLevel", 3).commit();
+                    Intent i = new Intent(SelectMap.this, GameScreen.class);
+                    startActivity(i);
+                    finish();
 				}
 			}
 			
