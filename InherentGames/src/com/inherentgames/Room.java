@@ -6,21 +6,28 @@ import java.util.ArrayList;
 import javax.vecmath.Vector3f;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.threed.jpct.CollisionEvent;
+import com.threed.jpct.CollisionListener;
+import com.threed.jpct.GLSLShader;
+import com.threed.jpct.IRenderHook;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
+import com.threed.jpct.Texture;
 import com.threed.jpct.TextureManager;
 import com.threed.jpct.World;
+import com.threed.jpct.util.BitmapHelper;
+import com.threed.jpct.util.SkyBox;
 
 
-public class Room extends World {
+public class Room extends World{
 	/**
 	 * 
 	 */
@@ -42,6 +49,10 @@ public class Room extends World {
 	
 	private float height, width, length;
 	
+	private GLSLShader shader;
+	
+	public SkyBox skybox;
+	
 	TextureManager tm;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
@@ -60,6 +71,7 @@ public class Room extends World {
 		
 		this.tm = tm;
 		
+		skybox = null;
 		roomObjectWords = new ArrayList<String>();
 		wordObjects = new ArrayList<WordObject>();
 		bubbleObjects = new ArrayList<Bubble>();
@@ -76,6 +88,13 @@ public class Room extends World {
 		}
 
 		setObjects(roomId);
+		
+		try {
+			shader = new GLSLShader(Loader.loadTextFile(context.getAssets().open("toon.vs")), Loader.loadTextFile(context.getAssets().open("toon.fs")));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 	}
 	
@@ -248,6 +267,42 @@ public class Room extends World {
 			bodies.add(ceiling.getBody());
 			addObject(ceiling.getFloor());
 			break;
+			
+		case 3:
+			try{
+				Bitmap bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_left)), 1024, 1024);
+				tm.addTexture("SkyboxLeft", new Texture(bitmap, true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_front)), 1024, 1024);
+				tm.addTexture("SkyboxFront", new Texture(bitmap, true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_right)), 1024, 1024);
+				tm.addTexture("SkyboxRight", new Texture(bitmap, true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_back)), 1024, 1024);
+				tm.addTexture("SkyboxBack", new Texture(bitmap, true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_top)), 1024, 1024);
+				tm.addTexture("SkyboxTop", new Texture(bitmap, true));
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.skybox_bottom)), 1024, 1024);
+				tm.addTexture("SkyboxBottom", new Texture(bitmap, true));
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.street)), 512, 512);
+				tm.addTexture("Street", new Texture(bitmap, true));
+				bitmap.recycle();
+				
+			}catch(Exception e){
+				//TODO: log exception
+			}
+			
+			skybox = new SkyBox("SkyboxLeft", "SkyboxFront", "SkyboxRight", "SkyboxBack", "SkyboxTop", "SkyboxBottom", 200f);
+			floor = new Floor(new SimpleVector(200,10,200),0);
+			floor.setTexture("Street");
+			bodies.add(floor.getBody());
+			addObject(floor.getFloor());
+			break;
 		}
 		
 	}
@@ -299,7 +354,7 @@ public class Room extends World {
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room0/clock.obj"),
 						context.getResources().getAssets().open("raw/room0/clock.mtl"), 1.0f)),new SimpleVector(0,(float)Math.PI/2,(float)Math.PI),"Clock",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room0/door.obj"),
-						context.getResources().getAssets().open("raw/room0/door.mtl"), 4.0f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
+						context.getResources().getAssets().open("raw/room0/door.mtl"), 4.5f)),new SimpleVector(0,0,0),"Door",WordObject.FEMININE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room0/book.obj"),
 						context.getResources().getAssets().open("raw/room0/book.mtl"), 1.8f)),new SimpleVector(0,0,0),"Book",WordObject.MASCULINE));
 				roomObjects.add(new WordObject(Object3D.mergeAll(Loader.loadOBJ(context.getResources().getAssets().open("raw/room0/paper.obj"),
@@ -321,7 +376,7 @@ public class Room extends World {
 			addWordObject(50,7,10, roomObjects.get(1), "Chair");
 			addWordObject(50,7,-35, roomObjects.get(1), "Chair");
 			//Chalk board 2
-			addWordObject(0,-10,80,roomObjects.get(2), "Chalkboard");
+			addWordObject(0,-10,78,roomObjects.get(2), "Chalkboard");
 			//BackPacks 3
 			addWordObject(-30,20,30,roomObjects.get(3), "Backpack");
 			addWordObject(50,9,25,roomObjects.get(3), "Backpack");
@@ -331,7 +386,7 @@ public class Room extends World {
 			//Clock 5
 			addWordObject(74,-25,-60, roomObjects.get(5), "Clock");
 			//Door 6
-			addWordObject(-37,-16,-74, roomObjects.get(6), "Door");
+			addWordObject(-45,-19,-88, roomObjects.get(6), "Door");
 			//Book 7
 			addWordObject(36,-3,-74, roomObjects.get(7), "Book", new SimpleVector(0,-(float)Math.PI/2,0));
 			addWordObject(19,9,-74, roomObjects.get(7), "Book", new SimpleVector(0,(float)Math.PI/2,0));
@@ -447,6 +502,81 @@ public class Room extends World {
 			addWordObject(30,-4,-40, roomObjects.get(8), "Table");
 
 			break;
+			
+		case 3: 
+			
+			try {
+				long startTime = System.currentTimeMillis();
+				
+				//Address = 0 (la dirección)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/address.obj"),
+						context.getResources().getAssets().open("raw/room3/address.mtl"), 20.0f)), 
+						new SimpleVector(0,0,0),"Address",WordObject.FEMININE));
+				Log.d("Room", "Loading object 'address' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//Bus = 1 (el autobús)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/bus.obj"),
+						context.getResources().getAssets().open("raw/room3/bus.mtl"), 1.3f)), 
+						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Bus",WordObject.MASCULINE));
+				Log.d("Room", "Loading object 'bus' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//Car = 2 (el coche)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/car.obj"),
+						context.getResources().getAssets().open("raw/room3/car.mtl"), 3.5f)), 
+						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Car",WordObject.MASCULINE));
+				Log.d("Room", "Loading object 'car' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//Map = 3 (el mapa)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/map.obj"),
+						context.getResources().getAssets().open("raw/room3/map.mtl"), 1.0f)), 
+						new SimpleVector((float)Math.PI/2,0,0),"Map",WordObject.MASCULINE));
+				Log.d("Room", "Loading object 'map' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//sign = 4 (la señal)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/street_sign.obj"),
+						context.getResources().getAssets().open("raw/room3/street_sign.mtl"), 0.5f)), 
+						new SimpleVector((float)Math.PI,0,0),"StreetSign",WordObject.FEMININE));
+				Log.d("Room", "Loading object 'sign' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//taxi = 5 (la taxi)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/taxi.obj"),
+						context.getResources().getAssets().open("raw/room3/taxi.mtl"), 2.5f)), 
+						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Taxi",WordObject.FEMININE));
+				Log.d("Room", "Loading object 'taxi' took " + (System.currentTimeMillis() - startTime) + " milliseconds");
+				startTime = System.currentTimeMillis();
+				//traffic light = 6 (el semáforo)
+				roomObjects.add(new WordObject(Object3D.mergeAll(
+						Loader.loadOBJ(context.getResources().getAssets().open("raw/room3/traffic_light.obj"),
+						context.getResources().getAssets().open("raw/room3/traffic_light.mtl"), 0.35f)), 
+						new SimpleVector((float)Math.PI,(float)Math.PI/2,0),"Traffic_Light",WordObject.MASCULINE));
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			
+			//Address 0
+			addWordObject(20,0f,10, roomObjects.get(0), "Address");
+			//Bus 1
+			addWordObject(-54,8f,13, roomObjects.get(1), "Bus", new SimpleVector(0,(float)Math.PI,0));
+			//Car 2
+			addWordObject(-30,8f,-23, roomObjects.get(2), "Car", new SimpleVector(0,(float)Math.PI/2,0));
+			//Map 3
+			addWordObject(4,-1f,-20, roomObjects.get(3), "Map");
+			//Street sign 4
+			addWordObject(-25,-1f,-19, roomObjects.get(4), "Sign");
+			//Taxi 5
+			addWordObject(20,7f,10, roomObjects.get(5), "Taxi", new SimpleVector(0,(float)Math.PI,0));
+			//Traffic Light 6
+			addWordObject(-70,-3f,-20, roomObjects.get(6), "Traffic_Light", new SimpleVector(0,(float)Math.PI,0));
+			addWordObject(-23,-3f,22, roomObjects.get(6), "Traffic_Light");
+			break;
 		}
 		Loader.clearCache();
 		roomObjects.clear();
@@ -489,7 +619,10 @@ public class Room extends World {
 		object.rotateBy(rotateBy);
 		object.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
 		object.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
-		if(tm.containsTexture(name)){
+		object.calcTangentVectors();
+		object.setShader(shader);
+		object.setSpecularLighting(true);
+		if(tm.containsTexture(name) && (name != Translator.translateToLanguage(name, Translator.SPANISH))){
 			object.setTexture(name);
 		}
 		if(!roomObjectWords.contains(name)){
@@ -527,6 +660,7 @@ public class Room extends World {
 		bubble.setAdditionalColor(bubbleColor);
 		bubble.setTexture("Default");
 		bubble.calcTextureWrapSpherical();
+		bubble.setBillboarding(Object3D.BILLBOARDING_ENABLED);
 		
 		addObject(bubble);
 		JPCTBulletMotionState ms = new JPCTBulletMotionState(bubble);
@@ -744,4 +878,5 @@ public class Room extends World {
 		
 		super.dispose();
 	}
+
 }

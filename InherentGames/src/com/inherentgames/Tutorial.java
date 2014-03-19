@@ -284,8 +284,8 @@ public class Tutorial extends Activity{
     		case MotionEvent.ACTION_UP:
 				xpos = -1;
 				ypos = -1;
-				renderer.setTouchTurn(0);
-				renderer.setTouchTurnUp(0);
+				renderer.horizontalSwipe = 0;
+				renderer.verticalSwipe = 0;
 				isShootMode = false;
 				isViewMode = true;
 				renderer.setFireButtonState(false);
@@ -304,8 +304,8 @@ public class Tutorial extends Activity{
     			Log.d("GameScreen", "Action Pointer Up");
 				xpos = -1;
 				ypos = -1;
-				renderer.setTouchTurn(0);
-				renderer.setTouchTurnUp(0);
+				renderer.horizontalSwipe = 0;
+				renderer.verticalSwipe = 0;
 				float xd = me.getX(1) - firstX;
 				float yd = me.getY(1) - firstY;
 				if (yd < (-height/5) && Math.abs(xd) < width/6) {
@@ -349,8 +349,8 @@ public class Tutorial extends Activity{
     				Camera cam1 = renderer.getCam();
     				SimpleVector dir1 = Interact2D.reproject2D3DWS(cam1, renderer.getFrameBuffer(), width/2, height/2);
     				if(isViewMode && moveProperties == 0){
-    					renderer.setTouchTurn(xd / -(width/5f));
-    					renderer.setTouchTurnUp(yd / -(height/5f));
+    					renderer.horizontalSwipe = (xd / -(width/5f));
+    					renderer.verticalSwipe = (yd / -(height/5f));
     				}
     				xpos = me.getX();
     				ypos = me.getY();

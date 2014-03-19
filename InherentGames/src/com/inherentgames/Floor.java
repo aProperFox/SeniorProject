@@ -26,7 +26,6 @@ public class Floor{
 	 * @param textureId
 	 */
 	public Floor(SimpleVector size, int textureId){
-		Log.i("IM IN THA LOOP", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		coordinates[0] = new SimpleVector(-size.x/2,size.y,+size.z/2);
 		coordinates[1] = new SimpleVector(+size.x/2,size.y,+size.z/2);
 		coordinates[2] = new SimpleVector(+size.x/2,size.y,-size.z/2);

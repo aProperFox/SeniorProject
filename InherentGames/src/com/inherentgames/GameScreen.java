@@ -69,10 +69,6 @@ public class GameScreen extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Logger.log("onCreate");
 		
-		if (master != null){
-			copy(master);
-		}
-		
 		super.onCreate(savedInstanceState);
 		Display display = getWindowManager().getDefaultDisplay();
 		
@@ -121,6 +117,7 @@ public class GameScreen extends Activity {
 				return configs[0];
 			}
 		});
+		
 		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
 		int levelNum = settings.getInt("loadLevel", 1);
 		Log.i("GameScreen", "Current level is: " + levelNum);
@@ -209,31 +206,19 @@ public class GameScreen extends Activity {
 		super.onStop();
 	}
 	
-	private void copy(Object src){
-		try{
-			Logger.log("Copying data from master Activity!");
-			Field[] fs = src.getClass().getDeclaredFields();
-			for (Field f : fs){
-				f.setAccessible(true);
-				f.set(this,  f.get(src));
-			}
-			
-		} catch (Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-	
 	public boolean onTouchEvent(MotionEvent me){
 		switch(me.getAction() & MotionEvent.ACTION_MASK){
 	    	
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX(0);
 				ypos = me.getY(0);
+				//Fire button
 				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16){
 					isViewMode = false;
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
+				//Pause button
 				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10){
 					isViewMode = false;
 					isShootMode = false;
@@ -282,8 +267,8 @@ public class GameScreen extends Activity {
     			Log.d("GameScreen", "Action Up");
 				xpos = -1;
 				ypos = -1;
-				renderer.setTouchTurn(0);
-				renderer.setTouchTurnUp(0);
+				renderer.horizontalSwipe = 0;
+				renderer.verticalSwipe = 0;
 				isShootMode = false;
 				isViewMode = true;
 				renderer.setFireButtonState(false);
@@ -293,8 +278,8 @@ public class GameScreen extends Activity {
     			Log.d("GameScreen", "Action Pointer Up");
 				xpos = -1;
 				ypos = -1;
-				renderer.setTouchTurn(0);
-				renderer.setTouchTurnUp(0);
+				renderer.horizontalSwipe = 0;
+				renderer.verticalSwipe = 0;
 				float xd = me.getX(1) - firstX;
 				float yd = me.getY(1) - firstY;
 				if (yd < (-height/5) && Math.abs(xd) < width/6) {
@@ -322,10 +307,9 @@ public class GameScreen extends Activity {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
-    				if(isViewMode){
-    					renderer.setTouchTurn(xd / -(width/5f));
-    					renderer.setTouchTurnUp(yd / -(height/5f));
-    				}
+					renderer.horizontalSwipe = (xd / -(width/5f));
+					renderer.verticalSwipe = (yd / -(height/5f));
+    					
     				xpos = me.getX();
     				ypos = me.getY();
     			}
@@ -343,12 +327,35 @@ public class GameScreen extends Activity {
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		try{
         switch (item.getItemId()) {
-        case R.id.delete_data:
-        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("hasBeatenTutorial").commit();
-        	getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().remove("nextLevel").commit();
+        case R.id.inc_object_x:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(1, 0, 0);
+        	break;
+        case R.id.inc_object_z:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 0, 1);
+        	break;
+        case R.id.dec_object_x:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(-1, 0, 0);
+        	break;
+        case R.id.dec_object_z:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 0, -1);
+        	break;
+        case R.id.inc_object_y:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 1, 0);
+        	break;
+        case R.id.dec_object_y:
+        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, -1, 0);
+        	return true;
+        case R.id.inc_obj:
+        	renderer.currentObjectId = renderer.objects.nextElement().getID();
+        	Log.d("GameScreen", "New Object is: " + renderer.getWorld().getObject(renderer.currentObjectId).getName());
         	return true;
         }
+        Log.d("GameScreen", "New object location: " + renderer.getWorld().getObject(renderer.currentObjectId).getTranslation());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
         return super.onOptionsItemSelected(item);
     }
 	

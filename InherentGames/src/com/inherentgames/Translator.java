@@ -8,6 +8,7 @@ public class Translator {
 	public static final int SPANISH = 1;
 	
 	private static String wordList[][] = {	
+		//Room 0-1
 		{"Desk", "Escritorio"},
 		{"Chair", "Silla"},
 		{"Chalkboard", "Pizarra"},
@@ -18,6 +19,7 @@ public class Translator {
 		{"Book", "Libro"},
 		{"Paper", "Papel"},
 		{"Window", "Ventana"},
+		//Room 2
 		{"Bill", "Cuenta"},
 		{"Bread", "Pan"},
 		{"Cake", "Pastel"},
@@ -27,6 +29,14 @@ public class Translator {
 		{"Plate", "Plato"},
 		{"Spoon", "Cuchara"},
 		{"Table", "Mesa"},
+		//Room 3
+		{"Address", "Direccion"},
+		{"Bus", "Autobus"},
+		{"Car", "Coche"},
+		{"Map", "Mapa"},
+		{"Sign", "Senal"},
+		{"Taxi", "Taxi"},
+		{"Traffic_Light", "Semaforo"},
 	};
 
 	/**
