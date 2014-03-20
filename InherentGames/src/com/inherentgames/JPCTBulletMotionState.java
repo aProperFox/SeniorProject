@@ -33,7 +33,7 @@ public class JPCTBulletMotionState extends MotionState{
 	}  
 	
 	
-  public Transform getWorldTransform(Transform worldTrans){
+  public Transform getWorldTransform(Transform worldTrans) {
     setTransformFromGraphic(worldTrans);
     return worldTrans;
   }

@@ -24,7 +24,7 @@ public class WordObject extends Object3D {
 	/**
 	 * @param obj
 	 */
-	public WordObject(WordObject obj){
+	public WordObject(WordObject obj) {
 		super(obj.toObject3D());
 		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
@@ -38,7 +38,7 @@ public class WordObject extends Object3D {
 	 * @param name
 	 * @param article
 	 */
-	public WordObject(Object3D obj, SimpleVector rotationAxis, String name, int article){
+	public WordObject(Object3D obj, SimpleVector rotationAxis, String name, int article) {
 		super(obj);
 		isStatic = true;
 		names[Translator.ENGLISH] = name;
@@ -50,29 +50,29 @@ public class WordObject extends Object3D {
 	/**
 	 * @return
 	 */
-	public boolean getStaticState(){
+	public boolean getStaticState() {
 		return isStatic;
 	}
 	
 	/**
 	 * @param state
 	 */
-	public void setStatic(boolean state){
+	public void setStatic(boolean state) {
 		isStatic = state;
 	}
 	
 	/**
 	 * 
 	 */
-	public void setMaxDimension(){
+	public void setMaxDimension() {
 		long startTime = System.currentTimeMillis();
 		/*
 		PolygonManager polyMan = this.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
 		SimpleVector minVerts = new SimpleVector(1000,1000,1000);
 		SimpleVector maxVerts = new SimpleVector(-1000,-1000,-1000);
-		for(int i = 0; i < polygons; i++){
-			for(int j = 0; j < 3; j++){
+		for(int i = 0; i < polygons; i++) {
+			for(int j = 0; j < 3; j++) {
 				if(minVerts.x > polyMan.getTransformedVertex(i, j).x)
 					minVerts.x = polyMan.getTransformedVertex(i,j).x;
 				if(maxVerts.x < polyMan.getTransformedVertex(i, j).x)
@@ -103,28 +103,28 @@ public class WordObject extends Object3D {
 	/**
 	 * @return
 	 */
-	public float getMaxDimension(){
+	public float getMaxDimension() {
 		return maxDimension;
 	}
 	
 	/**
 	 * @param id
 	 */
-	public void setObjectId(int id){
+	public void setObjectId(int id) {
 		this.objectId = id;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getObjectId(){
+	public int getObjectId() {
 		return objectId;
 	}
 	
 	/**
 	 * @return
 	 */
-	public int getArticle(){
+	public int getArticle() {
 		return article;
 	}
 	
@@ -132,7 +132,7 @@ public class WordObject extends Object3D {
 	 * @see com.threed.jpct.Object3D#setName(java.lang.String)
 	 */
 	@Override
-	public void setName(String name){
+	public void setName(String name) {
 		/**
 		 * TODO: setting for language
 		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
@@ -145,7 +145,7 @@ public class WordObject extends Object3D {
 	 * @param language
 	 * @return
 	 */
-	public String getName(int language){
+	public String getName(int language) {
 		return names[language];
 	}
 	
@@ -153,21 +153,21 @@ public class WordObject extends Object3D {
 	 * @see com.threed.jpct.Object3D#scale(float)
 	 */
 	@Override
-	public void scale(float scaleTo){
+	public void scale(float scaleTo) {
 		super.scale(scaleTo/maxDimension);
 	}
 	
 	/**
 	 * @param room
 	 */
-	public void removeObject(Room room){
+	public void removeObject(Room room) {
 		room.removeObject(objectId);
 	}
 	
 	/**
 	 * @param axes
 	 */
-	public void rotateBy(SimpleVector axes){
+	public void rotateBy(SimpleVector axes) {
 		this.rotateX(axes.x);
 		this.rotateY(axes.y);
 		this.rotateZ(axes.z);
@@ -176,14 +176,14 @@ public class WordObject extends Object3D {
 	/**
 	 * @return
 	 */
-	public Object3D toObject3D(){
+	public Object3D toObject3D() {
 		return (Object3D)this;
 	}
 
-	public float getMax(float[] vertices){
+	public float getMax(float[] vertices) {
 		float max = 0;
-		for(float vertex: vertices){
-			if(Math.abs(vertex) > max){
+		for(float vertex: vertices) {
+			if(Math.abs(vertex) > max) {
 				max = Math.abs(vertex);
 			}
 		}

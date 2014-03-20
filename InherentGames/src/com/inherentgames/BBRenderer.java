@@ -39,7 +39,7 @@ import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
-class MyRenderer implements GLSurfaceView.Renderer{
+class BBRenderer implements GLSurfaceView.Renderer{
 	private TextureManager tm = TextureManager.getInstance();
 	public static final int SHORT_TOAST = 5;
 	private FrameBuffer fb = null;
@@ -137,7 +137,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param h
 	 * @param roomNum
 	 */
-	public MyRenderer(Context c, int w, int h, int roomNum) {
+	public BBRenderer(Context c, int w, int h, int roomNum) {
 		context = c.getApplicationContext();
 		V = new SimpleVector(0, 0, 1);
 		this.roomNum = roomNum;
@@ -146,7 +146,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		height = h;
 		
 		//is tutorial?
-		if(roomNum == 0){
+		if(roomNum == 0) {
 			isTutorial = true;
 			wattsonText.add(wattsonPhrases[0][0]);
 			wattsonText.add(wattsonPhrases[0][1]);
@@ -169,7 +169,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 
 		
 		Bitmap bitmap;
-	      if(tm.containsTexture("gui_font")){
+	      if(tm.containsTexture("gui_font")) {
 	    	  
 	      }
 	      else{
@@ -228,7 +228,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.defaulttexture)), 256, 256);
 			tm.addTexture("Default", new Texture(bitmap,true));
 			bitmap.recycle();
-			}catch(Exception e){
+			}catch(Exception e) {
 				
 			}
 	      }
@@ -240,15 +240,15 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * 
 	 */
-	public void setTextures(){
+	public void setTextures() {
 		Bitmap bitmap;
 		try{
 			long startTime = System.currentTimeMillis();
-		switch(roomNum){
+		switch(roomNum) {
 			case 0:
 				
 				//Can probably delete if, since tutorial now mandatory
-				if(!tm.containsTexture("Escritorio")){
+				if(!tm.containsTexture("Escritorio")) {
 					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 256, 256);
 					tm.addTexture("Escritorio", new Texture(bitmap,true));
 					bitmap.recycle();
@@ -288,7 +288,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				bitmap.recycle();
 				
 				//Can probably delete if, since tutorial now mandatory
-				if(!tm.containsTexture("Escritorio")){
+				if(!tm.containsTexture("Escritorio")) {
 					bitmap = BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.escritorio)), 128, 128);
 					tm.addTexture("Escritorio", new Texture(bitmap,true));
 					bitmap.recycle();
@@ -443,7 +443,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				bitmap.recycle();
 			}
 		
-		} catch(Exception e){
+		} catch(Exception e) {
 			Log.i("MyRenderer", "Caught exception loading textures: " + e);
 		}
 	}
@@ -497,13 +497,13 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		dynamicWorld.setGravity(new Vector3f(0,-10,0));
 		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
 	
-		for(int i = 0; i < world.getNumBodies(); i++){
+		for(int i = 0; i < world.getNumBodies(); i++) {
 			dynamicWorld.addCollisionObject(world.getBody(i));
 		}
 	
 		dynamicWorld.clearForces();
 
-		for(int i = 5; i < world.getNumBodies(); i++){
+		for(int i = 5; i < world.getNumBodies(); i++) {
 			dynamicWorld.addRigidBody(world.getBody(i));
 		}
 	
@@ -578,9 +578,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		world.draw(fb);
 
 		//Only called for
-		if(isTutorial == false && MenuScreen.isDevMode == false){
-			if(!isPaused){
-				if(endTime - System.currentTimeMillis() > 0){
+		if(isTutorial == false && MenuScreen.isDevMode == false) {
+			if(!isPaused) {
+				if(endTime - System.currentTimeMillis() > 0) {
 					timeHeight = (int)((float)(endTime - System.currentTimeMillis())/100000f*(height*0.76));
 				}
 				else {
@@ -593,11 +593,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		
 		try{
 		
-		if(lastRotateTime < (System.currentTimeMillis() - 15)){
+		if(lastRotateTime < (System.currentTimeMillis() - 15)) {
 			lastRotateTime = System.currentTimeMillis();
 			ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
 			for(Bubble bubble : Reversed.reversed(bubbleObjects)) {
-				if(bubble.isHolding()){
+				if(bubble.isHolding()) {
 					Object3D obj = world.getObject(bubble.getHeldObjectId());
 					obj.setOrigin(bubble.getTranslation().calcSub(obj.getCenter()));
 					obj.rotateY(0.1f);
@@ -606,7 +606,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				}
 				else{
 					/* Currently, the bubble pops but the next one shot breaks the physics engine.
-					if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000){
+					if(System.currentTimeMillis() > bubble.getTimeCreated() + 5000) {
 						Log.i("MyRenderer", "I'm deleting the bubble!");
 						deleteBubble(bubble);
 						continue;
@@ -614,7 +614,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				}
 			}
 		}
-		}catch(ConcurrentModificationException e){
+		}catch(ConcurrentModificationException e) {
 			Log.e("MyRenderer", "Concurrent Modification error occured");
 		}
 		
@@ -622,9 +622,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 		/*
 		 * TODO: add color to WordObjects when camera is aimed at them
 		int id = world.getCameraBox().checkForCollision(cam.getDirection(), 80);
-		if(id != -100){
+		if(id != -100) {
 			WordObject wordObject = (WordObject)world.getObject(id);
-			if(wordObject.getStaticState()){
+			if(wordObject.getStaticState()) {
 			Log.i("MyRenderer", "Viewed object collision!");
 				//wordObject.setAdditionalColor(255,255,0);
 			}
@@ -636,14 +636,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @return
 	 */
-	public Room getWorld(){
+	public Room getWorld() {
 		return world;
 	}
 	
 	/**
 	 * @return
 	 */
-	public FrameBuffer getFrameBuffer(){
+	public FrameBuffer getFrameBuffer() {
 		return fb;
 	}
 	
@@ -651,11 +651,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param position
 	 * @return
 	 */
-	public RigidBody shoot(SimpleVector position){
-		if(!isPaused){
-			if(System.currentTimeMillis() > lastShot + 500){
+	public RigidBody shoot(SimpleVector position) {
+		if(!isPaused) {
+			if(System.currentTimeMillis() > lastShot + 500) {
 				RigidBody body = world.addBubble(position);
-				if(body != null){
+				if(body != null) {
 					Log.i("MyRenderer", "Before adding bubble to physics world");
 					dynamicWorld.addRigidBody(body);
 					int size = dynamicWorld.getCollisionObjectArray().size();
@@ -674,14 +674,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @return
 	 */
-	public int checkBubble(){
+	public int checkBubble() {
 		int i = 0;
 		//Checks bubble collision and if a collision occurs, it shrinks the object down
 		//and sets it in the state to stay inside the bubble object
 		try {
 			for(i = 0; i < world.getNumBubbles(); i++) {
 				Bubble bubble = world.getBubble(i);
-				if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null){
+				if(bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null) {
 					RigidBody tempBody = (RigidBody) dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex());
 					Vector3f linearVelocity = new Vector3f(0,0,0);
 					linearVelocity = tempBody.getLinearVelocity(linearVelocity);
@@ -689,18 +689,18 @@ class MyRenderer implements GLSurfaceView.Renderer{
 					int id = world.getObject(bubble.getObjectId()).checkForCollision(motion, 5);
 					WordObject collisionObject;
 					if(id != -100) Log.i("MyRenderer", "Checking object with id: " + id);
-					if(id >= 0){
+					if(id >= 0) {
 						Log.d("MyRenderer", "That doesn't make sense... id != 0, but not bubble nor wordObject");
-						if((collisionObject = world.getWordObject(id)) != null){
-							if(world.isBubbleType(id)){
+						if((collisionObject = world.getWordObject(id)) != null) {
+							if(world.isBubbleType(id)) {
 								Log.d("MyRenderer", "That doesn't make sense... Collision object is a bubble.");
 							}
 							else{
 								Log.i("MyRenderer", "Object is a WordObject!");
 							}
-							if(collisionObject.getArticle() == bubble.getArticle()){
+							if(collisionObject.getArticle() == bubble.getArticle()) {
 								bubbleWords.add(collisionObject.getName(Translator.ENGLISH));
-								if(collisionObject.getName(Translator.ENGLISH) != "Plate"){
+								if(collisionObject.getName(Translator.ENGLISH) != "Plate") {
 									collisionObject.scale(5.0f);
 								}
 								collisionObject.setStatic(false);
@@ -718,7 +718,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 								return 0;
 							}
 						}
-						else if(world.isBubbleType(id)){
+						else if(world.isBubbleType(id)) {
 							Log.i("MyRenderer", "Object is a bubble!");
 							Bubble bubbleCollisionObject = (Bubble) world.getObject(id);
 							world.removeObject(bubbleCollisionObject.getHeldObjectId());
@@ -738,14 +738,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @return
 	 */
-	public Camera getCam(){
+	public Camera getCam() {
 		return cam;
 	}
 	
 	/**
 	 * @param bubble
 	 */
-	public void deleteBubble(Bubble bubble){
+	public void deleteBubble(Bubble bubble) {
 		dynamicWorld.removeRigidBody((RigidBody)dynamicWorld.getCollisionObjectArray().get(bubble.getBodyIndex()));
 		world.removeBubble(bubble);
 	}
@@ -753,7 +753,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @param state
 	 */
-	public void loadBubble(int state){
+	public void loadBubble(int state) {
 		//Put 2D bubble image on screen with 2D renderer
 		world.setBubbleColor(state);
 		if(state == WordObject.FEMININE)
@@ -765,8 +765,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @param isPressed
 	 */
-	public void setFireButtonState(boolean isPressed){
-		if(isPressed){
+	public void setFireButtonState(boolean isPressed) {
+		if(isPressed) {
 			fireButtonState = "fireButtonPressed";
 		}
 		else{
@@ -777,11 +777,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @return
 	 */
-	public int iterateWattson(){
+	public int iterateWattson() {
 		wattsonText.clear();
-		if(!hasCompletedSteps){
+		if(!hasCompletedSteps) {
 			wattsonTextIterator ++;
-			if(wattsonTextIterator > screenItems.length -1){
+			if(wattsonTextIterator > screenItems.length -1) {
 				wattsonTextIterator = 0;
 			}
 			wattsonText.add(wattsonPhrases[wattsonTextIterator][0]);
@@ -789,7 +789,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			wattsonText.add(wattsonPhrases[wattsonTextIterator][2]);
 			
 			int lastItem = screenItems[screenItems.length - 1];
-			for(int i = screenItems.length - 1; i > 0; i--){
+			for(int i = screenItems.length - 1; i > 0; i--) {
 				screenItems[i] = screenItems[i-1];
 			}
 			screenItems[0] = lastItem;
@@ -807,13 +807,13 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @param fb
 	 */
-	public void display2DGameInfo(FrameBuffer fb){
+	public void display2DGameInfo(FrameBuffer fb) {
 		
-		if(isTutorial){
+		if(isTutorial) {
 			//CrossHair
 			renderer2D.blitCrosshair(fb, width, height);
 			
-			if(hasCompletedSteps){
+			if(hasCompletedSteps) {
 				//Bubble image
 				renderer2D.blitImage(fb, bubbleTexture, width/2, height, 256, 256, width/3, width/3, 5);
 				//Bubble text
@@ -835,12 +835,12 @@ class MyRenderer implements GLSurfaceView.Renderer{
 				renderer2D.blitImage(fb, pauseButtonState, width-width/30, width/35, 128, 128, width/15, width/15, 100);
 				
 				int iterator = 0, size = screenItems.length - 1;
-				for(int i : screenItems){
+				for(int i : screenItems) {
 					if(iterator < size)
 						displayScreenItem(fb, i);
 					iterator++;
 				}
-				if(screenItems[screenItems.length - 1] <= 0){
+				if(screenItems[screenItems.length - 1] <= 0) {
 				}
 				else{
 					renderer2D.blitImage(fb, "Filter", width/2, height/2, 64, 64, width, height, 10);
@@ -856,11 +856,11 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			try{
 				//Wattson help text
 				int iteration = 0;
-				for(String string : wattsonText){
+				for(String string : wattsonText) {
 					renderer2D.blitText(string, width/6, height/30 + (letterWidth*2*iteration), letterWidth, letterWidth*2,RGBColor.WHITE);
 					iteration++;
 				}
-			}catch (ConcurrentModificationException e){
+			}catch (ConcurrentModificationException e) {
 				Log.e("Myrenderer", "display2DGameInfo got ConcurrentModificationError: " + e);
 			}
 			
@@ -898,13 +898,13 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param fb
 	 * @param itemNum
 	 */
-	private void displayScreenItem(FrameBuffer fb, int itemNum){
+	private void displayScreenItem(FrameBuffer fb, int itemNum) {
 		boolean isLastItem;
 		if(screenItems[screenItems.length-1] == itemNum)
 			isLastItem = true;
 		else
 			isLastItem = false;
-		switch(itemNum){
+		switch(itemNum) {
 		case 0:
 			break;
 		case 1:
@@ -917,7 +917,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			//Bubble text
 			renderer2D.blitText(world.getBubbleArticle(), width/2-width/25, height-width/10, width/25, height/10,RGBColor.WHITE);
 			
-			if(isLastItem){
+			if(isLastItem) {
 				arrowX = (int)(width/3.5f);
 				arrowY = height - (width/8);
 				arrowImageWidth = 64;
@@ -933,7 +933,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
 			renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
 			
-			if(isLastItem){
+			if(isLastItem) {
 				arrowX = 4*width/5;
 				arrowY = height/2;
 				arrowImageWidth = 64;
@@ -951,7 +951,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 			renderer2D.blitImage(fb, "ScoreBars", width-(width/16), height/2, 128, 512, width/8, (int)(height*0.9), 100);
 			renderer2D.blitImage(fb, "ScoreArrow", (int)(width*0.9), (int)(height*0.881)- fuelHeight, 32, 32, width/38, width/38, 100);
 			
-			if(isLastItem){
+			if(isLastItem) {
 				arrowX = 7*width/8;
 				arrowY = height/2;
 				arrowImageWidth = 64;
@@ -987,8 +987,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * 
 	 */
-	public void setPauseButtonState(){
-		if(pauseButtonState == "pauseButton"){
+	public void setPauseButtonState() {
+		if(pauseButtonState == "pauseButton") {
 			isPaused = true;
 			timeLeft = endTime - System.currentTimeMillis();
 			pauseButtonState = "pauseButtonPressed";
@@ -1003,20 +1003,20 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * @return
 	 */
-	public boolean hasWonGame(){
+	public boolean hasWonGame() {
 		ArrayList<String> tempWords = world.getRoomObjectWords();
 		int listLength = tempWords.size();
 		float numWordsCaptured = 0;
-		for(int i = 0; i < tempWords.size(); i++){
-			for(int j = 0; j < bubbleWords.size(); j++){
-				if(bubbleWords.get(j) == tempWords.get(i)){
+		for(int i = 0; i < tempWords.size(); i++) {
+			for(int j = 0; j < bubbleWords.size(); j++) {
+				if(bubbleWords.get(j) == tempWords.get(i)) {
 					numWordsCaptured++;
 					break;
 				}
 			}
 		}
 		fuelHeight = (int)((float)(numWordsCaptured/listLength)*(height*0.75));
-		if(numWordsCaptured != listLength){
+		if(numWordsCaptured != listLength) {
 			return false;
 		}
 		levelWin();
@@ -1029,13 +1029,13 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param obj
 	 * @return
 	 */
-	public Vector3f getDimensions(Object3D obj){
+	public Vector3f getDimensions(Object3D obj) {
 		PolygonManager polyMan = obj.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
 		Vector3f minVerts = new Vector3f(1000,1000,1000);
 		Vector3f maxVerts = new Vector3f(-1000,-1000,-1000);
-		for(int i = 0; i < polygons; i++){
-			for(int j = 0; j < 3; j++){
+		for(int i = 0; i < polygons; i++) {
+			for(int j = 0; j < 3; j++) {
 				if(minVerts.x > polyMan.getTransformedVertex(i, j).x)
 					minVerts.x = polyMan.getTransformedVertex(i,j).x;
 				if(maxVerts.x < polyMan.getTransformedVertex(i, j).x)
@@ -1056,14 +1056,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * 
 	 */
-	public void levelWin(){
+	public void levelWin() {
 		SharedPreferences settings = context.getSharedPreferences(MenuScreen.PREFERENCES, 0);
 		bubbleTexture = "bubbleBlue";
-    	if(isTutorial){
+    	if(isTutorial) {
     		Log.d("MyRenderer", "Setting hasBeatenTutorial");
     		settings.edit().putBoolean("hasBeatenTutorial", true).commit();
-    		handler.post(new Runnable(){
-                public void run(){
+    		handler.post(new Runnable() {
+                public void run() {
                 	Toast toast = Toast.makeText(context, "Looks like you've got it!", Toast.LENGTH_LONG);
                     toast.show();
                     Intent intent = new Intent(context, GameScreen.class);
@@ -1080,8 +1080,8 @@ class MyRenderer implements GLSurfaceView.Renderer{
     		  if(settings.getInt("nextLevel", 0) < roomNum)
     			  settings.edit().putInt("nextLevel", roomNum).commit();
     	      
-	        handler.post(new Runnable(){
-	            public void run(){
+	        handler.post(new Runnable() {
+	            public void run() {
 	            	Toast toast = Toast.makeText(context, R.string.win_level_title, Toast.LENGTH_LONG);
 	                toast.show();
 	        		Intent intent = new Intent(context, GameScreen.class);
@@ -1099,9 +1099,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * 
 	 */
-	public void levelLose(){
-		handler.post(new Runnable(){
-            public void run(){
+	public void levelLose() {
+		handler.post(new Runnable() {
+            public void run() {
             	Toast toast = Toast.makeText(context, R.string.lose_level_title, Toast.LENGTH_LONG);
                 toast.show();
                 Intent intent = new Intent(context, GameScreen.class);
@@ -1116,9 +1116,9 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	/**
 	 * 
 	 */
-	public void restart(){
-		handler.post(new Runnable(){
-            public void run(){
+	public void restart() {
+		handler.post(new Runnable() {
+            public void run() {
                 Intent intent = new Intent(context, GameScreen.class);
         	    intent.setClass(context, MenuScreen.class);
         	    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -1133,7 +1133,7 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param vector
 	 * @return
 	 */
-	public Vector3f toVector3f(SimpleVector vector){
+	public Vector3f toVector3f(SimpleVector vector) {
 		return new Vector3f(vector.x,vector.y,vector.z);
 	}
 	
@@ -1141,14 +1141,14 @@ class MyRenderer implements GLSurfaceView.Renderer{
 	 * @param vector
 	 * @return
 	 */
-	public SimpleVector toSimpleVector(Vector3f vector){
+	public SimpleVector toSimpleVector(Vector3f vector) {
 		return new SimpleVector(vector.x,vector.y,vector.z);
 	}
 	
 	/**
 	 * @param num
 	 */
-	public void setRoomNum(int num){
+	public void setRoomNum(int num) {
 		roomNum = num;
 	}
 }

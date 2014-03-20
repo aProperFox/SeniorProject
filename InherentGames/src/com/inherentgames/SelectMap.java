@@ -27,7 +27,7 @@ public class SelectMap extends Activity {
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	@Override
-	public void onCreate(Bundle savedInstanceState){
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -45,7 +45,7 @@ public class SelectMap extends Activity {
 
 		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
 		levelNum = settings.getInt("nextLevel", 1);
-		switch(levelNum){
+		switch(levelNum) {
 		case 1:
 			Log.i("SelectMap", "loading Level 1 map");
 			setContentView(R.layout.stageone);
@@ -64,11 +64,11 @@ public class SelectMap extends Activity {
 	}
 	
 	
-	public boolean onTouchEvent(MotionEvent me){
+	public boolean onTouchEvent(MotionEvent me) {
 		float xpos = me.getX();
 		float ypos = me.getY();
-		if(me.getAction() == MotionEvent.ACTION_DOWN){
-			if(xpos > width*.13 && xpos < width*.33 && ypos > height*0.162 && ypos < height*0.4){
+		if(me.getAction() == MotionEvent.ACTION_DOWN) {
+			if(xpos > width*.13 && xpos < width*.33 && ypos > height*0.162 && ypos < height*0.4) {
 				getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("loadLevel", 1).commit();
                 Intent i = new Intent(SelectMap.this, VideoScreen.class);
                 i.putExtra(MenuScreen.EXTRA_MESSAGE, "comic1a");
@@ -76,8 +76,8 @@ public class SelectMap extends Activity {
                 finish();
 			}
 			
-			else if(xpos > width*.4 && xpos < width*.6 && ypos > height*0.618 && ypos < height*0.88){
-				if(levelNum > 1){
+			else if(xpos > width*.4 && xpos < width*.6 && ypos > height*0.618 && ypos < height*0.88) {
+				if(levelNum > 1) {
 					getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("loadLevel", 2).commit();
                     Intent i = new Intent(SelectMap.this, VideoScreen.class);
                     i.putExtra(MenuScreen.EXTRA_MESSAGE, "comic2a");
@@ -86,8 +86,8 @@ public class SelectMap extends Activity {
 				}
 			}
 			
-			else if(xpos > width*.675 && xpos < width*.88 && ypos > height*0.176 && ypos < height*0.44){
-				if(levelNum > 2){
+			else if(xpos > width*.675 && xpos < width*.88 && ypos > height*0.176 && ypos < height*0.44) {
+				if(levelNum > 2) {
 					getSharedPreferences(MenuScreen.PREFERENCES, 0).edit().putInt("loadLevel", 3).commit();
                     Intent i = new Intent(SelectMap.this, GameScreen.class);
                     startActivity(i);

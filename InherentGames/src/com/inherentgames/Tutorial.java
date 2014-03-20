@@ -43,7 +43,7 @@ public class Tutorial extends Activity{
     private Properties config;
     
 	private GLSurfaceView mGLView;
-	private MyRenderer renderer = null;
+	private BBRenderer renderer = null;
 	
 	private float xpos = -1;
 	private float ypos = -1;
@@ -119,7 +119,7 @@ public class Tutorial extends Activity{
 			}
 		});
 		
-		renderer = new MyRenderer(this, width, height, 0);
+		renderer = new BBRenderer(this, width, height, 0);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		setContentView(mGLView);
@@ -146,7 +146,7 @@ public class Tutorial extends Activity{
 	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
 	/*
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle(getString(R.string.c_title));
 		menu.add(0, v.getId(), 0, getString(R.string.c_resume));
@@ -155,14 +155,14 @@ public class Tutorial extends Activity{
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item){
-		if(item.getTitle()==getString(R.string.c_resume)){
+	public boolean onContextItemSelected(MenuItem item) {
+		if(item.getTitle()==getString(R.string.c_resume)) {
 			renderer.setPauseButtonState();
 		}
-		else if(item.getTitle()==getString(R.string.c_restart)){
+		else if(item.getTitle()==getString(R.string.c_restart)) {
     	    renderer.levelLose();
 		}
-		else if(item.getTitle()==getString(R.string.c_exit)){
+		else if(item.getTitle()==getString(R.string.c_exit)) {
 			 Intent intent = new Intent(context, MenuScreen.class);
 			 startActivity(intent);
 		}
@@ -195,7 +195,7 @@ public class Tutorial extends Activity{
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
 		mGLView.onResume();
 	}
@@ -204,19 +204,19 @@ public class Tutorial extends Activity{
 	 * @see android.app.Activity#onStop()
 	 */
 	@Override
-	protected void onStop(){
+	protected void onStop() {
 		super.onStop();
 	}
 	
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onTouchEvent(android.view.MotionEvent)
 	 */
-	public boolean onTouchEvent(MotionEvent me){
-		if(me.getAction() == MotionEvent.ACTION_DOWN && moveProperties > 0){
+	public boolean onTouchEvent(MotionEvent me) {
+		if(me.getAction() == MotionEvent.ACTION_DOWN && moveProperties > 0) {
 			xpos = me.getX();
 			ypos = me.getY();
-			if(xpos < width/5 && xpos > 0 && ypos > 0 && ypos < width/5){
-				if(lastPressedWattson < System.currentTimeMillis() - 1500){
+			if(xpos < width/5 && xpos > 0 && ypos > 0 && ypos < width/5) {
+				if(lastPressedWattson < System.currentTimeMillis() - 1500) {
 					moveProperties = renderer.iterateWattson();
 					lastPressedWattson = System.currentTimeMillis();
 					isViewMode = false;
@@ -225,19 +225,19 @@ public class Tutorial extends Activity{
 				return true;
 			}
 		}
-		if(moveProperties <= 2){
-			switch(me.getAction() & MotionEvent.ACTION_MASK){
+		if(moveProperties <= 2) {
+			switch(me.getAction() & MotionEvent.ACTION_MASK) {
 	    	
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX(0);
 				ypos = me.getY(0);
-				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16 && (moveProperties == 2 || moveProperties <= 0)){
+				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16 && (moveProperties == 2 || moveProperties <= 0)) {
 					isViewMode = false;
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
 				
-				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10 && moveProperties == 0){
+				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10 && moveProperties == 0) {
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState();
@@ -248,17 +248,17 @@ public class Tutorial extends Activity{
 					builder.setTitle(getString(R.string.c_title));
 					builder.setItems(items, new DialogInterface.OnClickListener() {
 					    public void onClick(DialogInterface dialog, int item) {
-							if(items[item]==getString(R.string.c_resume)){
+							if(items[item]==getString(R.string.c_resume)) {
 								renderer.setPauseButtonState();
 							}
-							else if(items[item]==getString(R.string.c_settings)){
+							else if(items[item]==getString(R.string.c_settings)) {
 								renderer.setPauseButtonState();
 								/*
 								Intent intent = new Intent(context, Settings.class);
 								startActivity(intent);
 								*/
 							}
-							else if(items[item]==getString(R.string.c_exit)){
+							else if(items[item]==getString(R.string.c_exit)) {
 								renderer.restart();
 							}
 					    }
@@ -309,7 +309,7 @@ public class Tutorial extends Activity{
 				float xd = me.getX(1) - firstX;
 				float yd = me.getY(1) - firstY;
 				if (yd < (-height/5) && Math.abs(xd) < width/6) {
-					if(moveProperties != -2){
+					if(moveProperties != -2) {
 						renderer.loadBubble(WordObject.MASCULINE);
 						moveProperties = renderer.iterateWattson();
 						Log.d("Tutorial", "Blue bubble shot, iterating Wattson");
@@ -317,8 +317,8 @@ public class Tutorial extends Activity{
 					else
 						return false;
 				}
-				else if(yd > (height/5) && Math.abs(xd) < width/6){
-					if(moveProperties != -1){
+				else if(yd > (height/5) && Math.abs(xd) < width/6) {
+					if(moveProperties != -1) {
 						renderer.loadBubble(WordObject.FEMININE);
 						moveProperties = renderer.iterateWattson();
 						Log.d("Tutorial", "Red bubble shot, iterating Wattson");
@@ -334,7 +334,7 @@ public class Tutorial extends Activity{
 				dir.scalarMul(-70);
 				RigidBody body = renderer.shoot(cam.getPosition());
 				Log.d("Tutorial", "Bubble Shot!");
-				if(body != null){
+				if(body != null) {
 					Vector3f force = new Vector3f(-dir.x*2, dir.y*2, dir.z*2);
 					body.activate(true);
 					body.setLinearVelocity(force);
@@ -342,13 +342,13 @@ public class Tutorial extends Activity{
 				return true;
 			
     		case MotionEvent.ACTION_MOVE:
-    			if(isViewMode){
+    			if(isViewMode) {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
     				Camera cam1 = renderer.getCam();
     				SimpleVector dir1 = Interact2D.reproject2D3DWS(cam1, renderer.getFrameBuffer(), width/2, height/2);
-    				if(isViewMode && moveProperties == 0){
+    				if(isViewMode && moveProperties == 0) {
     					renderer.horizontalSwipe = (xd / -(width/5f));
     					renderer.verticalSwipe = (yd / -(height/5f));
     				}
@@ -362,7 +362,7 @@ public class Tutorial extends Activity{
 		}
 		try {
 			Thread.sleep(15);
-		} catch (Exception e){
+		} catch (Exception e) {
 			//No need
 		}
 		return super.onTouchEvent(me);

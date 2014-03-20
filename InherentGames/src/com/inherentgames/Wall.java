@@ -32,7 +32,7 @@ public class Wall extends Surface{
 	 * @param height
 	 * @param textureName
 	 */
-	public Wall(SimpleVector origin, float width, float height, String textureName){
+	public Wall(SimpleVector origin, float width, float height, String textureName) {
 		super(origin, width, height, 0);
 		this.width = width;
 		this.height = height;
@@ -62,36 +62,36 @@ public class Wall extends Surface{
 	/**
 	 * @return
 	 */
-	public Object3D getWall(){
+	public Object3D getWall() {
 		return wall;
 	}
 	
 	/**
 	 * 
 	 */
-	private void setCoordinates(){
-		if(origin.x == 0 && origin.z > 0){
+	private void setCoordinates() {
+		if(origin.x == 0 && origin.z > 0) {
 			coordinates[0] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
 			coordinates[1] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
 			coordinates[2] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
 			coordinates[3] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
 			groundShape =  new BoxShape(new Vector3f(width, height, 1.0f));
 		}
-		else if(origin.x > 0 && origin.z == 0){
+		else if(origin.x > 0 && origin.z == 0) {
 			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
 			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
 			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z-(width/2));
 			coordinates[3] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));
 			groundShape =  new BoxShape(new Vector3f(1.0f, height, width));
 		}
-		if(origin.x == 0 && origin.z < 0){
+		if(origin.x == 0 && origin.z < 0) {
 			coordinates[0] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
 			coordinates[1] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
 			coordinates[2] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
 			coordinates[3] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
 			groundShape =  new BoxShape(new Vector3f(width, height, 1.0f));
 		}
-		if(origin.x < 0 && origin.z == 0){
+		if(origin.x < 0 && origin.z == 0) {
 			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
 			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
 			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));
@@ -103,7 +103,7 @@ public class Wall extends Surface{
 	/**
 	 * @return
 	 */
-	public RigidBody getBody(){
+	public RigidBody getBody() {
 		return body;
 	}
 	

@@ -6,13 +6,13 @@ import android.os.Bundle;
 public class Popup extends Activity{
         
         @Override
-        public void onCreate(Bundle savedInstanceState){
+        public void onCreate(Bundle savedInstanceState) {
                 
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.popup);
         }
         /*
-        public void onPopupBtClick(View view){
+        public void onPopupBtClick(View view) {
                 PopupMenu menu = new PopupMenu(this, view);
                 menu.getMenuInflater().inflate(R.menu.popupmenu, menu.getMenu());
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

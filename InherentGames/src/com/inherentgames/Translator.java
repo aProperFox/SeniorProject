@@ -44,10 +44,10 @@ public class Translator {
 	 * @param language
 	 * @return
 	 */
-	public static String translateToLanguage(String word, int language){
+	public static String translateToLanguage(String word, int language) {
 		Log.i("THE LENGTH OF THE ARRAY IS:", " " + wordList.length);
-		for(int i = 0; i < wordList.length; i++){
-			if(wordList[i][0] == word){
+		for(int i = 0; i < wordList.length; i++) {
+			if(wordList[i][0] == word) {
 				return wordList[i][language];
 			}
 		}
@@ -58,10 +58,10 @@ public class Translator {
 	 * @param word
 	 * @return
 	 */
-	public static int getIndexByWord(String word){
-		for(int i = 0; i < wordList.length; i++){
-			for(int j = 0; j < wordList[0].length; j++){
-				if(wordList[i][j] == word){
+	public static int getIndexByWord(String word) {
+		for(int i = 0; i < wordList.length; i++) {
+			for(int j = 0; j < wordList[0].length; j++) {
+				if(wordList[i][j] == word) {
 					Log.i("olsontl", "Word + id: " + wordList[i][j] + " " + i);
 					return i;
 				}

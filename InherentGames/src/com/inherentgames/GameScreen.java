@@ -47,7 +47,7 @@ public class GameScreen extends Activity {
     private Properties config;
     
 	private GLSurfaceView mGLView;
-	private MyRenderer renderer = null;
+	private BBRenderer renderer = null;
 	
 	private float xpos = -1;
 	private float ypos = -1;
@@ -123,7 +123,7 @@ public class GameScreen extends Activity {
 		Log.i("GameScreen", "Current level is: " + levelNum);
 		load = Toast.makeText(context, R.string.load_level, Toast.LENGTH_LONG);
         load.show();
-		renderer = new MyRenderer(this, width, height, levelNum);
+		renderer = new BBRenderer(this, width, height, levelNum);
 		mGLView.setRenderer(renderer);
 		mGLView.setKeepScreenOn(true);
 		setContentView(mGLView);
@@ -150,7 +150,7 @@ public class GameScreen extends Activity {
 	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
 	/*
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle(getString(R.string.c_title));
 		menu.add(0, v.getId(), 0, getString(R.string.c_resume));
@@ -159,14 +159,14 @@ public class GameScreen extends Activity {
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item){
-		if(item.getTitle()==getString(R.string.c_resume)){
+	public boolean onContextItemSelected(MenuItem item) {
+		if(item.getTitle()==getString(R.string.c_resume)) {
 			renderer.setPauseButtonState();
 		}
-		else if(item.getTitle()==getString(R.string.c_restart)){
+		else if(item.getTitle()==getString(R.string.c_restart)) {
     	    renderer.levelLose();
 		}
-		else if(item.getTitle()==getString(R.string.c_exit)){
+		else if(item.getTitle()==getString(R.string.c_exit)) {
 			 Intent intent = new Intent(context, MenuScreen.class);
 			 startActivity(intent);
 		}
@@ -178,7 +178,7 @@ public class GameScreen extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(MenuScreen.isDevMode){
+		if(MenuScreen.isDevMode) {
 		    MenuInflater inflater = getMenuInflater();
 		    inflater.inflate(R.menu.menu, menu);
 		}
@@ -193,7 +193,7 @@ public class GameScreen extends Activity {
 	}
 	
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		renderer.setRoomNum(getSharedPreferences(MenuScreen.PREFERENCES, 0).getInt("loadLevel", 1));
 		load.show();
 		super.onResume();
@@ -202,24 +202,24 @@ public class GameScreen extends Activity {
 	}
 
 	@Override
-	protected void onStop(){
+	protected void onStop() {
 		super.onStop();
 	}
 	
-	public boolean onTouchEvent(MotionEvent me){
-		switch(me.getAction() & MotionEvent.ACTION_MASK){
+	public boolean onTouchEvent(MotionEvent me) {
+		switch(me.getAction() & MotionEvent.ACTION_MASK) {
 	    	
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX(0);
 				ypos = me.getY(0);
 				//Fire button
-				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16){
+				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16) {
 					isViewMode = false;
 					isShootMode = true;
 					renderer.setFireButtonState(true);
 				}
 				//Pause button
-				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10){
+				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10) {
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState();
@@ -230,17 +230,17 @@ public class GameScreen extends Activity {
 					builder.setTitle(getString(R.string.c_title));
 					builder.setItems(items, new DialogInterface.OnClickListener() {
 					    public void onClick(DialogInterface dialog, int item) {
-							if(items[item]==getString(R.string.c_resume)){
+							if(items[item]==getString(R.string.c_resume)) {
 								renderer.setPauseButtonState();
 							}
-							else if(items[item]==getString(R.string.c_settings)){
+							else if(items[item]==getString(R.string.c_settings)) {
 								renderer.setPauseButtonState();
 								/*
 								Intent intent = new Intent(context, Settings.class);
 								startActivity(intent);
 								*/
 							}
-							else if(items[item]==getString(R.string.c_exit)){
+							else if(items[item]==getString(R.string.c_exit)) {
 								renderer.restart();
 							}
 					    }
@@ -285,7 +285,7 @@ public class GameScreen extends Activity {
 				if (yd < (-height/5) && Math.abs(xd) < width/6) {
 					renderer.loadBubble(WordObject.MASCULINE);
 				}
-				else if(yd > (height/5) && Math.abs(xd) < width/6){
+				else if(yd > (height/5) && Math.abs(xd) < width/6) {
 					renderer.loadBubble(WordObject.FEMININE);
 				}
 				else{
@@ -295,7 +295,7 @@ public class GameScreen extends Activity {
 				SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), width/2, height/2);
 				dir.scalarMul(-70);
 				RigidBody body = renderer.shoot(cam.getPosition());
-				if(body != null){
+				if(body != null) {
 					Vector3f force = new Vector3f(-dir.x*2, dir.y*2, dir.z*2);
 					body.activate(true);
 					body.setLinearVelocity(force);
@@ -303,7 +303,7 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_MOVE:
-    			if(isViewMode){
+    			if(isViewMode) {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
@@ -319,7 +319,7 @@ public class GameScreen extends Activity {
 		}
 		try {
 			Thread.sleep(15);
-		} catch (Exception e){
+		} catch (Exception e) {
 			//No need
 		}
 		return super.onTouchEvent(me);
@@ -353,7 +353,7 @@ public class GameScreen extends Activity {
         	return true;
         }
         Log.d("GameScreen", "New object location: " + renderer.getWorld().getObject(renderer.currentObjectId).getTranslation());
-		}catch (Exception e){
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
         return super.onOptionsItemSelected(item);

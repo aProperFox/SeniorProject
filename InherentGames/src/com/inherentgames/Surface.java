@@ -18,7 +18,7 @@ public class Surface{
 	 * @param height
 	 * @param textureId
 	 */
-	public Surface(SimpleVector origin, float width, float height, int textureId){
+	public Surface(SimpleVector origin, float width, float height, int textureId) {
 		
 		//Texture texture = new Texture(BitmapHelper.rescale(BitmapHelper.convert(context.getResources().getDrawable(R.drawable.ic_launcher)), 64, 64));
 		//TextureManager.getInstance().addTexture("texture", texture);
@@ -39,33 +39,33 @@ public class Surface{
 	/**
 	 * @return
 	 */
-	public Object3D getSurface(){
+	public Object3D getSurface() {
 		return surface;
 	}
 	
 	/**
 	 * 
 	 */
-	private void setCoordinates(){
-		if(origin.x == 0 && origin.z > 0){
+	private void setCoordinates() {
+		if(origin.x == 0 && origin.z > 0) {
 			coordinates[0] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
 			coordinates[1] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
 			coordinates[2] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
 			coordinates[3] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
 		}
-		else if(origin.x > 0 && origin.z == 0){
+		else if(origin.x > 0 && origin.z == 0) {
 			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
 			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
 			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z-(width/2));
 			coordinates[3] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));
 		}
-		if(origin.x == 0 && origin.z < 0){
+		if(origin.x == 0 && origin.z < 0) {
 			coordinates[0] = new SimpleVector(origin.x+(width/2),origin.y-(height/2),origin.z);
 			coordinates[1] = new SimpleVector(origin.x-(width/2),origin.y-(height/2),origin.z);
 			coordinates[2] = new SimpleVector(origin.x-(width/2),origin.y+(height/2),origin.z);
 			coordinates[3] = new SimpleVector(origin.x+(width/2),origin.y+(height/2),origin.z);
 		}
-		if(origin.x < 0 && origin.z == 0){
+		if(origin.x < 0 && origin.z == 0) {
 			coordinates[0] = new SimpleVector(origin.x,origin.y-(height/2),origin.z-(width/2));
 			coordinates[1] = new SimpleVector(origin.x,origin.y-(height/2),origin.z+(width/2));
 			coordinates[2] = new SimpleVector(origin.x,origin.y+(height/2),origin.z+(width/2));

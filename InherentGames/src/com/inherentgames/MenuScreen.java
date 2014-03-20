@@ -57,7 +57,7 @@ public class MenuScreen extends Activity {
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	@Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
        
             Log.d("MenuScreen", "onCreate called");
@@ -173,15 +173,15 @@ public class MenuScreen extends Activity {
             
     }
 	
-	public boolean onTouchEvent(MotionEvent me){
+	public boolean onTouchEvent(MotionEvent me) {
 		float xpos = me.getX();
 		float ypos = me.getY();
-		if(me.getAction() == MotionEvent.ACTION_DOWN){
-			if(xpos > width*.264 && xpos < width*.443 && ypos> height*.075 && ypos < height*.313){
+		if(me.getAction() == MotionEvent.ACTION_DOWN) {
+			if(xpos > width*.264 && xpos < width*.443 && ypos> height*.075 && ypos < height*.313) {
 				easterEggCount++;
 			}
 		}
-		if(easterEggCount >= 3 && canEasterEggPlay == true){
+		if(easterEggCount >= 3 && canEasterEggPlay == true) {
 			mp.stop();
 			mp.release();
 			mp = MediaPlayer.create(context, R.raw.fly_haircut);
@@ -194,7 +194,7 @@ public class MenuScreen extends Activity {
 	}
 	
 	@Override
-	public void onPause(){
+	public void onPause() {
 		super.onPause();
 		try {
 			if (mp != null && mp.isPlaying())
@@ -207,11 +207,11 @@ public class MenuScreen extends Activity {
 	
 	@SuppressLint("InlinedApi")
 	@Override
-	public void onResume(){
+	public void onResume() {
 		
 		Log.d("MenuScreen", "Resuming Menu screen");
 		
-		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)){
+		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)) {
 			playButton.setEnabled(true);
 			Log.d("MenuScreen", "Enabling button");
 		}
@@ -248,10 +248,10 @@ public class MenuScreen extends Activity {
 	}
 	
 	@Override
-	public void onStart(){
+	public void onStart() {
 		Log.d("MenuScreen", "onStart");
 		
-		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)){
+		if(getSharedPreferences(MenuScreen.PREFERENCES, 0).getBoolean("hasBeatenTutorial", false)) {
 			playButton.setEnabled(true);
 			Log.d("MenuScreen", "Enabling button");
 
@@ -265,7 +265,7 @@ public class MenuScreen extends Activity {
 	}
 	
 	@Override
-	public void onStop(){
+	public void onStop() {
 		super.onStop();
 		try {
 			if (mp.isPlaying())
@@ -279,7 +279,7 @@ public class MenuScreen extends Activity {
 	}
 	
 	@Override
-	public void onDestroy(){
+	public void onDestroy() {
 		super.onDestroy();
     	mp.release();
     	mp = null;
@@ -287,7 +287,7 @@ public class MenuScreen extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(MenuScreen.isDevMode){
+		if(MenuScreen.isDevMode) {
 		    MenuInflater inflater = getMenuInflater();
 		    inflater.inflate(R.menu.menu, menu);
 		}
@@ -307,7 +307,7 @@ public class MenuScreen extends Activity {
     }
 	
 	
-	private void setButtonConfig(Button button, String text){
+	private void setButtonConfig(Button button, String text) {
 		button.setTextColor(buttonTextColor);
         button.setTextSize(24);
         button.setText(text);

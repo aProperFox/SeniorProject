@@ -44,7 +44,7 @@ public class SplashScreen extends Activity {
         }
         
         public void onClick(View v) {
-                switch(v.getId()){
+                switch(v.getId()) {
                 case R.id.start:
                         Intent i = new Intent(this, MainActivity.class);
                         startActivity(i);

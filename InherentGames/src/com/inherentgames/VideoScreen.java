@@ -43,7 +43,7 @@ public class VideoScreen extends Activity{
      	    this.UiChangeListener();
         }
         
-        if(message.contains("b")){
+        if(message.contains("b")) {
         	shouldLoadMap = true;
         }
         else
@@ -61,7 +61,7 @@ public class VideoScreen extends Activity{
             @Override
             public void onCompletion(MediaPlayer mp) 
             {
-            	if(shouldLoadMap){
+            	if(shouldLoadMap) {
             		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
             		intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
@@ -80,9 +80,9 @@ public class VideoScreen extends Activity{
     }
 	
 	@Override
-	public boolean onTouchEvent(MotionEvent me){
-		if(me.getAction() == MotionEvent.ACTION_DOWN){
-			if(shouldLoadMap){
+	public boolean onTouchEvent(MotionEvent me) {
+		if(me.getAction() == MotionEvent.ACTION_DOWN) {
+			if(shouldLoadMap) {
         		Intent intent = new Intent(VideoScreen.this, SelectMap.class);
                 startActivity(intent);
                 finish();
