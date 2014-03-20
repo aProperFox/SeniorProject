@@ -4,7 +4,7 @@ import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;
 
-public class Bubble extends WordObject{
+public class Bubble extends WordObject {
 
 	
 	/**
@@ -24,17 +24,17 @@ public class Bubble extends WordObject{
 	 * @param article
 	 * @param timeInMillis
 	 */
-	public Bubble(SimpleVector translation, int article, long timeInMillis) {
-		super(Primitives.getSphere(5.0f),new SimpleVector(0,0,0),"Bubble", article);
+	public Bubble( SimpleVector translation, int article, long timeInMillis ) {
+		super( Primitives.getSphere( 5.0f ), new SimpleVector( 0, 0, 0 ), "Bubble", article );
 		
 		timeCreated = timeInMillis;
 		
-		setTransparency(8);
-		setSpecularLighting(Object3D.SPECULAR_ENABLED);
-		translate(translation);
+		setTransparency( 8 );
+		setSpecularLighting( Object3D.SPECULAR_ENABLED );
+		translate( translation );
 		build();
-		setCollisionMode(Object3D.COLLISION_CHECK_SELF);
-		setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
+		setCollisionMode( Object3D.COLLISION_CHECK_SELF );
+		setCollisionOptimization( Object3D.COLLISION_DETECTION_OPTIMIZED );
 		this.article = article;
 		isHolding = false;
 		heldObjectId = -1;
@@ -50,7 +50,7 @@ public class Bubble extends WordObject{
 	/**
 	 * @param id
 	 */
-	public void setHeldObjectId(int id) {
+	public void setHeldObjectId( int id ) {
 		heldObjectId = id;
 		isHolding = true;
 	}
@@ -65,7 +65,7 @@ public class Bubble extends WordObject{
 	/**
 	 * @param index
 	 */
-	public void setLocalBodyIndex(int index) {
+	public void setLocalBodyIndex( int index ) {
 		localBodyIndex = index;
 	}
 	
@@ -76,7 +76,7 @@ public class Bubble extends WordObject{
 		return localBodyIndex;
 	}
 	
-	/* (non-Javadoc)
+	/* ( non-Javadoc )
 	 * @see com.inherentgames.WordObject#getArticle()
 	 */
 	public int getArticle() {
@@ -93,21 +93,21 @@ public class Bubble extends WordObject{
 	/**
 	 * @param index
 	 */
-	public void setBodyIndex(int index) {
+	public void setBodyIndex( int index ) {
 		bodyIndex = index;
 	}
 	
-	/* (non-Javadoc)
+	/* ( non-Javadoc )
 	 * @see com.inherentgames.WordObject#getObjectId()
 	 */
 	public int getObjectId() {
 		return objectId;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.inherentgames.WordObject#setObjectId(int)
+	/* ( non-Javadoc )
+	 * @see com.inherentgames.WordObject#setObjectId( int )
 	 */
-	public void setObjectId(int id) {
+	public void setObjectId( int id ) {
 		objectId = id;
 	}
 	

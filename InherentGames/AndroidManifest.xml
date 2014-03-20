@@ -38,11 +38,11 @@
             android:value="com.inherentgames.GameScreen" />
         </activity>
         
-        <activity android:name="com.inherentgames.SelectMap"
+        <activity android:name="com.inherentgames.MapScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
 	        <meta-data android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.inherentgames.SelectMap" />
+            android:value="com.inherentgames.MapScreen" />
         </activity>
         
         <activity android:name="com.inherentgames.Tutorial"

@@ -64,111 +64,111 @@ public class GameScreen extends Activity {
 	private Drawable icon;
 	
 	// Stops Eclipse from complaining about new API calls
-	@SuppressWarnings("deprecation")
-	@SuppressLint({ "InlinedApi", "NewApi" })
-	protected void onCreate(Bundle savedInstanceState) {
-		Logger.log("onCreate");
+	@SuppressWarnings( "deprecation" )
+	@SuppressLint( { "InlinedApi", "NewApi" } )
+	protected void onCreate( Bundle savedInstanceState ) {
+		Logger.log( "onCreate" );
 		
-		super.onCreate(savedInstanceState);
+		super.onCreate( savedInstanceState );
 		Display display = getWindowManager().getDefaultDisplay();
 		
 		// Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
 		context = this;
-		assetsPropertyReader = new AssetsPropertyReader(context);
-		config = assetsPropertyReader.getProperties("config.properties");
+		assetsPropertyReader = new AssetsPropertyReader( context );
+		config = assetsPropertyReader.getProperties( "config.properties" );
          
-		mGLView = new GLSurfaceView(getApplication());
+		mGLView = new GLSurfaceView( getApplication() );
 		
-		// Enable Immersive mode (hides status and nav bar)
-		if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+		// Enable Immersive mode ( hides status and nav bar )
+		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
 	        mGLView.setSystemUiVisibility(
 	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	                | View.SYSTEM_UI_FLAG_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
 	        this.UiChangeListener();
     	}
 		
 		// Use legacy code if running on older Android versions
-		if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+		if ( android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2 ) {
 			width = display.getWidth();
 			height = display.getHeight();
 		} else {
 			Point size = new Point();
-			display.getRealSize(size);
+			display.getRealSize( size );
 			width = size.x;
 			height = size.y;
 		}
 		
-		mGLView.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
+		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 			
 			@Override
-			public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
+			public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display ) {
 				//Ensure that we get a 16bit framebuffer. Otherwise we'll fall
-				//back to PixelFlinger on some device (read: Samsung I7500)
+				//back to PixelFlinger on some device ( read: Samsung I7500 )
 				int[] attributes = new int[] {EGL10.EGL_DEPTH_SIZE, 16, EGL10.EGL_NONE};
 				EGLConfig[] configs = new EGLConfig[1];
 				int[] result = new int[1];
-				egl.eglChooseConfig(display, attributes, configs, 1, result);
+				egl.eglChooseConfig( display, attributes, configs, 1, result );
 				return configs[0];
 			}
-		});
+		} );
 		
-		SharedPreferences settings = getSharedPreferences(MenuScreen.PREFERENCES, 0);
-		int levelNum = settings.getInt("loadLevel", 1);
-		Log.i("GameScreen", "Current level is: " + levelNum);
-		load = Toast.makeText(context, R.string.load_level, Toast.LENGTH_LONG);
+		SharedPreferences settings = getSharedPreferences( MenuScreen.PREFERENCES, 0 );
+		int levelNum = settings.getInt( "loadLevel", 1 );
+		Log.i( "GameScreen", "Current level is: " + levelNum );
+		load = Toast.makeText( context, R.string.load_level, Toast.LENGTH_LONG );
         load.show();
-		renderer = new BBRenderer(this, width, height, levelNum);
-		mGLView.setRenderer(renderer);
-		mGLView.setKeepScreenOn(true);
-		setContentView(mGLView);
+		renderer = new BBRenderer( this, width, height, levelNum );
+		mGLView.setRenderer( renderer );
+		mGLView.setKeepScreenOn( true );
+		setContentView( mGLView );
 		
 		
-		icon = getResources().getDrawable(R.drawable.pause_button_pressed);
-		Bitmap bb=((BitmapDrawable) icon).getBitmap();
+		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
+		Bitmap bb=( (BitmapDrawable ) icon ).getBitmap();
 
 		int iconWidth = bb.getWidth();
 		int iconHeight = bb.getHeight();           
 		  
-		float scaleWidth = ((float) width/8) / iconWidth;
-		float scaleHeight = ((float) width/8) / iconHeight;
+		float scaleWidth = ( (float ) width/8 ) / iconWidth;
+		float scaleHeight = ( (float ) width/8 ) / iconHeight;
 
 
 		Matrix matrix = new Matrix();
-		matrix.postScale(scaleWidth, scaleHeight);
+		matrix.postScale( scaleWidth, scaleHeight );
 
-		Bitmap resultBitmap = Bitmap.createBitmap(bb, 0, 0,iconWidth, iconHeight, matrix, true);
-		icon = new BitmapDrawable(resultBitmap);
+		Bitmap resultBitmap = Bitmap.createBitmap( bb, 0, 0, iconWidth, iconHeight, matrix, true );
+		icon = new BitmapDrawable( resultBitmap );
 		
 	}
 	
 	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
 	/*
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle(getString(R.string.c_title));
-		menu.add(0, v.getId(), 0, getString(R.string.c_resume));
-		menu.add(0, v.getId(), 0, getString(R.string.c_restart));
-		menu.add(0, v.getId(), 0, getString(R.string.c_exit));	
+	public void onCreateContextMenu( ContextMenu menu, View v, ContextMenuInfo menuInfo ) {
+		super.onCreateContextMenu( menu, v, menuInfo );
+		menu.setHeaderTitle( getString( R.string.c_title ) );
+		menu.add( 0, v.getId(), 0, getString( R.string.c_resume ) );
+		menu.add( 0, v.getId(), 0, getString( R.string.c_restart ) );
+		menu.add( 0, v.getId(), 0, getString( R.string.c_exit ) );	
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		if(item.getTitle()==getString(R.string.c_resume)) {
+	public boolean onContextItemSelected( MenuItem item ) {
+		if ( item.getTitle()==getString( R.string.c_resume ) ) {
 			renderer.setPauseButtonState();
 		}
-		else if(item.getTitle()==getString(R.string.c_restart)) {
+		else if ( item.getTitle()==getString( R.string.c_restart ) ) {
     	    renderer.levelLose();
 		}
-		else if(item.getTitle()==getString(R.string.c_exit)) {
-			 Intent intent = new Intent(context, MenuScreen.class);
-			 startActivity(intent);
+		else if ( item.getTitle()==getString( R.string.c_exit ) ) {
+			 Intent intent = new Intent( context, MenuScreen.class );
+			 startActivity( intent );
 		}
 		
 		return true;
@@ -177,10 +177,10 @@ public class GameScreen extends Activity {
 	
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		if(MenuScreen.isDevMode) {
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		if ( MenuScreen.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate(R.menu.menu, menu);
+		    inflater.inflate( R.menu.menu, menu );
 		}
 	    return true;
 	}
@@ -194,7 +194,7 @@ public class GameScreen extends Activity {
 	
 	@Override
 	protected void onResume() {
-		renderer.setRoomNum(getSharedPreferences(MenuScreen.PREFERENCES, 0).getInt("loadLevel", 1));
+		renderer.setRoomNum( getSharedPreferences( MenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 ) );
 		load.show();
 		super.onResume();
 		//renderer.setTextures();
@@ -206,51 +206,51 @@ public class GameScreen extends Activity {
 		super.onStop();
 	}
 	
-	public boolean onTouchEvent(MotionEvent me) {
-		switch(me.getAction() & MotionEvent.ACTION_MASK) {
+	public boolean onTouchEvent( MotionEvent me ) {
+		switch( me.getAction() & MotionEvent.ACTION_MASK ) {
 	    	
     		case MotionEvent.ACTION_DOWN:
-				xpos = me.getX(0);
-				ypos = me.getY(0);
+				xpos = me.getX( 0 );
+				ypos = me.getY( 0 );
 				//Fire button
-				if(xpos < (3 * width/16) && xpos > width/16 && ypos > (height - (3 * width/16)) && ypos < height - width/16) {
+				if ( xpos < ( 3 * width/16 ) && xpos > width/16 && ypos > ( height - ( 3 * width/16 ) ) && ypos < height - width/16 ) {
 					isViewMode = false;
 					isShootMode = true;
-					renderer.setFireButtonState(true);
+					renderer.setFireButtonState( true );
 				}
 				//Pause button
-				else if(xpos < width && xpos > width-(width/10) && ypos > 0 && ypos < width/10) {
+				else if ( xpos < width && xpos > width-( width/10 ) && ypos > 0 && ypos < width/10 ) {
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState();
-					final CharSequence[] items = {getString(R.string.c_resume), getString(R.string.c_settings), getString(R.string.c_exit)};
+					final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setIcon(icon);
-					builder.setTitle(getString(R.string.c_title));
-					builder.setItems(items, new DialogInterface.OnClickListener() {
-					    public void onClick(DialogInterface dialog, int item) {
-							if(items[item]==getString(R.string.c_resume)) {
+					AlertDialog.Builder builder = new AlertDialog.Builder( this );
+					builder.setIcon( icon );
+					builder.setTitle( getString( R.string.c_title ) );
+					builder.setItems( items, new DialogInterface.OnClickListener() {
+					    public void onClick( DialogInterface dialog, int item ) {
+							if ( items[item]==getString( R.string.c_resume ) ) {
 								renderer.setPauseButtonState();
 							}
-							else if(items[item]==getString(R.string.c_settings)) {
+							else if ( items[item]==getString( R.string.c_settings ) ) {
 								renderer.setPauseButtonState();
 								/*
-								Intent intent = new Intent(context, Settings.class);
-								startActivity(intent);
+								Intent intent = new Intent( context, Settings.class );
+								startActivity( intent );
 								*/
 							}
-							else if(items[item]==getString(R.string.c_exit)) {
+							else if ( items[item]==getString( R.string.c_exit ) ) {
 								renderer.restart();
 							}
 					    }
-					});
+					} );
 					AlertDialog alert = builder.create();
 					alert.show();
 					
 				}
 				
-				else{
+				else {
 					isViewMode = true;
 					isShootMode = false;
 				}
@@ -258,57 +258,57 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_DOWN:
-				firstX = me.getX(1);
-				firstY = me.getY(1);
+				firstX = me.getX( 1 );
+				firstY = me.getY( 1 );
 				isViewMode = false;
 				return true;
 			
     		case MotionEvent.ACTION_UP:
-    			Log.d("GameScreen", "Action Up");
+    			Log.d( "GameScreen", "Action Up" );
 				xpos = -1;
 				ypos = -1;
 				renderer.horizontalSwipe = 0;
 				renderer.verticalSwipe = 0;
 				isShootMode = false;
 				isViewMode = true;
-				renderer.setFireButtonState(false);
+				renderer.setFireButtonState( false );
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
-    			Log.d("GameScreen", "Action Pointer Up");
+    			Log.d( "GameScreen", "Action Pointer Up" );
 				xpos = -1;
 				ypos = -1;
 				renderer.horizontalSwipe = 0;
 				renderer.verticalSwipe = 0;
-				float xd = me.getX(1) - firstX;
-				float yd = me.getY(1) - firstY;
-				if (yd < (-height/5) && Math.abs(xd) < width/6) {
-					renderer.loadBubble(WordObject.MASCULINE);
+				float xd = me.getX( 1 ) - firstX;
+				float yd = me.getY( 1 ) - firstY;
+				if ( yd < ( -height/5 ) && Math.abs( xd ) < width/6 ) {
+					renderer.loadBubble( WordObject.MASCULINE );
 				}
-				else if(yd > (height/5) && Math.abs(xd) < width/6) {
-					renderer.loadBubble(WordObject.FEMININE);
+				else if ( yd > ( height/5 ) && Math.abs( xd ) < width/6 ) {
+					renderer.loadBubble( WordObject.FEMININE );
 				}
-				else{
+				else {
 					return true;
 				}
 				Camera cam = renderer.getCam();
-				SimpleVector dir = Interact2D.reproject2D3DWS(cam, renderer.getFrameBuffer(), width/2, height/2);
-				dir.scalarMul(-70);
-				RigidBody body = renderer.shoot(cam.getPosition());
-				if(body != null) {
-					Vector3f force = new Vector3f(-dir.x*2, dir.y*2, dir.z*2);
-					body.activate(true);
-					body.setLinearVelocity(force);
+				SimpleVector dir = Interact2D.reproject2D3DWS( cam, renderer.getFrameBuffer(), width/2, height/2 );
+				dir.scalarMul( -70 );
+				RigidBody body = renderer.shoot( cam.getPosition() );
+				if ( body != null ) {
+					Vector3f force = new Vector3f( -dir.x*2, dir.y*2, dir.z*2 );
+					body.activate( true );
+					body.setLinearVelocity( force );
 				}
 				return true;
 			
     		case MotionEvent.ACTION_MOVE:
-    			if(isViewMode) {
+    			if ( isViewMode ) {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
-					renderer.horizontalSwipe = (xd / -(width/5f));
-					renderer.verticalSwipe = (yd / -(height/5f));
+					renderer.horizontalSwipe = ( xd / -( width/5f ) );
+					renderer.verticalSwipe = ( yd / -( height/5f ) );
     					
     				xpos = me.getX();
     				ypos = me.getY();
@@ -318,69 +318,69 @@ public class GameScreen extends Activity {
 		
 		}
 		try {
-			Thread.sleep(15);
-		} catch (Exception e) {
+			Thread.sleep( 15 );
+		} catch ( Exception e ) {
 			//No need
 		}
-		return super.onTouchEvent(me);
+		return super.onTouchEvent( me );
 	}
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-		try{
-        switch (item.getItemId()) {
+    public boolean onOptionsItemSelected( MenuItem item ) {
+		try {
+        switch ( item.getItemId() ) {
         case R.id.inc_object_x:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(1, 0, 0);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 1, 0, 0 );
         	break;
         case R.id.inc_object_z:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 0, 1);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, 1 );
         	break;
         case R.id.dec_object_x:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(-1, 0, 0);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( -1, 0, 0 );
         	break;
         case R.id.dec_object_z:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 0, -1);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, -1 );
         	break;
         case R.id.inc_object_y:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, 1, 0);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 1, 0 );
         	break;
         case R.id.dec_object_y:
-        	renderer.getWorld().getObject(renderer.currentObjectId).translate(0, -1, 0);
+        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, -1, 0 );
         	return true;
         case R.id.inc_obj:
         	renderer.currentObjectId = renderer.objects.nextElement().getID();
-        	Log.d("GameScreen", "New Object is: " + renderer.getWorld().getObject(renderer.currentObjectId).getName());
+        	Log.d( "GameScreen", "New Object is: " + renderer.getWorld().getObject( renderer.currentObjectId ).getName() );
         	return true;
         }
-        Log.d("GameScreen", "New object location: " + renderer.getWorld().getObject(renderer.currentObjectId).getTranslation());
-		}catch (Exception e) {
+        Log.d( "GameScreen", "New object location: " + renderer.getWorld().getObject( renderer.currentObjectId ).getTranslation() );
+		}catch ( Exception e ) {
 			e.printStackTrace();
 		}
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected( item );
     }
 	
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
 	
-	@SuppressLint("NewApi")
+	@SuppressLint( "NewApi" )
 	public void UiChangeListener() {
         final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
-            @TargetApi(19)
+        decorView.setOnSystemUiVisibilityChangeListener ( new View.OnSystemUiVisibilityChangeListener() {
+            @TargetApi( 19 )
 			@Override
-            public void onSystemUiVisibilityChange(int visibility) {
-                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+            public void onSystemUiVisibilityChange( int visibility ) {
+                if ( (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN ) == 0 ) {
                     decorView.setSystemUiVisibility(
                             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
                 }
             }
-        });
+        } );
     }
 	
 }

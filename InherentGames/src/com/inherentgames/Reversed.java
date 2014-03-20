@@ -7,12 +7,12 @@ import java.util.ListIterator;
 public class Reversed<T> implements Iterable<T> {
     private final ArrayList<T> original;
 
-    public Reversed(ArrayList<T> original) {
+    public Reversed( ArrayList<T> original ) {
         this.original = original;
     }
 
     public Iterator<T> iterator() {
-        final ListIterator<T> i = original.listIterator(original.size());
+        final ListIterator<T> i = original.listIterator( original.size() );
 
         return new Iterator<T>() {
             public boolean hasNext() { return i.hasPrevious(); }
@@ -21,7 +21,7 @@ public class Reversed<T> implements Iterable<T> {
         };
     }
 
-    public static <T> Reversed<T> reversed(ArrayList<T> original) {
-        return new Reversed<T>(original);
+    public static <T> Reversed<T> reversed( ArrayList<T> original ) {
+        return new Reversed<T>( original );
     }
 }

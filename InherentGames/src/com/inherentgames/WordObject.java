@@ -24,11 +24,11 @@ public class WordObject extends Object3D {
 	/**
 	 * @param obj
 	 */
-	public WordObject(WordObject obj) {
-		super(obj.toObject3D());
+	public WordObject( WordObject obj ) {
+		super( obj.toObject3D() );
 		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
-		names[Translator.ENGLISH] = obj.getName(Translator.ENGLISH);
+		names[Translator.ENGLISH] = obj.getName( Translator.ENGLISH );
 		this.article = obj.getArticle();
 	}
 	
@@ -38,12 +38,12 @@ public class WordObject extends Object3D {
 	 * @param name
 	 * @param article
 	 */
-	public WordObject(Object3D obj, SimpleVector rotationAxis, String name, int article) {
-		super(obj);
+	public WordObject( Object3D obj, SimpleVector rotationAxis, String name, int article ) {
+		super( obj );
 		isStatic = true;
 		names[Translator.ENGLISH] = name;
 		this.article = article;
-		rotateBy(rotationAxis);
+		rotateBy( rotationAxis );
 		setMaxDimension();
 	}
 	
@@ -57,7 +57,7 @@ public class WordObject extends Object3D {
 	/**
 	 * @param state
 	 */
-	public void setStatic(boolean state) {
+	public void setStatic( boolean state ) {
 		isStatic = state;
 	}
 	
@@ -69,35 +69,35 @@ public class WordObject extends Object3D {
 		/*
 		PolygonManager polyMan = this.getPolygonManager();
 		int polygons = polyMan.getMaxPolygonID();
-		SimpleVector minVerts = new SimpleVector(1000,1000,1000);
-		SimpleVector maxVerts = new SimpleVector(-1000,-1000,-1000);
-		for(int i = 0; i < polygons; i++) {
-			for(int j = 0; j < 3; j++) {
-				if(minVerts.x > polyMan.getTransformedVertex(i, j).x)
-					minVerts.x = polyMan.getTransformedVertex(i,j).x;
-				if(maxVerts.x < polyMan.getTransformedVertex(i, j).x)
-					maxVerts.x = polyMan.getTransformedVertex(i, j).x;
-				if(minVerts.y > polyMan.getTransformedVertex(i, j).y)
-					minVerts.y = polyMan.getTransformedVertex(i,j).y;
-				if(maxVerts.y < polyMan.getTransformedVertex(i, j).y)
-					maxVerts.y = polyMan.getTransformedVertex(i, j).y;
-				if(minVerts.z > polyMan.getTransformedVertex(i, j).z)
-					minVerts.z = polyMan.getTransformedVertex(i,j).z;
-				if(maxVerts.z < polyMan.getTransformedVertex(i, j).z)
-					maxVerts.z = polyMan.getTransformedVertex(i, j).z;
+		SimpleVector minVerts = new SimpleVector( 1000, 1000, 1000 );
+		SimpleVector maxVerts = new SimpleVector( -1000, -1000, -1000 );
+		for ( int i = 0; i < polygons; i++ ) {
+			for ( int j = 0; j < 3; j++ ) {
+				if ( minVerts.x > polyMan.getTransformedVertex( i, j ).x )
+					minVerts.x = polyMan.getTransformedVertex( i, j ).x;
+				if ( maxVerts.x < polyMan.getTransformedVertex( i, j ).x )
+					maxVerts.x = polyMan.getTransformedVertex( i, j ).x;
+				if ( minVerts.y > polyMan.getTransformedVertex( i, j ).y )
+					minVerts.y = polyMan.getTransformedVertex( i, j ).y;
+				if ( maxVerts.y < polyMan.getTransformedVertex( i, j ).y )
+					maxVerts.y = polyMan.getTransformedVertex( i, j ).y;
+				if ( minVerts.z > polyMan.getTransformedVertex( i, j ).z )
+					minVerts.z = polyMan.getTransformedVertex( i, j ).z;
+				if ( maxVerts.z < polyMan.getTransformedVertex( i, j ).z )
+					maxVerts.z = polyMan.getTransformedVertex( i, j ).z;
 			}
 		}
-		SimpleVector dimensions = new SimpleVector(maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z);
-		if(dimensions.x > dimensions.z &&dimensions.x > dimensions.y)
+		SimpleVector dimensions = new SimpleVector( maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z );
+		if ( dimensions.x > dimensions.z &&dimensions.x > dimensions.y )
 			maxDimension = dimensions.x;
-		else if(dimensions.z > dimensions.x && dimensions.z > dimensions.y)
+		else if ( dimensions.z > dimensions.x && dimensions.z > dimensions.y )
 			maxDimension = dimensions.z;
 		else
 			maxDimension = dimensions.y;
 			*/
 		Mesh mesh = this.getMesh();
-		maxDimension = getMax(mesh.getBoundingBox());
-		Log.d("WordObject", "Checking dimensions took " + (System.currentTimeMillis()-startTime) + " milliseconds.");
+		maxDimension = getMax( mesh.getBoundingBox() );
+		Log.d( "WordObject", "Checking dimensions took " + ( System.currentTimeMillis()-startTime ) + " milliseconds." );
 	}
 	
 	/**
@@ -110,7 +110,7 @@ public class WordObject extends Object3D {
 	/**
 	 * @param id
 	 */
-	public void setObjectId(int id) {
+	public void setObjectId( int id ) {
 		this.objectId = id;
 	}
 	
@@ -128,63 +128,63 @@ public class WordObject extends Object3D {
 		return article;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.threed.jpct.Object3D#setName(java.lang.String)
+	/* ( non-Javadoc )
+	 * @see com.threed.jpct.Object3D#setName( java.lang.String )
 	 */
 	@Override
-	public void setName(String name) {
+	public void setName( String name ) {
 		/**
 		 * TODO: setting for language
 		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
 		 */
 		names[Translator.ENGLISH] = name;
-		names[Translator.SPANISH] = Translator.translateToLanguage(name,Translator.SPANISH);
+		names[Translator.SPANISH] = Translator.translateToLanguage( name, Translator.SPANISH );
 	}
 	
 	/**
 	 * @param language
 	 * @return
 	 */
-	public String getName(int language) {
+	public String getName( int language ) {
 		return names[language];
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.threed.jpct.Object3D#scale(float)
+	/* ( non-Javadoc )
+	 * @see com.threed.jpct.Object3D#scale( float )
 	 */
 	@Override
-	public void scale(float scaleTo) {
-		super.scale(scaleTo/maxDimension);
+	public void scale( float scaleTo ) {
+		super.scale( scaleTo/maxDimension );
 	}
 	
 	/**
 	 * @param room
 	 */
-	public void removeObject(Room room) {
-		room.removeObject(objectId);
+	public void removeObject( Room room ) {
+		room.removeObject( objectId );
 	}
 	
 	/**
 	 * @param axes
 	 */
-	public void rotateBy(SimpleVector axes) {
-		this.rotateX(axes.x);
-		this.rotateY(axes.y);
-		this.rotateZ(axes.z);
+	public void rotateBy( SimpleVector axes ) {
+		this.rotateX( axes.x );
+		this.rotateY( axes.y );
+		this.rotateZ( axes.z );
 	}
 	
 	/**
 	 * @return
 	 */
 	public Object3D toObject3D() {
-		return (Object3D)this;
+		return ( Object3D )this;
 	}
 
-	public float getMax(float[] vertices) {
+	public float getMax( float[] vertices ) {
 		float max = 0;
-		for(float vertex: vertices) {
-			if(Math.abs(vertex) > max) {
-				max = Math.abs(vertex);
+		for ( float vertex: vertices ) {
+			if ( Math.abs( vertex ) > max ) {
+				max = Math.abs( vertex );
 			}
 		}
 		return max*1.1f;

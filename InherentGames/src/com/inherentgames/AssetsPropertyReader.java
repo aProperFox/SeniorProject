@@ -12,7 +12,7 @@ public class AssetsPropertyReader {
        private Context context;
        private Properties properties;
 
-       public AssetsPropertyReader(Context context) {
+       public AssetsPropertyReader( Context context ) {
               this.context = context;
               /**
                * Constructs a new Properties object.
@@ -20,7 +20,7 @@ public class AssetsPropertyReader {
               properties = new Properties();
        }
 
-       public Properties getProperties(String FileName) {
+       public Properties getProperties( String FileName ) {
 
               try {
                      /**
@@ -32,15 +32,15 @@ public class AssetsPropertyReader {
                      /**
                       * Open an asset using ACCESS_STREAMING mode. This
                       */
-                     InputStream inputStream = assetManager.open(FileName);
+                     InputStream inputStream = assetManager.open( FileName );
                      /**
                       * Loads properties from the specified InputStream,
                       */
-                     properties.load(inputStream);
+                     properties.load( inputStream );
 
-              } catch (IOException e) {
+              } catch ( IOException e ) {
                      // TODO Auto-generated catch block
-                     Log.e("AssetsPropertyReader",e.toString());
+                     Log.e( "AssetsPropertyReader", e.toString() );
               }
               return properties;
 
