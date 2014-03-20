@@ -35,12 +35,11 @@ import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
-import com.threed.jpct.TextureManager;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
 class BBRenderer implements GLSurfaceView.Renderer {
-	private TextureManager tm = TextureManager.getInstance();
+	private BBTextureManager tm;
 	public static final int SHORT_TOAST = 5;
 	private FrameBuffer fb = null;
 	private Room world = null;
@@ -58,7 +57,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	private int lightCycle = 0;
 	private Light sun1 = null, sun2 = null;
 	
-	Context context;
+	private Context context;
 	
 	private int roomNum = 1;
 	
@@ -137,8 +136,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * @param h
 	 * @param roomNum
 	 */
-	public BBRenderer( Context c, int w, int h, int roomNum ) {
-		context = c.getApplicationContext();
+	public BBRenderer( int w, int h, int roomNum ) {
+		context = BB.getAppContext();
+		tm = BBTextureManager.getInstance();
 		V = new SimpleVector( 0, 0, 1 );
 		this.roomNum = roomNum;
 		
@@ -463,7 +463,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		renderer2D = new Renderer2D( fb );
 		clock = new Clock();
 		setTextures();
-		world = new Room( roomNum, context, tm );
+		world = new Room( roomNum );
 		world.setAmbientLight( 20, 20, 20 );
 		
 		sun1 = new Light( world );

@@ -19,9 +19,9 @@ public final class BBTextureManager {
 	private TextureManager tm;
 	private Context context;
 	
-	protected BBTextureManager( Context c ) {
+	protected BBTextureManager() {
 		tm = TextureManager.getInstance();
-		context = c;
+		context = BB.getAppContext();
 	}
 	
 	public void	addTexture( String name ) {
@@ -48,9 +48,9 @@ public final class BBTextureManager {
 		return tm.getDummyTexture();
 	}
 	
-	public static BBTextureManager getInstance( Context c ) {
+	public static BBTextureManager getInstance() {
 		if ( instance == null ) {
-			instance = new BBTextureManager( c );
+			instance = new BBTextureManager();
 		}
 		return instance;
 	}

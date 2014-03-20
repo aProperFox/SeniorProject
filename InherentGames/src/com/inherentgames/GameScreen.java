@@ -76,7 +76,7 @@ public class GameScreen extends Activity {
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
 		context = this;
-		assetsPropertyReader = new AssetsPropertyReader( context );
+		assetsPropertyReader = new AssetsPropertyReader();
 		config = assetsPropertyReader.getProperties( "config.properties" );
          
 		mGLView = new GLSurfaceView( getApplication() );
@@ -123,7 +123,7 @@ public class GameScreen extends Activity {
 		Log.i( "GameScreen", "Current level is: " + levelNum );
 		load = Toast.makeText( context, R.string.load_level, Toast.LENGTH_LONG );
         load.show();
-		renderer = new BBRenderer( this, width, height, levelNum );
+		renderer = new BBRenderer( width, height, levelNum );
 		mGLView.setRenderer( renderer );
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );

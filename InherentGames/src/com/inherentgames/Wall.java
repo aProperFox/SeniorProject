@@ -1,9 +1,6 @@
 package com.inherentgames;
 
 import javax.vecmath.Vector3f;
-
-import android.content.Context;
-
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.RigidBody;
@@ -24,7 +21,6 @@ public class Wall extends Surface {
 	
 	private RigidBody body;
 	private CollisionShape groundShape;
-	Context context;
 
 	/**
 	 * @param origin

@@ -77,7 +77,7 @@ public class Tutorial extends Activity {
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
 		context = this;
-		assetsPropertyReader = new AssetsPropertyReader( context );
+		assetsPropertyReader = new AssetsPropertyReader();
 		config = assetsPropertyReader.getProperties( "config.properties" );
          
 		mGLView = new GLSurfaceView( getApplication() );
@@ -119,7 +119,7 @@ public class Tutorial extends Activity {
 			}
 		} );
 		
-		renderer = new BBRenderer( this, width, height, 0 );
+		renderer = new BBRenderer( width, height, 0 );
 		mGLView.setRenderer( renderer );
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );

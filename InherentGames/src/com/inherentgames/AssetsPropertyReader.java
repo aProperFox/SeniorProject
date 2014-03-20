@@ -12,8 +12,8 @@ public class AssetsPropertyReader {
        private Context context;
        private Properties properties;
 
-       public AssetsPropertyReader( Context context ) {
-              this.context = context;
+       public AssetsPropertyReader() {
+              this.context = BB.getAppContext();
               /**
                * Constructs a new Properties object.
                */

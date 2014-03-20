@@ -33,13 +33,13 @@ public class MenuScreen extends Activity {
 	
 	private MediaPlayer mp;
 	
-	SoundPool soundPool;
-	SparseIntArray soundPoolMap;
-	int soundID = 1;
+	private SoundPool soundPool;
+	private SparseIntArray soundPoolMap;
+	private int soundID = 1;
 
-	Context context;
+	private Context context;
 	
-	Button sound1;
+	private Button sound1;
 	private int easterEggCount;
 	private int width;
 	private int height;

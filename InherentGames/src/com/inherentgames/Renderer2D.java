@@ -3,11 +3,10 @@ package com.inherentgames;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.Texture;
-import com.threed.jpct.TextureManager;
 
 public class Renderer2D {
 	private FrameBuffer fb;
-	private TextureManager tm = TextureManager.getInstance();
+	private BBTextureManager tm;
 
 	private static final Texture REFERENCE_POINT = new Texture( 8, 8, RGBColor.WHITE );
 
@@ -19,6 +18,7 @@ public class Renderer2D {
 	 * @param fb
 	 */
 	public Renderer2D( FrameBuffer fb ) {
+		tm = BBTextureManager.getInstance();
 		this.fb = fb;
 	}
 

@@ -36,7 +36,7 @@ public class Room extends World {
 	public static RGBColor bubbleBlue = new RGBColor( 132, 211, 245 );
 	
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
-	Context context;
+	private Context context;
 	public Wall wall;
 	public Floor floor;
 	public Floor ceiling;
@@ -53,7 +53,7 @@ public class Room extends World {
 	
 	public SkyBox skybox;
 	
-	TextureManager tm;
+	BBTextureManager tm;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
 	private int cameraBoxId = 0;
@@ -66,10 +66,10 @@ public class Room extends World {
 	 * @param context
 	 * @param tm
 	 */
-	public Room( int roomId, Context context, TextureManager tm ) {
-		this.context = context.getApplicationContext();
+	public Room( int roomId ) {
+		this.context = BB.getAppContext();
 		
-		this.tm = tm;
+		tm = BBTextureManager.getInstance();
 		
 		skybox = null;
 		roomObjectWords = new ArrayList<String>();
