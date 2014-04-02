@@ -1,13 +1,13 @@
 package com.inherentgames;
 
+import java.util.Locale;
+
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseIntArray;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,7 +38,6 @@ public class MenuScreen extends Activity {
 
 	private Context context;
 	
-	private Button sound1;
 	private int easterEggCount;
 	private int width;
 	private int height;
@@ -54,7 +52,6 @@ public class MenuScreen extends Activity {
 	private Button playButton;
 	
 	
-	@SuppressWarnings( "deprecation" )
 	@SuppressLint( "NewApi" )
 	@Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -65,23 +62,13 @@ public class MenuScreen extends Activity {
             context = this;
             easterEggCount = 0;
             canEasterEggPlay = true;
-            Display display = getWindowManager().getDefaultDisplay();
-    		
-    		// Use legacy code if running on older Android versions
-    		if ( android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2 ) {
-    			width = display.getWidth();
-    			height = display.getHeight();
-    		} else {
-    			Point size = new Point();
-    			display.getSize( size );
-    			width = size.x;
-    			height = size.y;
-    		}
-    		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
-
             
+            width = BB.getWidth();
+            height = BB.getHeight();
+            
+    		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
             requestWindowFeature( Window.FEATURE_NO_TITLE );
-            setContentView( R.layout.home );
+            setContentView( R.layout.menu_screen );
             
             try {
 	            mp = MediaPlayer.create( this, R.raw.time_pi_theme );
@@ -97,10 +84,11 @@ public class MenuScreen extends Activity {
             
             buttonTextColor = Color.rgb( 156, 192, 207 );
             
-            typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" ); 
+            typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
+            
             // click-handler for buttons
             playButton = ( Button ) findViewById( R.id.playbutton );
-            setButtonConfig( playButton, getString( R.string.play_button ) );
+            setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
             
             SharedPreferences settings = getSharedPreferences( PREFERENCES, 0 );
 
@@ -113,7 +101,6 @@ public class MenuScreen extends Activity {
             	Log.d( "MenuScreen", "Enabling button" );
             }
             
-            sound1 = ( Button ) playButton;
             playButton.setOnClickListener( new View.OnClickListener() {
                     
                     @Override
@@ -133,7 +120,7 @@ public class MenuScreen extends Activity {
             } );
             
             Button settingsButton = ( Button ) findViewById( R.id.settingsbutton );
-            setButtonConfig( settingsButton, getString( R.string.settings_button ) );
+            setButtonConfig( settingsButton, getString( R.string.settings_button ).toUpperCase(Locale.US) );
             
             settingsButton.setOnClickListener( new View.OnClickListener() {
                     
@@ -146,7 +133,7 @@ public class MenuScreen extends Activity {
             
             
             Button tutorialButton = ( Button ) findViewById( R.id.tutorialbutton );
-            setButtonConfig( tutorialButton, getString( R.string.tutorial_button ) );
+            setButtonConfig( tutorialButton, getString( R.string.tutorial_button ).toUpperCase(Locale.US) );
             
             tutorialButton.setOnClickListener( new View.OnClickListener() {
                     
@@ -159,7 +146,7 @@ public class MenuScreen extends Activity {
             
             
             Button storeButton = ( Button ) findViewById( R.id.storebutton );
-            setButtonConfig( storeButton, getString( R.string.store_button ) );
+            setButtonConfig( storeButton, getString( R.string.store_button ).toUpperCase(Locale.US) );
             
             storeButton.setOnClickListener( new View.OnClickListener() {
                     
@@ -222,17 +209,9 @@ public class MenuScreen extends Activity {
 		super.onResume();
 
 		
-		// Enable Immersive mode ( hides status and nav bar )
-		View currentView = getWindow().getDecorView();
+		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-			currentView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-		    this.UiChangeListener();
+			BB.setImmersiveMode( findViewById( Window.ID_ANDROID_CONTENT ), getWindow().getDecorView() );
 		}
 		
 		try {
@@ -306,24 +285,5 @@ public class MenuScreen extends Activity {
         button.setText( text );
         button.setTypeface( typeface );
 	}
-	
-	public void UiChangeListener() {
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener ( new View.OnSystemUiVisibilityChangeListener() {
-            @TargetApi( 19 )
-			@Override
-            public void onSystemUiVisibilityChange( int visibility ) {
-                if ( (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN ) == 0 ) {
-                    decorView.setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-                }
-            }
-        } );
-    }
 	
 }

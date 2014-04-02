@@ -11,9 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.VideoView;
 
-@TargetApi( Build.VERSION_CODES.HONEYCOMB )
 public class VideoScreen extends Activity {
 	VideoView videoView;
 	
@@ -23,7 +23,7 @@ public class VideoScreen extends Activity {
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.videoscreen );
+        setContentView( R.layout.video_screen );
         
         Intent intent = getIntent();
         final String message = intent.getStringExtra( MenuScreen.EXTRA_MESSAGE );
@@ -31,17 +31,10 @@ public class VideoScreen extends Activity {
         videoView = ( VideoView )findViewById( R.id.VideoView );
         View root = videoView.getRootView();
         
-        // Enable Immersive mode ( hides status and nav bar )
-        if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-	        videoView.setSystemUiVisibility(
-	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-     	    this.UiChangeListener();
-        }
+        // Enable Immersive mode (hides status and nav bar)
+    	if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
+    		BB.setImmersiveMode( findViewById( Window.ID_ANDROID_CONTENT ).getRootView(), getWindow().getDecorView() );
+    	}
         
         if ( message.contains( "b" ) ) {
         	shouldLoadMap = true;
@@ -97,26 +90,6 @@ public class VideoScreen extends Activity {
 			
 		return true;
 	}
-	
-	@SuppressLint( "NewApi" )
-	public void UiChangeListener() {
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener ( new View.OnSystemUiVisibilityChangeListener() {
-            @TargetApi( 19 )
-			@Override
-            public void onSystemUiVisibilityChange( int visibility ) {
-                if ( (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN ) == 0 ) {
-                    decorView.setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-                }
-            }
-        } );
-    }
 	
 	@Override
 	protected void onResume() {

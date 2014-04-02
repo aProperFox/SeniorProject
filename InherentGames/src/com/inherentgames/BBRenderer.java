@@ -14,12 +14,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.widget.Toast;
 
+import com.android.texample2.GLText;
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
@@ -29,12 +32,14 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.Clock;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
+import com.threed.jpct.IPaintListener;
 import com.threed.jpct.Light;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
+import com.threed.jpct.World;
 import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
@@ -43,16 +48,28 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	public static final int SHORT_TOAST = 5;
 	private FrameBuffer fb = null;
 	private Room world = null;
-	private RGBColor back = new RGBColor( 50, 50, 100 );
+	private World loadingWorld = null;
+	private Texture loadingTex = null;
+	private Runnable gameLoader = null;
+	private Renderer2D renderer2D;
+	private GLText glText;
+	
+	private boolean loading = true;
+	
+	private DiscreteDynamicsWorld dynamicWorld;
+	private DefaultCollisionConfiguration collisionConfiguration;
+	private CollisionDispatcher dispatcher;
+	
+	private RGBColor back = new RGBColor( 255, 255, 255 );
+	
+	private SimpleVector V;
+	
+	public Camera cam;
 	
 	public float horizontalSwipe = 0;
 	public float verticalSwipe = 0;
 	
 	private long lastRotateTime = 0;
-	
-	private SimpleVector V;
-	
-	public Camera cam;
 	
 	private int lightCycle = 0;
 	private Light sun1 = null, sun2 = null;
@@ -64,12 +81,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	private ArrayList<String> bubbleWords = new ArrayList<String>();
 	
 	private String fireButtonState = "fireButton";
-	
-	private Renderer2D renderer2D;
-	
-	private DiscreteDynamicsWorld dynamicWorld;
-	private DefaultCollisionConfiguration collisionConfiguration;
-	private CollisionDispatcher dispatcher;
 	
 	public int currentObjectId;
 	public Enumeration<Object3D> objects;
@@ -122,13 +133,25 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	SparseIntArray soundPoolMap;
 	int soundID = 1;
 	
-	private boolean isPaused;
+	private boolean isPaused = false;
 	private boolean isTutorial;
 	private boolean hasCompletedSteps = false;
 	private int[] screenItems = {0, 5, 4, 4, 3, 5, -3, -2, -1, 5, 5, 5, 2, 2, 5};
 	
 	private int arrowX, arrowY, arrowImageWidth, arrowImageHeight, arrowScreenWidth, arrowScreenHeight;
 	private String arrowState = "ArrowUp";
+	
+	private int paintCount = 0;
+	private float ms;
+	
+	private Vector3f worldAabbMin;
+	private Vector3f worldAabbMax;
+	private AxisSweep3 overlappingPairCache;
+	private SequentialImpulseConstraintSolver solver;
+	
+	private float[] mProjMatrix = new float[16];
+	private float[] mVMatrix = new float[16];
+	private float[] mVPMatrix = new float[16];
 	
 	/**
 	 * @param c
@@ -145,7 +168,201 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		width = w;
 		height = h;
 		
-		//is tutorial?
+		letterWidth = width/96;
+		
+		gameLoader = new Runnable() {
+
+			@Override
+			public void run() {
+				// Prepare tutorial (if applicable)
+				prepareTutorial();
+				// Load resources
+				tm.loadSprites();
+				setTextures();
+				loadSounds();
+				// Prepare environment
+				setupScene();
+				// Done loading
+				loading = false;
+			}
+			
+		};
+		/*
+		//tm.loadSprites();
+			
+		//setTextures();
+		*/
+	}
+	
+	/* ( non-Javadoc )
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceChanged( javax.microedition.khronos.opengles.GL10, int, int )
+	 */
+	public void onSurfaceChanged( GL10 gl, int w, int h ) {
+		if ( fb != null ) {
+			fb.dispose();
+		}
+		fb = new FrameBuffer( gl, w, h );
+		
+		loadingWorld = new World();
+		loadingWorld.renderScene(fb);
+		loadingTex = new Texture( BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.cover1 ) ), 1024, 1024 ), true );
+		
+		fb.setPaintListener( new IPaintListener() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 449987772860108478L;
+
+			@Override
+			public void finishedPainting() {
+				++paintCount;
+				if ( paintCount == 1 )
+					new Thread( gameLoader ).start();
+				if ( paintCount == 2 ) {
+					Log.e( "BBRenderer", "Finished loading game" );
+					paintCount = 0;
+				}
+				fb.setPaintListener(null);
+			}
+
+			@Override
+			public void startPainting() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		} );
+		
+	}
+
+	
+	/* ( non-Javadoc )
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated( javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig )
+	 */
+	public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
+		/*glText = new GLText( BB.getAppContext().getAssets() );
+		glText.load( "futura-normal.ttf", 14, 2, 2 );
+		
+		// enable texture + alpha blending
+		GLES20.glEnable(GLES20.GL_BLEND);
+		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);*/
+	}
+
+	/* ( non-Javadoc )
+	 * @see android.opengl.GLSurfaceView.Renderer#onDrawFrame( javax.microedition.khronos.opengles.GL10 )
+	 */
+	public void onDrawFrame( GL10 gl ) {
+		
+		if ( horizontalSwipe != 0 || verticalSwipe != 0 ) {
+			V.set( cam.getDirection() );
+			//Log.d( "BBRenderer", "Cam direction: " + V );
+			V.rotateY( horizontalSwipe );
+			cam.lookAt( V );
+			cam.rotateCameraX( -verticalSwipe/1.5f );
+			horizontalSwipe = 0;
+			verticalSwipe = 0;
+		}
+		
+		// Clear the frame buffer
+		fb.clear( back );
+		
+		if ( loading ) {
+			
+			loadingWorld.draw( fb );
+			/*Matrix.multiplyMM(mVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
+			glText.begin( 0.0f, 0.0f, 1.0f, 1.0f, mVPMatrix );
+			glText.draw( "Loading...", 50, 200 );
+			glText.end();*/
+			fb.blit(
+				loadingTex,
+				0,
+				0,
+				width/2-512,
+				height/2-512,
+				1024,
+				1024,
+				true
+			);
+			fb.display();
+			
+		} else {
+		
+			ms = clock.getTimeMicroseconds();
+			clock.reset();
+			
+			// Step forward one "iteration" in the physics world
+			try {
+				dynamicWorld.stepSimulation( ms / 1000000f );
+			} catch ( NullPointerException e ) {
+				Log.e( "BBRenderer", "jBulletPhysics threw a NullPointerException." );
+			}
+			
+			// Render skybox (if applicable)
+			if ( world.skybox != null )
+				world.skybox.render( world, fb );
+		    
+		    // Render the world, and then draw to the frame buffer
+			world.renderScene( fb );
+			world.draw( fb );
+	
+			// Update time bar
+			if ( !isTutorial ) {
+				if ( !isPaused ) {
+					if ( endTime - System.currentTimeMillis() > 0 ) {
+						timeHeight = ( int )( (float )( endTime - System.currentTimeMillis() )/100000f*( height*0.76 ) );
+					} else {
+						levelLose();
+					}
+				}
+			}
+			
+			display2DGameInfo( fb );
+			
+			try {
+				if ( lastRotateTime < ( System.currentTimeMillis() - 15 ) ) {
+					lastRotateTime = System.currentTimeMillis();
+					ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
+					for ( Bubble bubble : Reversed.reversed( bubbleObjects ) ) {
+						if ( bubble.isHolding() ) {
+							Object3D obj = world.getObject( bubble.getHeldObjectId() );
+							obj.setOrigin( bubble.getTranslation().calcSub( obj.getCenter() ) );
+							obj.rotateY( 0.1f );
+							world.getObject( bubble.getObjectId() ).rotateY( 0.1f );
+							
+						}
+						else {
+							/* Currently, the bubble pops but the next one shot breaks the physics engine.
+							if ( System.currentTimeMillis() > bubble.getTimeCreated() + 5000 ) {
+								Log.i( "BBRenderer", "I'm deleting the bubble!" );
+								deleteBubble( bubble );
+								continue;
+							}*/
+						}
+					}
+				}
+			} catch( ConcurrentModificationException e ) {
+				Log.e( "BBRenderer", "Concurrent Modification error occured" );
+			}
+			
+			checkBubble();
+			/*
+			 * TODO: add color to WordObjects when camera is aimed at them
+			int id = world.getCameraBox().checkForCollision( cam.getDirection(), 80 );
+			if ( id != -100 ) {
+				WordObject wordObject = ( WordObject )world.getObject( id );
+				if ( wordObject.getStaticState() ) {
+				Log.i( "BBRenderer", "Viewed object collision!" );
+					//wordObject.setAdditionalColor( 255, 255, 0 );
+				}
+			}
+			*/
+		}
+			
+	}
+	
+	public void prepareTutorial() {
+		// Is tutorial?
 		if ( roomNum == 0 ) {
 			isTutorial = true;
 			wattsonText.add( wattsonPhrases[0][0] );
@@ -159,84 +376,93 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			arrowImageHeight = 64;
 			arrowScreenWidth = width/12;
 			arrowScreenHeight = width/6;
-			
-		}
-		else {
+		} else {
 			isTutorial = false;
 		}
-		
-		letterWidth = width/96;
-
-		
-		Bitmap bitmap;
-	      if ( tm.containsTexture( "gui_font" ) ) {
-	    	  
-	      }
-	      else {
-			try {
-	  	      
-			Texture text = new Texture( context.getResources().openRawResource( R.raw.font ) );
-			text.setFiltering( false );
-			tm.addTexture( "gui_font", text );
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.bubblered ) ), 256, 256 );
-			tm.addTexture( "bubbleRed", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.bubbleblue ) ), 256, 256 );
-			tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.firebutton ) ), 128, 128 );
-			tm.addTexture( "fireButton", new Texture( bitmap, true ) );
-			
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.firebuttonpressed ) ), 128, 128 );
-			tm.addTexture( "fireButtonPressed", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.pause_button ) ), 128, 128 );
-			tm.addTexture( "pauseButton", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.pause_button_pressed ) ), 128, 128 );
-			tm.addTexture( "pauseButtonPressed", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.word_bar ) ), 16, 512 );
-			tm.addTexture( "FuelBar", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.time_bar ) ), 16, 512 );
-			tm.addTexture( "TimeBar", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.score_bars ) ), 128, 512 );
-			tm.addTexture( "ScoreBars", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.info_bar ) ), 128, 128 );
-			tm.addTexture( "InfoBar", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.fuel_bar_arrow ) ), 32, 32 );
-			tm.addTexture( "ScoreArrow", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.arrow_up ) ), 32, 64 );
-			tm.addTexture( "ArrowUp", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.arrow_right ) ), 64, 32 );
-			tm.addTexture( "ArrowRight", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.arrow_left ) ), 64, 32 );
-			tm.addTexture( "ArrowLeft", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.filter ) ), 64, 64 );
-			tm.addTexture( "Filter", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			
-			bitmap = BitmapHelper.rescale( BitmapHelper.convert( context.getResources().getDrawable( R.drawable.defaulttexture ) ), 256, 256 );
-			tm.addTexture( "Default", new Texture( bitmap, true ) );
-			bitmap.recycle();
-			}catch( Exception e ) {
-				
-			}
-	      }
-			
-		setTextures();
-		
 	}
+	
+	public void loadSounds() {
+		soundPool = new SoundPool( 4, AudioManager.STREAM_MUSIC, 100 );
+        soundPoolMap = new SparseIntArray();
+        soundPoolMap.put( 1, soundPool.load( context, R.raw.escritorio, 1 ) );
+        soundPoolMap.put( 2, soundPool.load( context, R.raw.silla, 1 ) );
+        soundPoolMap.put( 3, soundPool.load( context, R.raw.pizarra, 1 ) );
+        soundPoolMap.put( 4, soundPool.load( context, R.raw.mochila, 1 ) );
+        soundPoolMap.put( 5, soundPool.load( context, R.raw.calendario, 1 ) );
+        soundPoolMap.put( 6, soundPool.load( context, R.raw.reloj, 1 ) );
+        soundPoolMap.put( 7, soundPool.load( context, R.raw.puerta, 1 ) );
+        soundPoolMap.put( 8, soundPool.load( context, R.raw.libro, 1 ) );
+        soundPoolMap.put( 9, soundPool.load( context, R.raw.papel, 1 ) );
+        soundPoolMap.put( 10, soundPool.load( context, R.raw.ventana, 1 ) );
+        soundPoolMap.put( 11, soundPool.load( context, R.raw.cuenta, 1 ) );
+        soundPoolMap.put( 12, soundPool.load( context, R.raw.pan, 1 ) );
+        soundPoolMap.put( 13, soundPool.load( context, R.raw.pastel, 1 ) );
+        soundPoolMap.put( 14, soundPool.load( context, R.raw.taza, 1 ) );
+        soundPoolMap.put( 15, soundPool.load( context, R.raw.cuchillo, 1 ) );
+        soundPoolMap.put( 16, soundPool.load( context, R.raw.efectivo, 1 ) );
+        soundPoolMap.put( 17, soundPool.load( context, R.raw.plato, 1 ) );
+        soundPoolMap.put( 18, soundPool.load( context, R.raw.cuchara, 1 ) );
+        soundPoolMap.put( 19, soundPool.load( context, R.raw.mesa, 1 ) );
+	}
+	
+	public void setupScene() {
+		isArrowAscending = true;
+		arrowHeight = ( int )( (( float )height )/3.5f );
+		
+		renderer2D = new Renderer2D( fb );
+		clock = new Clock();
+		//setTextures();
+		world = new Room( roomNum );
+		world.setAmbientLight( 20, 20, 20 );
+		
+		sun1 = new Light( world );
+		sun1.setPosition( new SimpleVector( 0, -20, world.getLength()/2 ) );
+		sun1.setIntensity( 250, 250, 250 );
+		
+		sun2 = new Light( world );
+		sun2.setPosition( new SimpleVector( 0, -20, -world.getLength()/2 ) );
+		sun2.setIntensity( 250, 250, 250 );
+		
+		cam = world.getCamera();
+		cam.setPosition( new SimpleVector( 0, 0, 0 ) );
+		cam.lookAt( new SimpleVector( 0, 0.1, 0 ) );
+		cam.setOrientation( new SimpleVector( 0, 0, 1 ), new SimpleVector( 0, -1, 0 ) );
+		//cam.lookAt( new SimpleVector( 0, -0.1, 1 ) );
+		
+		objects = world.getObjects();
+		currentObjectId = objects.nextElement().getID();
+		
+		MemoryHelper.compact();
+		
+		collisionConfiguration = new DefaultCollisionConfiguration();
+		dispatcher = new CollisionDispatcher( collisionConfiguration );
+		worldAabbMin = new Vector3f( -1000, -1000, -1000 );
+		worldAabbMax = new Vector3f( 1000, 1000, 1000 );
+		
+		overlappingPairCache = new AxisSweep3( worldAabbMin, worldAabbMax, world.getNumWordObjects() + 50 );
+		solver = new SequentialImpulseConstraintSolver();
+		
+		dynamicWorld = new DiscreteDynamicsWorld( dispatcher, overlappingPairCache, solver, collisionConfiguration );
+		dynamicWorld.setGravity( new Vector3f( 0, -10, 0 ) );
+		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
+	
+		for ( int i = 0; i < world.getNumBodies(); i++ ) {
+			dynamicWorld.addCollisionObject( world.getBody( i ) );
+		}
+	
+		dynamicWorld.clearForces();
 
+		for ( int i = 5; i < world.getNumBodies(); i++ ) {
+			dynamicWorld.addRigidBody( world.getBody( i ) );
+		}
+	
+		timeHeight = ( int )( height*0.76 );
+		endTime = System.currentTimeMillis() + 100000;
+		fuelHeight = 0;
+		
+        isPaused = false;
+	}
+	
 	/**
 	 * 
 	 */
@@ -268,7 +494,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				tm.addTexture( "TutorialCeiling", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				Log.d( "MyRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
+				Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				
 				break;
 			case 1:
@@ -342,7 +568,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				tm.addTexture( "Room0Ceiling", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				Log.d( "MyRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
+				Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				
 				break;
 			case 2:
@@ -406,7 +632,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				tm.addTexture( "Mesa", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				Log.d( "MyRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
+				Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				break;
 				
 			case 3:
@@ -444,193 +670,8 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			}
 		
 		} catch( Exception e ) {
-			Log.i( "MyRenderer", "Caught exception loading textures: " + e );
+			Log.i( "BBRenderer", "Caught exception loading textures: " + e );
 		}
-	}
-	
-	/* ( non-Javadoc )
-	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceChanged( javax.microedition.khronos.opengles.GL10, int, int )
-	 */
-	public void onSurfaceChanged( GL10 gl, int w, int h ) {
-		if ( fb != null ) {
-			fb.dispose();
-		}
-		fb = new FrameBuffer( gl, w, h );
-
-		isArrowAscending = true;
-		arrowHeight = ( int )( (( float )height )/3.5f );
-		
-		renderer2D = new Renderer2D( fb );
-		clock = new Clock();
-		setTextures();
-		world = new Room( roomNum );
-		world.setAmbientLight( 20, 20, 20 );
-		
-		sun1 = new Light( world );
-		sun1.setPosition( new SimpleVector( 0, -20, world.getLength()/2 ) );
-		sun1.setIntensity( 250, 250, 250 );
-		
-		sun2 = new Light( world );
-		sun2.setPosition( new SimpleVector( 0, -20, -world.getLength()/2 ) );
-		sun2.setIntensity( 250, 250, 250 );
-		
-		cam = world.getCamera();
-		cam.setPosition( new SimpleVector( 0, 0, 0 ) );
-		cam.lookAt( new SimpleVector( 0, 0.1, 0 ) );
-		cam.setOrientation( new SimpleVector( 0, 0, 1 ), new SimpleVector( 0, -1, 0 ) );
-		//cam.lookAt( new SimpleVector( 0, -0.1, 1 ) );
-		
-		objects = world.getObjects();
-		currentObjectId = objects.nextElement().getID();
-		
-		MemoryHelper.compact();
-		
-		collisionConfiguration = new DefaultCollisionConfiguration();
-		dispatcher = new CollisionDispatcher( collisionConfiguration );
-		Vector3f worldAabbMin = new Vector3f( -1000, -1000, -1000 );
-		Vector3f worldAabbMax = new Vector3f( 1000, 1000, 1000 );
-		
-		AxisSweep3 overlappingPairCache = new AxisSweep3( worldAabbMin, worldAabbMax, world.getNumWordObjects() + 50 );
-		SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
-		
-		dynamicWorld = new DiscreteDynamicsWorld( dispatcher, overlappingPairCache, solver, collisionConfiguration );
-		dynamicWorld.setGravity( new Vector3f( 0, -10, 0 ) );
-		dynamicWorld.getDispatchInfo().allowedCcdPenetration = 0f;
-	
-		for ( int i = 0; i < world.getNumBodies(); i++ ) {
-			dynamicWorld.addCollisionObject( world.getBody( i ) );
-		}
-	
-		dynamicWorld.clearForces();
-
-		for ( int i = 5; i < world.getNumBodies(); i++ ) {
-			dynamicWorld.addRigidBody( world.getBody( i ) );
-		}
-	
-		timeHeight = ( int )( height*0.76 );
-		endTime = System.currentTimeMillis() + 100000;
-		fuelHeight = 0;
-		
-		soundPool = new SoundPool( 4, AudioManager.STREAM_MUSIC, 100 );
-        //soundPoolMap = new HashMap<Integer, Integer>();
-        soundPoolMap = new SparseIntArray();
-        soundPoolMap.put( 1, soundPool.load( context, R.raw.escritorio, 1 ) );
-        soundPoolMap.put( 2, soundPool.load( context, R.raw.silla, 1 ) );
-        soundPoolMap.put( 3, soundPool.load( context, R.raw.pizarra, 1 ) );
-        soundPoolMap.put( 4, soundPool.load( context, R.raw.mochila, 1 ) );
-        soundPoolMap.put( 5, soundPool.load( context, R.raw.calendario, 1 ) );
-        soundPoolMap.put( 6, soundPool.load( context, R.raw.reloj, 1 ) );
-        soundPoolMap.put( 7, soundPool.load( context, R.raw.puerta, 1 ) );
-        soundPoolMap.put( 8, soundPool.load( context, R.raw.libro, 1 ) );
-        soundPoolMap.put( 9, soundPool.load( context, R.raw.papel, 1 ) );
-        soundPoolMap.put( 10, soundPool.load( context, R.raw.ventana, 1 ) );
-        soundPoolMap.put( 11, soundPool.load( context, R.raw.cuenta, 1 ) );
-        soundPoolMap.put( 12, soundPool.load( context, R.raw.pan, 1 ) );
-        soundPoolMap.put( 13, soundPool.load( context, R.raw.pastel, 1 ) );
-        soundPoolMap.put( 14, soundPool.load( context, R.raw.taza, 1 ) );
-        soundPoolMap.put( 15, soundPool.load( context, R.raw.cuchillo, 1 ) );
-        soundPoolMap.put( 16, soundPool.load( context, R.raw.efectivo, 1 ) );
-        soundPoolMap.put( 17, soundPool.load( context, R.raw.plato, 1 ) );
-        soundPoolMap.put( 18, soundPool.load( context, R.raw.cuchara, 1 ) );
-        soundPoolMap.put( 19, soundPool.load( context, R.raw.mesa, 1 ) );
-        isPaused = false;
-		
-		
-	}
-
-	
-	/* ( non-Javadoc )
-	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated( javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig )
-	 */
-	public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
-	}
-
-	/* ( non-Javadoc )
-	 * @see android.opengl.GLSurfaceView.Renderer#onDrawFrame( javax.microedition.khronos.opengles.GL10 )
-	 */
-	public void onDrawFrame( GL10 gl ) {
-		
-		if ( horizontalSwipe != 0 || verticalSwipe != 0 ) {
-			V.set( cam.getDirection() );
-			Log.d( "MyRenderer", "Cam direction: " + V );
-			V.rotateY( horizontalSwipe );
-			cam.lookAt( V );
-			cam.rotateCameraX( -verticalSwipe/1.5f );
-			horizontalSwipe = 0;
-			verticalSwipe = 0;
-			
-		}
-		
-		float ms = clock.getTimeMicroseconds();
-		clock.reset();
-		try {
-			dynamicWorld.stepSimulation( ms / 1000000f );
-		} catch ( NullPointerException e ) {
-			Log.e( "MyRenderer", "jBulletPhysics threw a NullPointerException." );
-		}
-		fb.clear( back );
-		
-		if ( world.skybox != null )
-			world.skybox.render( world, fb );
-	    
-	    
-		world.renderScene( fb );
-		world.draw( fb );
-
-		//Only called for
-		if ( isTutorial == false && MenuScreen.isDevMode == false ) {
-			if ( !isPaused ) {
-				if ( endTime - System.currentTimeMillis() > 0 ) {
-					timeHeight = ( int )( (float )( endTime - System.currentTimeMillis() )/100000f*( height*0.76 ) );
-				}
-				else {
-					levelLose();
-				}
-			}
-		}
-		
-		display2DGameInfo( fb );
-		
-		try {
-		
-		if ( lastRotateTime < ( System.currentTimeMillis() - 15 ) ) {
-			lastRotateTime = System.currentTimeMillis();
-			ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
-			for ( Bubble bubble : Reversed.reversed( bubbleObjects ) ) {
-				if ( bubble.isHolding() ) {
-					Object3D obj = world.getObject( bubble.getHeldObjectId() );
-					obj.setOrigin( bubble.getTranslation().calcSub( obj.getCenter() ) );
-					obj.rotateY( 0.1f );
-					world.getObject( bubble.getObjectId() ).rotateY( 0.1f );
-					
-				}
-				else {
-					/* Currently, the bubble pops but the next one shot breaks the physics engine.
-					if ( System.currentTimeMillis() > bubble.getTimeCreated() + 5000 ) {
-						Log.i( "MyRenderer", "I'm deleting the bubble!" );
-						deleteBubble( bubble );
-						continue;
-					}*/
-				}
-			}
-		}
-		}catch( ConcurrentModificationException e ) {
-			Log.e( "MyRenderer", "Concurrent Modification error occured" );
-		}
-		
-		checkBubble();
-		/*
-		 * TODO: add color to WordObjects when camera is aimed at them
-		int id = world.getCameraBox().checkForCollision( cam.getDirection(), 80 );
-		if ( id != -100 ) {
-			WordObject wordObject = ( WordObject )world.getObject( id );
-			if ( wordObject.getStaticState() ) {
-			Log.i( "MyRenderer", "Viewed object collision!" );
-				//wordObject.setAdditionalColor( 255, 255, 0 );
-			}
-		}
-		*/
-			
 	}
 	
 	/**
@@ -656,14 +697,14 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			if ( System.currentTimeMillis() > lastShot + 500 ) {
 				RigidBody body = world.addBubble( position );
 				if ( body != null ) {
-					Log.i( "MyRenderer", "Before adding bubble to physics world" );
+					Log.i( "BBRenderer", "Before adding bubble to physics world" );
 					dynamicWorld.addRigidBody( body );
 					int size = dynamicWorld.getCollisionObjectArray().size();
 					body = ( RigidBody ) dynamicWorld.getCollisionObjectArray().get( size-1 );
 					body.setGravity( new Vector3f( 0, 0, 0 ) );
 					world.getLastBubble().setBodyIndex( size-1 );
 					lastShot = System.currentTimeMillis();
-					Log.i( "MyRenderer", "After adding bubble to physics world: " );
+					Log.i( "BBRenderer", "After adding bubble to physics world: " );
 					return body;
 				}
 			}
@@ -688,15 +729,15 @@ class BBRenderer implements GLSurfaceView.Renderer {
 					SimpleVector motion = new SimpleVector( linearVelocity.x, -linearVelocity.y, -linearVelocity.z );
 					int id = world.getObject( bubble.getObjectId() ).checkForCollision( motion, 5 );
 					WordObject collisionObject;
-					if ( id != -100 ) Log.i( "MyRenderer", "Checking object with id: " + id );
+					if ( id != -100 ) Log.i( "BBRenderer", "Checking object with id: " + id );
 					if ( id >= 0 ) {
-						Log.d( "MyRenderer", "That doesn't make sense... id != 0, but not bubble nor wordObject" );
+						Log.d( "BBRenderer", "That doesn't make sense... id != 0, but not bubble nor wordObject" );
 						if ( (collisionObject = world.getWordObject( id ) ) != null ) {
 							if ( world.isBubbleType( id ) ) {
-								Log.d( "MyRenderer", "That doesn't make sense... Collision object is a bubble." );
+								Log.d( "BBRenderer", "That doesn't make sense... Collision object is a bubble." );
 							}
 							else {
-								Log.i( "MyRenderer", "Object is a WordObject!" );
+								Log.i( "BBRenderer", "Object is a WordObject!" );
 							}
 							if ( collisionObject.getArticle() == bubble.getArticle() ) {
 								bubbleWords.add( collisionObject.getName( Translator.ENGLISH ) );
@@ -710,7 +751,16 @@ class BBRenderer implements GLSurfaceView.Renderer {
 								bubble.calcTextureWrap();
 								bubble.build();
 								soundPool.play( Translator.getIndexByWord( collisionObject.getName( Translator.SPANISH ) ) + 1, 3, 3, 1, 0, 1f );
-								hasWonGame();
+								if ( hasWonGame() ) {
+									new Thread( new Runnable() {
+
+										@Override
+										public void run() {
+											levelWin();
+										}
+										
+									}).start();
+								}
 								return 0;
 							}
 							else {
@@ -719,7 +769,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 							}
 						}
 						else if ( world.isBubbleType( id ) ) {
-							Log.i( "MyRenderer", "Object is a bubble!" );
+							Log.i( "BBRenderer", "Object is a bubble!" );
 							Bubble bubbleCollisionObject = ( Bubble ) world.getObject( id );
 							world.removeObject( bubbleCollisionObject.getHeldObjectId() );
 							deleteBubble( bubbleCollisionObject );
@@ -730,7 +780,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				}
 			}
 		} catch ( IndexOutOfBoundsException e ) {
-			Log.e( "MyRenderer", "Index is out of bounds for index " + i + " and array size " + world.getNumBubbles() );
+			Log.e( "BBRenderer", "Index is out of bounds for index " + i + " and array size " + world.getNumBubbles() );
 		}
 		return 0;
 	}
@@ -798,7 +848,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				hasCompletedSteps = true;
 			if ( lastItem == -3 )
 				lastItem = -1;
-			Log.d( "MyRenderer", "Iterating Wattson, and return value of: " + lastItem );
+			Log.d( "BBRenderer", "Iterating Wattson, and return value of: " + lastItem );
 			return lastItem;
 		}
 		return 0;
@@ -861,7 +911,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 					iteration++;
 				}
 			}catch ( ConcurrentModificationException e ) {
-				Log.e( "Myrenderer", "display2DGameInfo got ConcurrentModificationError: " + e );
+				Log.e( "BBRenderer", "display2DGameInfo got ConcurrentModificationError: " + e );
 			}
 			
 		}
@@ -1004,24 +1054,15 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * @return
 	 */
 	public boolean hasWonGame() {
-		ArrayList<String> tempWords = world.getRoomObjectWords();
-		int listLength = tempWords.size();
-		float numWordsCaptured = 0;
-		for ( int i = 0; i < tempWords.size(); i++ ) {
-			for ( int j = 0; j < bubbleWords.size(); j++ ) {
-				if ( bubbleWords.get( j ) == tempWords.get( i ) ) {
-					numWordsCaptured++;
-					break;
-				}
-			}
-		}
-		fuelHeight = ( int )( (float )( numWordsCaptured/listLength )*( height*0.75 ) );
-		if ( numWordsCaptured != listLength ) {
+		int captured = bubbleWords.size();
+		int total = world.getNumWordObjects();
+		
+		fuelHeight = (int) ( ((float) captured / total) * (height * 0.75) );
+		
+		if ( captured != total )
 			return false;
-		}
-		levelWin();
-		System.gc();
-		return true;
+		else
+			return true;
 	}
 	
 	
@@ -1060,8 +1101,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		SharedPreferences settings = context.getSharedPreferences( MenuScreen.PREFERENCES, 0 );
 		bubbleTexture = "bubbleBlue";
     	if ( isTutorial ) {
-    		Log.d( "MyRenderer", "Setting hasBeatenTutorial" );
+    		Log.d( "BBRenderer", "Setting hasBeatenTutorial" );
     		settings.edit().putBoolean( "hasBeatenTutorial", true ).commit();
+    		
+            world.dispose();
     		handler.post( new Runnable() {
                 public void run() {
                 	Toast toast = Toast.makeText( context, "Looks like you've got it!", Toast.LENGTH_LONG );
@@ -1070,17 +1113,17 @@ class BBRenderer implements GLSurfaceView.Renderer {
             	    intent.setClass( context, MenuScreen.class );
             	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             	    context.startActivity( intent );
-            	    world.dispose();
+            	    loading = true;
                 }
             } );
-    	}
-    	else {
-    		  roomNum++;
+    	} else {
+    		roomNum++;
     		  
-    		  if ( settings.getInt( "nextLevel", 0 ) < roomNum )
-    			  settings.edit().putInt( "nextLevel", roomNum ).commit();
-    	      
-	        handler.post( new Runnable() {
+    		if ( settings.getInt( "nextLevel", 0 ) < roomNum )
+    			settings.edit().putInt( "nextLevel", roomNum ).commit();
+    		
+            world.dispose();
+    		handler.post( new Runnable() {
 	            public void run() {
 	            	Toast toast = Toast.makeText( context, R.string.win_level_title, Toast.LENGTH_LONG );
 	                toast.show();
@@ -1089,7 +1132,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
 	        	    intent.putExtra( MenuScreen.EXTRA_MESSAGE, "comic" + ( roomNum-1 ) + "b" );
 	        	    context.startActivity( intent );
-	        		world.dispose();
+	        	    loading = true;
 	            }
 	        } );
     	}
@@ -1100,6 +1143,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * 
 	 */
 	public void levelLose() {
+        world.dispose();
 		handler.post( new Runnable() {
             public void run() {
             	Toast toast = Toast.makeText( context, R.string.lose_level_title, Toast.LENGTH_LONG );
@@ -1108,22 +1152,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
         	    intent.setClass( context, MenuScreen.class );
         	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         	    context.startActivity( intent );
-        	    world.dispose();
-            }
-        } );
-	}
-	
-	/**
-	 * 
-	 */
-	public void restart() {
-		handler.post( new Runnable() {
-            public void run() {
-                Intent intent = new Intent( context, GameScreen.class );
-        	    intent.setClass( context, MenuScreen.class );
-        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-        	    context.startActivity( intent );
-        	    world.dispose();
+        	    loading = true;
             }
         } );
 	}

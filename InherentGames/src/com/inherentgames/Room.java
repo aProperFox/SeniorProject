@@ -88,12 +88,12 @@ public class Room extends World {
 
 		setObjects( roomId );
 		
-		try {
+		/*try {
 			shader = new GLSLShader( Loader.loadTextFile( context.getAssets().open( "toon.vs" ) ), Loader.loadTextFile( context.getAssets().open( "toon.fs" ) ) );
 		} catch ( IOException e1 ) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
 		
 	}
 	

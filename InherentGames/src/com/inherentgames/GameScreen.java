@@ -42,9 +42,7 @@ import com.threed.jpct.SimpleVector;
 
 public class GameScreen extends Activity {
 	private static GameScreen master = null;
-	private AssetsPropertyReader assetsPropertyReader;
-    private Context context;
-    private Properties config;
+	private Context context;
     
 	private GLSurfaceView mGLView;
 	private BBRenderer renderer = null;
@@ -70,45 +68,22 @@ public class GameScreen extends Activity {
 		Logger.log( "onCreate" );
 		
 		super.onCreate( savedInstanceState );
-		Display display = getWindowManager().getDefaultDisplay();
 		
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
 		context = this;
-		assetsPropertyReader = new AssetsPropertyReader();
-		config = assetsPropertyReader.getProperties( "config.properties" );
          
 		mGLView = new GLSurfaceView( getApplication() );
 		
-		// Enable Immersive mode ( hides status and nav bar )
-		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-	        mGLView.setSystemUiVisibility(
-	                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	                | View.SYSTEM_UI_FLAG_FULLSCREEN
-	                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-	        this.UiChangeListener();
-    	}
-		
-		// Use legacy code if running on older Android versions
-		if ( android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2 ) {
-			width = display.getWidth();
-			height = display.getHeight();
-		} else {
-			Point size = new Point();
-			display.getRealSize( size );
-			width = size.x;
-			height = size.y;
-		}
+		width = BB.getWidth();
+		height = BB.getHeight();
 		
 		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 			
 			@Override
 			public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display ) {
-				//Ensure that we get a 16bit framebuffer. Otherwise we'll fall
+				//Ensure that we get a 16bit frame buffer. Otherwise we'll fall
 				//back to PixelFlinger on some device ( read: Samsung I7500 )
 				int[] attributes = new int[] {EGL10.EGL_DEPTH_SIZE, 16, EGL10.EGL_NONE};
 				EGLConfig[] configs = new EGLConfig[1];
@@ -123,11 +98,11 @@ public class GameScreen extends Activity {
 		Log.i( "GameScreen", "Current level is: " + levelNum );
 		load = Toast.makeText( context, R.string.load_level, Toast.LENGTH_LONG );
         load.show();
+        
 		renderer = new BBRenderer( width, height, levelNum );
 		mGLView.setRenderer( renderer );
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );
-		
 		
 		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
 		Bitmap bb=( (BitmapDrawable ) icon ).getBitmap();
@@ -199,6 +174,10 @@ public class GameScreen extends Activity {
 		super.onResume();
 		//renderer.setTextures();
 		mGLView.onResume();
+		// Enable Immersive mode (hides status and nav bar)
+		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
+			BB.setImmersiveMode( mGLView, getWindow().getDecorView() );
+		}
 	}
 
 	@Override
@@ -241,7 +220,7 @@ public class GameScreen extends Activity {
 								*/
 							}
 							else if ( items[item]==getString( R.string.c_exit ) ) {
-								renderer.restart();
+								finish();
 							}
 					    }
 					} );
@@ -362,25 +341,5 @@ public class GameScreen extends Activity {
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
-	
-	@SuppressLint( "NewApi" )
-	public void UiChangeListener() {
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener ( new View.OnSystemUiVisibilityChangeListener() {
-            @TargetApi( 19 )
-			@Override
-            public void onSystemUiVisibilityChange( int visibility ) {
-                if ( (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN ) == 0 ) {
-                    decorView.setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-                }
-            }
-        } );
-    }
 	
 }

@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+@SuppressLint("NewApi")
 public class MapScreen extends Activity {
 
 	Button stage1;
@@ -30,17 +32,8 @@ public class MapScreen extends Activity {
 	public void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		// Use legacy code if running on older Android versions
-		if ( android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2 ) {
-			width = display.getWidth();
-			height = display.getHeight();
-		} else {
-			Point size = new Point();
-			display.getSize( size );
-			width = size.x;
-			height = size.y;
-		}
+		width = BB.getWidth();
+		height = BB.getHeight();
 		
 
 		SharedPreferences settings = getSharedPreferences( MenuScreen.PREFERENCES, 0 );
@@ -48,35 +41,26 @@ public class MapScreen extends Activity {
 		switch( levelNum ) {
 			case 1:
 				Log.i( "MapScreen", "loading Level 1 map" );
-				setContentView( R.layout.stageone );
+				setContentView( R.layout.stage1 );
 				break;
 			case 2:
 				Log.i( "MapScreen", "loading Level 2 map" );
-				setContentView( R.layout.stagetwo );
+				setContentView( R.layout.stage2 );
 				break;
 			case 3:
 				Log.i( "MapScreen", "Loading Level 3 map" );
-				setContentView( R.layout.stagethree );
+				setContentView( R.layout.stage3 );
 				break;
 		}
 	}
 	
 	@SuppressLint("InlinedApi")
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void onResume() {
 		super.onResume();
 		
-		// Enable Immersive mode ( hides status and nav bar )
-		View currentView = getWindow().getDecorView();
+		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-			currentView.setSystemUiVisibility(
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-				| View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-		    this.UiChangeListener();
+			BB.setImmersiveMode( findViewById( Window.ID_ANDROID_CONTENT ), getWindow().getDecorView() );
 		}
 	}
 	
@@ -124,26 +108,5 @@ public class MapScreen extends Activity {
 	   setIntent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
 	   startActivity( setIntent );
 	}
-	
-	@SuppressLint("InlinedApi")
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void UiChangeListener() {
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener ( new View.OnSystemUiVisibilityChangeListener() {
-            @TargetApi( 19 )
-			@Override
-            public void onSystemUiVisibilityChange( int visibility ) {
-                if ( (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN ) == 0 ) {
-                    decorView.setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-                }
-            }
-        } );
-    }
 	
 }
