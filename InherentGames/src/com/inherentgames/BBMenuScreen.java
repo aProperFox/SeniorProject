@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 
 @SuppressLint( "NewApi" )
-public class MenuScreen extends Activity {
+public class BBMenuScreen extends Activity {
 	
 	private MediaPlayer mp;
 	
@@ -110,7 +110,7 @@ public class MenuScreen extends Activity {
                         int priority = 1;
                         int no_loop = 0;
                         float normal_playback_rate = 1f;
-                        Intent i = new Intent( MenuScreen.this, MapScreen.class );
+                        Intent i = new Intent( BBMenuScreen.this, BBMapScreen.class );
                         startActivity( i );
                         overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
                         soundPool.play( soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate );
@@ -126,7 +126,7 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick( View v ) {
-                        Intent i = new Intent( MenuScreen.this, Settings.class );
+                        Intent i = new Intent( BBMenuScreen.this, BBSettings.class );
                         startActivity( i );
                     }
             } );
@@ -139,7 +139,7 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick( View v ) {
-                        Intent i = new Intent( MenuScreen.this, Tutorial.class );
+                        Intent i = new Intent( BBMenuScreen.this, BBTutorial.class );
                         startActivity( i );
                     }
             } );
@@ -152,7 +152,7 @@ public class MenuScreen extends Activity {
                     
                     @Override
                     public void onClick( View v ) {
-                        Intent i = new Intent( MenuScreen.this, Store.class );
+                        Intent i = new Intent( BBMenuScreen.this, BBStore.class );
                         startActivity( i );
                     }
             } );
@@ -198,7 +198,7 @@ public class MenuScreen extends Activity {
 		
 		Log.d( "MenuScreen", "Resuming Menu screen" );
 		
-		if ( getSharedPreferences( MenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
+		if ( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
 			playButton.setEnabled( true );
 			Log.d( "MenuScreen", "Enabling button" );
 		}
@@ -230,7 +230,7 @@ public class MenuScreen extends Activity {
 	public void onStart() {
 		Log.d( "MenuScreen", "onStart" );
 		
-		if ( getSharedPreferences( MenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
+		if ( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
 			playButton.setEnabled( true );
 			Log.d( "MenuScreen", "Enabling button" );
 
@@ -259,7 +259,7 @@ public class MenuScreen extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		if ( MenuScreen.isDevMode ) {
+		if ( BBMenuScreen.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
 		    inflater.inflate( R.menu.menu, menu );
 		}
@@ -270,8 +270,8 @@ public class MenuScreen extends Activity {
     public boolean onOptionsItemSelected( MenuItem item ) {
         switch ( item.getItemId() ) {
         case R.id.delete_data:
-        	getSharedPreferences( MenuScreen.PREFERENCES, 0 ).edit().remove( "hasBeatenTutorial" ).commit();
-        	getSharedPreferences( MenuScreen.PREFERENCES, 0 ).edit().remove( "nextLevel" ).commit();
+        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().remove( "hasBeatenTutorial" ).commit();
+        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().remove( "nextLevel" ).commit();
         	playButton.setEnabled( false );
         	return true;
         }

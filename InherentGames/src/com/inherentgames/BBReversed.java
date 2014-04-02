@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-public class Reversed<T> implements Iterable<T> {
+public class BBReversed<T> implements Iterable<T> {
     private final ArrayList<T> original;
 
-    public Reversed( ArrayList<T> original ) {
+    public BBReversed( ArrayList<T> original ) {
         this.original = original;
     }
 
@@ -21,7 +21,7 @@ public class Reversed<T> implements Iterable<T> {
         };
     }
 
-    public static <T> Reversed<T> reversed( ArrayList<T> original ) {
-        return new Reversed<T>( original );
+    public static <T> BBReversed<T> reversed( ArrayList<T> original ) {
+        return new BBReversed<T>( original );
     }
 }

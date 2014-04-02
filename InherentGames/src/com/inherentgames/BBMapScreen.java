@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 @SuppressLint("NewApi")
-public class MapScreen extends Activity {
+public class BBMapScreen extends Activity {
 
 	Button stage1;
 	ImageButton stage2;
@@ -36,7 +36,7 @@ public class MapScreen extends Activity {
 		height = BB.getHeight();
 		
 
-		SharedPreferences settings = getSharedPreferences( MenuScreen.PREFERENCES, 0 );
+		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		levelNum = settings.getInt( "nextLevel", 1 );
 		switch( levelNum ) {
 			case 1:
@@ -69,18 +69,18 @@ public class MapScreen extends Activity {
 		float ypos = me.getY();
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
 			if ( xpos > width*.13 && xpos < width*.33 && ypos > height*0.162 && ypos < height*0.4 ) {
-				getSharedPreferences( MenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 1 ).commit();
-                Intent i = new Intent( MapScreen.this, VideoScreen.class );
-                i.putExtra( MenuScreen.EXTRA_MESSAGE, "comic1a" );
+				getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 1 ).commit();
+                Intent i = new Intent( BBMapScreen.this, BBVideoScreen.class );
+                i.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic1a" );
                 startActivity( i );
                 finish();
 			}
 			
 			else if ( xpos > width*.4 && xpos < width*.6 && ypos > height*0.618 && ypos < height*0.88 ) {
 				if ( levelNum > 1 ) {
-					getSharedPreferences( MenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 2 ).commit();
-                    Intent i = new Intent( MapScreen.this, VideoScreen.class );
-                    i.putExtra( MenuScreen.EXTRA_MESSAGE, "comic2a" );
+					getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 2 ).commit();
+                    Intent i = new Intent( BBMapScreen.this, BBVideoScreen.class );
+                    i.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic2a" );
                     startActivity( i );
                     finish();
 				}
@@ -88,8 +88,8 @@ public class MapScreen extends Activity {
 			
 			else if ( xpos > width*.675 && xpos < width*.88 && ypos > height*0.176 && ypos < height*0.44 ) {
 				if ( levelNum > 2 ) {
-					getSharedPreferences( MenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 3 ).commit();
-                    Intent i = new Intent( MapScreen.this, GameScreen.class );
+					getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 3 ).commit();
+                    Intent i = new Intent( BBMapScreen.this, BBGameScreen.class );
                     startActivity( i );
                     finish();
 				}
@@ -104,7 +104,7 @@ public class MapScreen extends Activity {
 	@Override
 	public void onBackPressed() {
 	   Log.d( "MapScreen", "onBackPressed Called" );
-	   Intent setIntent = new Intent( this, MenuScreen.class );
+	   Intent setIntent = new Intent( this, BBMenuScreen.class );
 	   setIntent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
 	   startActivity( setIntent );
 	}

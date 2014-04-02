@@ -15,7 +15,7 @@
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         android:largeHeap="true">
         
-        <activity android:name="com.inherentgames.MenuScreen"
+        <activity android:name="com.inherentgames.BBMenuScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
             
@@ -25,48 +25,48 @@
 	        </intent-filter>
         </activity>
         
-        <activity android:name="com.inherentgames.VideoScreen"
+        <activity android:name="com.inherentgames.BBVideoScreen"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 	        <meta-data android:name="android.support.PARENT_ACTIVITY"
             android:value="com.inherentgames.VideoScreen" />
 		</activity>
         
-        <activity android:name="com.inherentgames.GameScreen"
+        <activity android:name="com.inherentgames.BBGameScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">    
 	        <meta-data android:name="android.support.PARENT_ACTIVITY"
             android:value="com.inherentgames.GameScreen" />
         </activity>
         
-        <activity android:name="com.inherentgames.MapScreen"
+        <activity android:name="com.inherentgames.BBMapScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
 	        <meta-data android:name="android.support.PARENT_ACTIVITY"
             android:value="com.inherentgames.MapScreen" />
         </activity>
         
-        <activity android:name="com.inherentgames.Tutorial"
+        <activity android:name="com.inherentgames.BBTutorial"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 		</activity>
 		
-        <activity android:name="com.inherentgames.Settings"
+        <activity android:name="com.inherentgames.BBSettings"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 		</activity>
 		
-        <activity android:name="com.inherentgames.Store"
+        <activity android:name="com.inherentgames.BBStore"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 		</activity>
 		
-        <activity android:name="com.inherentgames.Popup"
+        <activity android:name="com.inherentgames.BBPopup"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 		</activity>
 		
-        <activity android:name="com.inherentgames.LoadingScreen"
+        <activity android:name="com.inherentgames.BBLoadingScreen"
              android:label="@string/app_name"
              android:screenOrientation="landscape">
 		</activity>

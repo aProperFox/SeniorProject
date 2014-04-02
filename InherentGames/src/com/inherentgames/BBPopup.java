@@ -3,7 +3,7 @@ package com.inherentgames;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class Popup extends Activity {
+public class BBPopup extends Activity {
         
         @Override
         public void onCreate( Bundle savedInstanceState ) {

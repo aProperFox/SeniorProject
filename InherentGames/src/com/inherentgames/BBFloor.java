@@ -13,7 +13,7 @@ import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
-public class Floor {
+public class BBFloor {
 	SimpleVector[] coordinates = new SimpleVector[4];
 	String type = "";
 	
@@ -25,7 +25,7 @@ public class Floor {
 	 * @param size
 	 * @param textureId
 	 */
-	public Floor( SimpleVector size, int textureId ) {
+	public BBFloor( SimpleVector size, int textureId ) {
 		coordinates[0] = new SimpleVector( -size.x/2, size.y, +size.z/2 );
 		coordinates[1] = new SimpleVector( +size.x/2, size.y, +size.z/2 );
 		coordinates[2] = new SimpleVector( +size.x/2, size.y, -size.z/2 );

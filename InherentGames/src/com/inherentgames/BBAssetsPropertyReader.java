@@ -8,11 +8,11 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-public class AssetsPropertyReader {
+public class BBAssetsPropertyReader {
        private Context context;
        private Properties properties;
 
-       public AssetsPropertyReader() {
+       public BBAssetsPropertyReader() {
               this.context = BB.getAppContext();
               /**
                * Constructs a new Properties object.

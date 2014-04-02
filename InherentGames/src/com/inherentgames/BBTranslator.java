@@ -2,7 +2,7 @@ package com.inherentgames;
 
 import android.util.Log;
 
-public class Translator {
+public class BBTranslator {
 	//Language values
 	public static final int ENGLISH = 0;
 	public static final int SPANISH = 1;

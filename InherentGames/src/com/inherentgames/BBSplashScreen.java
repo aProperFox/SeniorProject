@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
  
-public class SplashScreen extends Activity {
+public class BBSplashScreen extends Activity {
 
  
     @Override
@@ -20,11 +20,11 @@ public class SplashScreen extends Activity {
             @Override
             public void run() {
                     //new activity
-                Intent i = new Intent( SplashScreen.this, MenuScreen.class );
+                Intent i = new Intent( BBSplashScreen.this, BBMenuScreen.class );
                 startActivity( i );
  
                 // activity closed
-                SplashScreen.this.finish();
+                BBSplashScreen.this.finish();
             }
         }, 3000 );
     }

@@ -47,11 +47,11 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	private BBTextureManager tm;
 	public static final int SHORT_TOAST = 5;
 	private FrameBuffer fb = null;
-	private Room world = null;
+	private BBRoom world = null;
 	private World loadingWorld = null;
 	private Texture loadingTex = null;
 	private Runnable gameLoader = null;
-	private Renderer2D renderer2D;
+	private BBRenderer2D renderer2D;
 	private GLText glText;
 	
 	private boolean loading = true;
@@ -322,8 +322,8 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			try {
 				if ( lastRotateTime < ( System.currentTimeMillis() - 15 ) ) {
 					lastRotateTime = System.currentTimeMillis();
-					ArrayList<Bubble> bubbleObjects = world.getBubbleObjects();
-					for ( Bubble bubble : Reversed.reversed( bubbleObjects ) ) {
+					ArrayList<BBBubble> bubbleObjects = world.getBubbleObjects();
+					for ( BBBubble bubble : BBReversed.reversed( bubbleObjects ) ) {
 						if ( bubble.isHolding() ) {
 							Object3D obj = world.getObject( bubble.getHeldObjectId() );
 							obj.setOrigin( bubble.getTranslation().calcSub( obj.getCenter() ) );
@@ -409,10 +409,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		isArrowAscending = true;
 		arrowHeight = ( int )( (( float )height )/3.5f );
 		
-		renderer2D = new Renderer2D( fb );
+		renderer2D = new BBRenderer2D( fb );
 		clock = new Clock();
 		//setTextures();
-		world = new Room( roomNum );
+		world = new BBRoom( roomNum );
 		world.setAmbientLight( 20, 20, 20 );
 		
 		sun1 = new Light( world );
@@ -677,7 +677,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	/**
 	 * @return
 	 */
-	public Room getWorld() {
+	public BBRoom getWorld() {
 		return world;
 	}
 	
@@ -721,14 +721,14 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		//and sets it in the state to stay inside the bubble object
 		try {
 			for ( i = 0; i < world.getNumBubbles(); i++ ) {
-				Bubble bubble = world.getBubble( i );
+				BBBubble bubble = world.getBubble( i );
 				if ( bubble.isHolding() == false && bubble.getBodyIndex() != -1 && bubble != null ) {
 					RigidBody tempBody = ( RigidBody ) dynamicWorld.getCollisionObjectArray().get( bubble.getBodyIndex() );
 					Vector3f linearVelocity = new Vector3f( 0, 0, 0 );
 					linearVelocity = tempBody.getLinearVelocity( linearVelocity );
 					SimpleVector motion = new SimpleVector( linearVelocity.x, -linearVelocity.y, -linearVelocity.z );
 					int id = world.getObject( bubble.getObjectId() ).checkForCollision( motion, 5 );
-					WordObject collisionObject;
+					BBWordObject collisionObject;
 					if ( id != -100 ) Log.i( "BBRenderer", "Checking object with id: " + id );
 					if ( id >= 0 ) {
 						Log.d( "BBRenderer", "That doesn't make sense... id != 0, but not bubble nor wordObject" );
@@ -740,17 +740,17 @@ class BBRenderer implements GLSurfaceView.Renderer {
 								Log.i( "BBRenderer", "Object is a WordObject!" );
 							}
 							if ( collisionObject.getArticle() == bubble.getArticle() ) {
-								bubbleWords.add( collisionObject.getName( Translator.ENGLISH ) );
-								if ( collisionObject.getName( Translator.ENGLISH ) != "Plate" ) {
+								bubbleWords.add( collisionObject.getName( BBTranslator.ENGLISH ) );
+								if ( collisionObject.getName( BBTranslator.ENGLISH ) != "Plate" ) {
 									collisionObject.scale( 5.0f );
 								}
 								collisionObject.setStatic( false );
 								bubble.setHeldObjectId( id );
 								//Object3D worldBubbleObject = world.getObject( bubble.getObjectId() );
-								bubble.setTexture( collisionObject.getName( Translator.SPANISH ) );
+								bubble.setTexture( collisionObject.getName( BBTranslator.SPANISH ) );
 								bubble.calcTextureWrap();
 								bubble.build();
-								soundPool.play( Translator.getIndexByWord( collisionObject.getName( Translator.SPANISH ) ) + 1, 3, 3, 1, 0, 1f );
+								soundPool.play( BBTranslator.getIndexByWord( collisionObject.getName( BBTranslator.SPANISH ) ) + 1, 3, 3, 1, 0, 1f );
 								if ( hasWonGame() ) {
 									new Thread( new Runnable() {
 
@@ -770,7 +770,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 						}
 						else if ( world.isBubbleType( id ) ) {
 							Log.i( "BBRenderer", "Object is a bubble!" );
-							Bubble bubbleCollisionObject = ( Bubble ) world.getObject( id );
+							BBBubble bubbleCollisionObject = ( BBBubble ) world.getObject( id );
 							world.removeObject( bubbleCollisionObject.getHeldObjectId() );
 							deleteBubble( bubbleCollisionObject );
 							deleteBubble( bubble );
@@ -795,7 +795,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	/**
 	 * @param bubble
 	 */
-	public void deleteBubble( Bubble bubble ) {
+	public void deleteBubble( BBBubble bubble ) {
 		dynamicWorld.removeRigidBody( (RigidBody )dynamicWorld.getCollisionObjectArray().get( bubble.getBodyIndex() ) );
 		world.removeBubble( bubble );
 	}
@@ -806,7 +806,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	public void loadBubble( int state ) {
 		//Put 2D bubble image on screen with 2D renderer
 		world.setBubbleColor( state );
-		if ( state == WordObject.FEMININE )
+		if ( state == BBWordObject.FEMININE )
 			bubbleTexture = "bubbleRed";
 		else
 			bubbleTexture = "bubbleBlue";
@@ -1098,7 +1098,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * 
 	 */
 	public void levelWin() {
-		SharedPreferences settings = context.getSharedPreferences( MenuScreen.PREFERENCES, 0 );
+		SharedPreferences settings = context.getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		bubbleTexture = "bubbleBlue";
     	if ( isTutorial ) {
     		Log.d( "BBRenderer", "Setting hasBeatenTutorial" );
@@ -1109,8 +1109,8 @@ class BBRenderer implements GLSurfaceView.Renderer {
                 public void run() {
                 	Toast toast = Toast.makeText( context, "Looks like you've got it!", Toast.LENGTH_LONG );
                     toast.show();
-                    Intent intent = new Intent( context, GameScreen.class );
-            	    intent.setClass( context, MenuScreen.class );
+                    Intent intent = new Intent( context, BBGameScreen.class );
+            	    intent.setClass( context, BBMenuScreen.class );
             	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             	    context.startActivity( intent );
             	    loading = true;
@@ -1127,10 +1127,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	            public void run() {
 	            	Toast toast = Toast.makeText( context, R.string.win_level_title, Toast.LENGTH_LONG );
 	                toast.show();
-	        		Intent intent = new Intent( context, GameScreen.class );
-	        	    intent.setClass( context, VideoScreen.class );
+	        		Intent intent = new Intent( context, BBGameScreen.class );
+	        	    intent.setClass( context, BBVideoScreen.class );
 	        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-	        	    intent.putExtra( MenuScreen.EXTRA_MESSAGE, "comic" + ( roomNum-1 ) + "b" );
+	        	    intent.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic" + ( roomNum-1 ) + "b" );
 	        	    context.startActivity( intent );
 	        	    loading = true;
 	            }
@@ -1148,8 +1148,8 @@ class BBRenderer implements GLSurfaceView.Renderer {
             public void run() {
             	Toast toast = Toast.makeText( context, R.string.lose_level_title, Toast.LENGTH_LONG );
                 toast.show();
-                Intent intent = new Intent( context, GameScreen.class );
-        	    intent.setClass( context, MenuScreen.class );
+                Intent intent = new Intent( context, BBGameScreen.class );
+        	    intent.setClass( context, BBMenuScreen.class );
         	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         	    context.startActivity( intent );
         	    loading = true;

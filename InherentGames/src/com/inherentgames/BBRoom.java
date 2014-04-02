@@ -27,7 +27,7 @@ import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.SkyBox;
 
 
-public class Room extends World {
+public class BBRoom extends World {
 	/**
 	 * 
 	 */
@@ -37,14 +37,14 @@ public class Room extends World {
 	
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
 	private Context context;
-	public Wall wall;
-	public Floor floor;
-	public Floor ceiling;
+	public BBWall wall;
+	public BBFloor floor;
+	public BBFloor ceiling;
 	private ArrayList<RigidBody> bodies = new ArrayList<RigidBody>();
 	private ArrayList<RigidBody> bubbles = new ArrayList<RigidBody>();
-	private ArrayList<Bubble> bubbleObjects;
-	private ArrayList<WordObject> wordObjects;
-	private ArrayList<WordObject> roomObjects;
+	private ArrayList<BBBubble> bubbleObjects;
+	private ArrayList<BBWordObject> wordObjects;
+	private ArrayList<BBWordObject> roomObjects;
 	private ArrayList<String> roomObjectWords;
 	
 	private float height, width, length;
@@ -66,16 +66,16 @@ public class Room extends World {
 	 * @param context
 	 * @param tm
 	 */
-	public Room( int roomId ) {
+	public BBRoom( int roomId ) {
 		this.context = BB.getAppContext();
 		
 		tm = BBTextureManager.getInstance();
 		
 		skybox = null;
 		roomObjectWords = new ArrayList<String>();
-		wordObjects = new ArrayList<WordObject>();
-		bubbleObjects = new ArrayList<Bubble>();
-		roomObjects = new ArrayList<WordObject>();
+		wordObjects = new ArrayList<BBWordObject>();
+		bubbleObjects = new ArrayList<BBBubble>();
+		roomObjects = new ArrayList<BBWordObject>();
 		
 		bubbleColor = bubbleBlue;
 		
@@ -136,7 +136,7 @@ public class Room extends World {
 	/**
 	 * @param bubble
 	 */
-	public void removeBubble( Bubble bubble ) {
+	public void removeBubble( BBBubble bubble ) {
 		bubbleObjects.remove( bubble );
 		bubbles.remove( bubble.getLocalBodyIndex() );
 		removeObject( bubble );
@@ -150,40 +150,40 @@ public class Room extends World {
 		if ( getWallNumByRoomId( room ) == -1 ) {
 			Log.i( "Room", "Invalid room number" );
 		}
-		Wall wall;
+		BBWall wall;
 		//set walls by room number
 		switch( room ) {
 
 		case 0:
 			
 			//First wall
-			wall = new Wall( new SimpleVector( 0, 0, 75 ), 80, 50, "TutorialWall" );
+			wall = new BBWall( new SimpleVector( 0, 0, 75 ), 80, 50, "TutorialWall" );
 			walls.add( wall.getWall() );
 			walls.get( 0 ).setTexture( "TutorialWall" );
 			bodies.add( wall.getBody() );
 			//Second wall
-			wall = new Wall( new SimpleVector( 40, 0, 0 ), 150, 50, "TutorialWall" );
+			wall = new BBWall( new SimpleVector( 40, 0, 0 ), 150, 50, "TutorialWall" );
 			walls.add( wall.getWall() );
 			walls.get( 1 ).setTexture( "TutorialWall" );
 			bodies.add( wall.getBody() );
 			//Third wall
-			wall = new Wall( new SimpleVector( 0, 0, -75 ), 80, 50, "TutorialWall" );
+			wall = new BBWall( new SimpleVector( 0, 0, -75 ), 80, 50, "TutorialWall" );
 			walls.add( wall.getWall() );
 			walls.get( 2 ).setTexture( "TutorialWall" );
 			bodies.add( wall.getBody() );
 			//Fourth wall
-			wall = new Wall( new SimpleVector( -40, 0, 0 ), 150, 50, "TutorialWall" );
+			wall = new BBWall( new SimpleVector( -40, 0, 0 ), 150, 50, "TutorialWall" );
 			walls.add( wall.getWall() );
 			walls.get( 3 ).setTexture( "TutorialWall" );
 			bodies.add( wall.getBody() );
 			
 			//Wall class and floor class to be changed to extend surface class
 			//TODO change Floor class to allow change center
-			floor = new Floor( new SimpleVector( 80, 25, 150 ), 0 );
+			floor = new BBFloor( new SimpleVector( 80, 25, 150 ), 0 );
 			floor.setTexture( "TutorialFloor" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
-			ceiling = new Floor( new SimpleVector( 80, -25, 150 ), 0 );
+			ceiling = new BBFloor( new SimpleVector( 80, -25, 150 ), 0 );
 			ceiling.setTexture( "TutorialCeiling" );
 			bodies.add( ceiling.getBody() );
 			addObject( ceiling.getFloor() );
@@ -197,32 +197,32 @@ public class Room extends World {
 			width = 156;
 			
 			//First wall
-			wall = new Wall( new SimpleVector( 0, 0, length/2 ), width, height, "Room0Wall0" );
+			wall = new BBWall( new SimpleVector( 0, 0, length/2 ), width, height, "Room0Wall0" );
 			walls.add( wall.getWall() );
 			walls.get( 0 ).setTexture( "Room0Wall0" );
 			bodies.add( wall.getBody() );
 			//Second wall
-			wall = new Wall( new SimpleVector( width/2, 0, 0 ), length, height, "Room0Wall1" );
+			wall = new BBWall( new SimpleVector( width/2, 0, 0 ), length, height, "Room0Wall1" );
 			walls.add( wall.getWall() );
 			walls.get( 1 ).setTexture( "Room0Wall1" );
 			bodies.add( wall.getBody() );
 			//Third wall
-			wall = new Wall( new SimpleVector( 0, 0, -length/2 ), width, height, "Room0Wall2" );
+			wall = new BBWall( new SimpleVector( 0, 0, -length/2 ), width, height, "Room0Wall2" );
 			walls.add( wall.getWall() );
 			walls.get( 2 ).setTexture( "Room0Wall2" );
 			bodies.add( wall.getBody() );
 			//Fourth wall
-			wall = new Wall( new SimpleVector( -width/2, 0, 0 ), length, height, "Room0Wall3" );
+			wall = new BBWall( new SimpleVector( -width/2, 0, 0 ), length, height, "Room0Wall3" );
 			walls.add( wall.getWall() );
 			walls.get( 3 ).setTexture( "Room0Wall3" );
 			bodies.add( wall.getBody() );
 			
 			//Wall class and floor class to be changed to extend surface class
-			floor = new Floor( new SimpleVector( width, height/2, length ), 0 );
+			floor = new BBFloor( new SimpleVector( width, height/2, length ), 0 );
 			floor.setTexture( "Room0Floor" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
-			ceiling = new Floor( new SimpleVector( width, -height/2, length ), 0 );
+			ceiling = new BBFloor( new SimpleVector( width, -height/2, length ), 0 );
 			ceiling.setTexture( "Room0Ceiling" );
 			bodies.add( ceiling.getBody() );
 			addObject( ceiling.getFloor() );
@@ -232,32 +232,32 @@ public class Room extends World {
 		case 2:
 			
 			//First wall
-			wall = new Wall( new SimpleVector( 0, 0, 75 ), 130, 50, "Room1Wall0" );
+			wall = new BBWall( new SimpleVector( 0, 0, 75 ), 130, 50, "Room1Wall0" );
 			walls.add( wall.getWall() );
 			walls.get( 0 ).setTexture( "Room1Wall0" );
 			bodies.add( wall.getBody() );
 			//Second wall
-			wall = new Wall( new SimpleVector( 65, 0, 0 ), 150, 50, "Room1Wall1" );
+			wall = new BBWall( new SimpleVector( 65, 0, 0 ), 150, 50, "Room1Wall1" );
 			walls.add( wall.getWall() );
 			walls.get( 1 ).setTexture( "Room1Wall1" );
 			bodies.add( wall.getBody() );
 			//Third wall
-			wall = new Wall( new SimpleVector( 0, 0, -75 ), 130, 50, "Room1Wall2" );
+			wall = new BBWall( new SimpleVector( 0, 0, -75 ), 130, 50, "Room1Wall2" );
 			walls.add( wall.getWall() );
 			walls.get( 2 ).setTexture( "Room1Wall2" );
 			bodies.add( wall.getBody() );
 			//Fourth wall
-			wall = new Wall( new SimpleVector( -65, 0, 0 ), 150, 50, "Room1Wall3" );
+			wall = new BBWall( new SimpleVector( -65, 0, 0 ), 150, 50, "Room1Wall3" );
 			walls.add( wall.getWall() );
 			walls.get( 3 ).setTexture( "Room1Wall3" );
 			bodies.add( wall.getBody() );
 			
 			//Wall class and floor class to be changed to extend surface class
-			floor = new Floor( new SimpleVector( 130, 25, 150 ), 0 );
+			floor = new BBFloor( new SimpleVector( 130, 25, 150 ), 0 );
 			floor.setTexture( "Room1Floor" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
-			ceiling = new Floor( new SimpleVector( 130, -25, 150 ), 0 );
+			ceiling = new BBFloor( new SimpleVector( 130, -25, 150 ), 0 );
 			ceiling.setTexture( "Room1Ceiling" );
 			bodies.add( ceiling.getBody() );
 			addObject( ceiling.getFloor() );
@@ -295,7 +295,7 @@ public class Room extends World {
 			}
 			
 			skybox = new SkyBox( "SkyboxLeft", "SkyboxFront", "SkyboxRight", "SkyboxBack", "SkyboxTop", "SkyboxBottom", 200f );
-			floor = new Floor( new SimpleVector( 200, 10, 200 ), 0 );
+			floor = new BBFloor( new SimpleVector( 200, 10, 200 ), 0 );
 			floor.setTexture( "Street" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
@@ -320,12 +320,12 @@ public class Room extends World {
 		case 0:
 			
 			try {
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/desk.obj" ),
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/desk.obj" ),
 						context.getResources().getAssets().open( "raw/room0/desk.mtl" ), 1.5f ) ),
-						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Desk", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chair.obj" ),
+						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Desk", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chair.obj" ),
 						context.getResources().getAssets().open( "raw/room0/chair.mtl" ), 3.0f ) ),
-						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Chair", WordObject.FEMININE ) );
+						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Chair", BBWordObject.FEMININE ) );
 			} catch( Exception e ) {
 				
 			}
@@ -338,28 +338,28 @@ public class Room extends World {
 		case 1:
 			
 			try {
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/desk.obj" ),
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/desk.obj" ),
 						context.getResources().getAssets().open( "raw/room0/desk.mtl" ), 1.5f ) ),
-						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Desk", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chair.obj" ),
+						new SimpleVector( (float )Math.PI, -( float )Math.PI/2, 0 ), "Desk", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chair.obj" ),
 						context.getResources().getAssets().open( "raw/room0/chair.mtl" ), 3.0f ) ),
-						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Chair", WordObject.FEMININE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chalkboard.obj" ),
-						context.getResources().getAssets().open( "raw/room0/chalkboard.mtl" ), 6.0f ) ), new SimpleVector( 0, ( float )Math.PI, ( float )Math.PI ), "Chalkboard", WordObject.FEMININE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/backpack.obj" ),
-						context.getResources().getAssets().open( "raw/room0/backpack.mtl" ), 2.0f ) ), new SimpleVector( 0, 0.8f*( float )Math.PI/2, ( float )Math.PI ), "Backpack", WordObject.FEMININE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/calendar.obj" ),
-						context.getResources().getAssets().open( "raw/room0/calendar.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, ( float )Math.PI ), "Calendar", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/clock.obj" ),
-						context.getResources().getAssets().open( "raw/room0/clock.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2, ( float )Math.PI ), "Clock", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/door.obj" ),
-						context.getResources().getAssets().open( "raw/room0/door.mtl" ), 4.5f ) ), new SimpleVector( 0, 0, 0 ), "Door", WordObject.FEMININE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/book.obj" ),
-						context.getResources().getAssets().open( "raw/room0/book.mtl" ), 1.8f ) ), new SimpleVector( 0, 0, 0 ), "Book", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/paper.obj" ),
-						context.getResources().getAssets().open( "raw/room0/paper.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, ( float )Math.PI ), "Paper", WordObject.MASCULINE ) );
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/window.obj" ),
-						context.getResources().getAssets().open( "raw/room0/window.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, 0 ), "Window", WordObject.FEMININE ) );
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Chair", BBWordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/chalkboard.obj" ),
+						context.getResources().getAssets().open( "raw/room0/chalkboard.mtl" ), 6.0f ) ), new SimpleVector( 0, ( float )Math.PI, ( float )Math.PI ), "Chalkboard", BBWordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/backpack.obj" ),
+						context.getResources().getAssets().open( "raw/room0/backpack.mtl" ), 2.0f ) ), new SimpleVector( 0, 0.8f*( float )Math.PI/2, ( float )Math.PI ), "Backpack", BBWordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/calendar.obj" ),
+						context.getResources().getAssets().open( "raw/room0/calendar.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, ( float )Math.PI ), "Calendar", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/clock.obj" ),
+						context.getResources().getAssets().open( "raw/room0/clock.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2, ( float )Math.PI ), "Clock", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/door.obj" ),
+						context.getResources().getAssets().open( "raw/room0/door.mtl" ), 4.5f ) ), new SimpleVector( 0, 0, 0 ), "Door", BBWordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/book.obj" ),
+						context.getResources().getAssets().open( "raw/room0/book.mtl" ), 1.8f ) ), new SimpleVector( 0, 0, 0 ), "Book", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/paper.obj" ),
+						context.getResources().getAssets().open( "raw/room0/paper.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, ( float )Math.PI ), "Paper", BBWordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room0/window.obj" ),
+						context.getResources().getAssets().open( "raw/room0/window.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, 0 ), "Window", BBWordObject.FEMININE ) );
 			} catch ( IOException e ) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -409,23 +409,23 @@ public class Room extends World {
 				long startTime = System.currentTimeMillis();
 				
 				//Bill = 0
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/bill.obj" ),
-						context.getResources().getAssets().open( "raw/room1/bill.mtl" ), 1.0f ) ), new SimpleVector( -( float )Math.PI/2, 0, 0 ), "Bill", WordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/bill.obj" ),
+						context.getResources().getAssets().open( "raw/room1/bill.mtl" ), 1.0f ) ), new SimpleVector( -( float )Math.PI/2, 0, 0 ), "Bill", BBWordObject.FEMININE ) );
 				Log.d( "Room", "Loading object 'bill' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Bread = 1
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/bread.obj" ),
-						context.getResources().getAssets().open( "raw/room1/bread.mtl" ), 0.75f ) ), new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bread", WordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/bread.obj" ),
+						context.getResources().getAssets().open( "raw/room1/bread.mtl" ), 0.75f ) ), new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bread", BBWordObject.MASCULINE ) );
 				Log.d( "Room", "Loading object 'bread' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Cake = 2
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/cake.obj" ),
-						context.getResources().getAssets().open( "raw/room1/cake.mtl" ), 1.0f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Cake", WordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/cake.obj" ),
+						context.getResources().getAssets().open( "raw/room1/cake.mtl" ), 1.0f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Cake", BBWordObject.MASCULINE ) );
 				Log.d( "Room", "Loading object 'cake' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Cup = 3
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/cup.obj" ),
-						context.getResources().getAssets().open( "raw/room1/cup.mtl" ), 0.5f ) ), new SimpleVector( 0, 0, 0 ), "Cup", WordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/cup.obj" ),
+						context.getResources().getAssets().open( "raw/room1/cup.mtl" ), 0.5f ) ), new SimpleVector( 0, 0, 0 ), "Cup", BBWordObject.FEMININE ) );
 				/*Fork = 4
 				 * Deleted currently as file was HUGE
 				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/fork.obj" ),
@@ -434,28 +434,28 @@ public class Room extends World {
 				//Knife = 5
 				Log.d( "Room", "Loading object 'cup' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/knife.obj" ),
-						context.getResources().getAssets().open( "raw/room1/knife.mtl" ), 0.3f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Knife", WordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/knife.obj" ),
+						context.getResources().getAssets().open( "raw/room1/knife.mtl" ), 0.3f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Knife", BBWordObject.MASCULINE ) );
 				//Money = 6
 				Log.d( "Room", "Loading object 'knife' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/money.obj" ),
-						context.getResources().getAssets().open( "raw/room1/money.mtl" ), 1.0f ) ), new SimpleVector( -( float )Math.PI/2, 0, 0 ), "Money", WordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/money.obj" ),
+						context.getResources().getAssets().open( "raw/room1/money.mtl" ), 1.0f ) ), new SimpleVector( -( float )Math.PI/2, 0, 0 ), "Money", BBWordObject.MASCULINE ) );
 				//Plate = 7
 				Log.d( "Room", "Loading object 'money' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/plate.obj" ),
-						context.getResources().getAssets().open( "raw/room1/plate.mtl" ), 1.0f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Plate", WordObject.MASCULINE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/plate.obj" ),
+						context.getResources().getAssets().open( "raw/room1/plate.mtl" ), 1.0f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Plate", BBWordObject.MASCULINE ) );
 				//Spoon = 8
 				Log.d( "Room", "Loading object 'plate' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/spoon.obj" ),
-						context.getResources().getAssets().open( "raw/room1/spoon.mtl" ), 1.0f ) ), new SimpleVector( 0, -( float )Math.PI/2, ( float )Math.PI ), "Spoon", WordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/spoon.obj" ),
+						context.getResources().getAssets().open( "raw/room1/spoon.mtl" ), 1.0f ) ), new SimpleVector( 0, -( float )Math.PI/2, ( float )Math.PI ), "Spoon", BBWordObject.FEMININE ) );
 				//Table = 9
 				Log.d( "Room", "Loading object 'spoon' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				roomObjects.add( new WordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/table.obj" ),
-						context.getResources().getAssets().open( "raw/room1/table.mtl" ), 1.5f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Table", WordObject.FEMININE ) );
+				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( context.getResources().getAssets().open( "raw/room1/table.obj" ),
+						context.getResources().getAssets().open( "raw/room1/table.mtl" ), 1.5f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Table", BBWordObject.FEMININE ) );
 				Log.d( "Room", "Loading object 'table' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 			} catch ( IOException e ) {
 				// TODO Auto-generated catch block
@@ -511,52 +511,52 @@ public class Room extends World {
 				long startTime = System.currentTimeMillis();
 				
 				//Address = 0 ( la dirección )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/address.obj" ),
 						context.getResources().getAssets().open( "raw/room3/address.mtl" ), 20.0f ) ), 
-						new SimpleVector( 0, 0, 0 ), "Address", WordObject.FEMININE ) );
+						new SimpleVector( 0, 0, 0 ), "Address", BBWordObject.FEMININE ) );
 				Log.d( "Room", "Loading object 'address' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Bus = 1 ( el autobús )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/bus.obj" ),
 						context.getResources().getAssets().open( "raw/room3/bus.mtl" ), 1.3f ) ), 
-						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bus", WordObject.MASCULINE ) );
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bus", BBWordObject.MASCULINE ) );
 				Log.d( "Room", "Loading object 'bus' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Car = 2 ( el coche )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/car.obj" ),
 						context.getResources().getAssets().open( "raw/room3/car.mtl" ), 3.5f ) ), 
-						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Car", WordObject.MASCULINE ) );
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Car", BBWordObject.MASCULINE ) );
 				Log.d( "Room", "Loading object 'car' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//Map = 3 ( el mapa )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/map.obj" ),
 						context.getResources().getAssets().open( "raw/room3/map.mtl" ), 1.0f ) ), 
-						new SimpleVector( (float )Math.PI/2, 0, 0 ), "Map", WordObject.MASCULINE ) );
+						new SimpleVector( (float )Math.PI/2, 0, 0 ), "Map", BBWordObject.MASCULINE ) );
 				Log.d( "Room", "Loading object 'map' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//sign = 4 ( la señal )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/street_sign.obj" ),
 						context.getResources().getAssets().open( "raw/room3/street_sign.mtl" ), 0.5f ) ), 
-						new SimpleVector( (float )Math.PI, 0, 0 ), "StreetSign", WordObject.FEMININE ) );
+						new SimpleVector( (float )Math.PI, 0, 0 ), "StreetSign", BBWordObject.FEMININE ) );
 				Log.d( "Room", "Loading object 'sign' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//taxi = 5 ( la taxi )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/taxi.obj" ),
 						context.getResources().getAssets().open( "raw/room3/taxi.mtl" ), 2.5f ) ), 
-						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Taxi", WordObject.FEMININE ) );
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Taxi", BBWordObject.FEMININE ) );
 				Log.d( "Room", "Loading object 'taxi' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				//traffic light = 6 ( el semáforo )
-				roomObjects.add( new WordObject( Object3D.mergeAll(
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( context.getResources().getAssets().open( "raw/room3/traffic_light.obj" ),
 						context.getResources().getAssets().open( "raw/room3/traffic_light.mtl" ), 0.35f ) ), 
-						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Traffic_Light", WordObject.MASCULINE ) );
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Traffic_Light", BBWordObject.MASCULINE ) );
 
 			} catch ( IOException e ) {
 				// TODO Auto-generated catch block
@@ -598,7 +598,7 @@ public class Room extends World {
 	 * @param wordObject
 	 * @param name
 	 */
-	private void addWordObject( float x, float y, float z, WordObject wordObject, String name ) {
+	private void addWordObject( float x, float y, float z, BBWordObject wordObject, String name ) {
 		addWordObject( x, y, z, wordObject, name, new SimpleVector( 0, 0, 0 ) );
 	}
 	
@@ -610,11 +610,11 @@ public class Room extends World {
 	 * @param name
 	 * @param rotateBy
 	 */
-	private void addWordObject( float x, float y, float z, WordObject wordObject, String name, SimpleVector rotateBy ) {
+	private void addWordObject( float x, float y, float z, BBWordObject wordObject, String name, SimpleVector rotateBy ) {
 		//Creates a new WordObject from the generic roomObject
 		//and adds it to the Room and wordObjects ArrayList
 		Log.i( "olsontl", "Adding object " + name );
-		WordObject object = new WordObject( wordObject );
+		BBWordObject object = new BBWordObject( wordObject );
 		object.setCenter( SimpleVector.ORIGIN );
 		object.setOrigin( new SimpleVector( x, y, z ) );
 		object.setName( name );
@@ -624,14 +624,14 @@ public class Room extends World {
 		object.calcTangentVectors();
 		object.setShader( shader );
 		object.setSpecularLighting( true );
-		if ( tm.containsTexture( name ) && ( name != Translator.translateToLanguage( name, Translator.SPANISH ) ) ) {
+		if ( tm.containsTexture( name ) && ( name != BBTranslator.translateToLanguage( name, BBTranslator.SPANISH ) ) ) {
 			object.setTexture( name );
 		}
 		if ( !roomObjectWords.contains( name ) ) {
 			roomObjectWords.add( name );
 		}
 		object.build();
-		if ( object.getArticle() == WordObject.FEMININE )
+		if ( object.getArticle() == BBWordObject.FEMININE )
 			object.setAdditionalColor( 200, 0, 0 );
 		else
 			object.setAdditionalColor( 0, 0, 200 );
@@ -653,12 +653,12 @@ public class Room extends World {
 		shape.calculateLocalInertia( mass, localInertia );
 		int article = 0;
 		if ( bubbleColor == bubbleRed ) {
-			article = WordObject.FEMININE;
+			article = BBWordObject.FEMININE;
 		}
 		else if ( bubbleColor == bubbleBlue ) {
-			article = WordObject.MASCULINE;
+			article = BBWordObject.MASCULINE;
 		}
-		Bubble bubble = new Bubble( position, article, System.currentTimeMillis() );
+		BBBubble bubble = new BBBubble( position, article, System.currentTimeMillis() );
 		bubble.setAdditionalColor( bubbleColor );
 		bubble.setTexture( "Default" );
 		bubble.calcTextureWrapSpherical();
@@ -684,9 +684,9 @@ public class Room extends World {
 	 * @param state
 	 */
 	public void setBubbleColor( int state ) {
-		if ( state == Bubble.MASCULINE ) {
+		if ( state == BBBubble.MASCULINE ) {
 			bubbleColor = bubbleBlue;
-		} else if ( state == Bubble.FEMININE ) {
+		} else if ( state == BBBubble.FEMININE ) {
 			bubbleColor = bubbleRed;
 		}
 	}
@@ -695,14 +695,14 @@ public class Room extends World {
 	 * @param index
 	 * @return
 	 */
-	public Bubble getBubble( int index ) {
+	public BBBubble getBubble( int index ) {
 		return bubbleObjects.get( index );
 	}
 	
 	/**
 	 * @return
 	 */
-	public ArrayList<Bubble> getBubbleObjects() {
+	public ArrayList<BBBubble> getBubbleObjects() {
 		return bubbleObjects;
 	}
 	
@@ -756,7 +756,7 @@ public class Room extends World {
 	 * @param wordObject
 	 * @return
 	 */
-	public int addObject( WordObject wordObject ) {
+	public int addObject( BBWordObject wordObject ) {
 		//Extra function for adding an object to the Room class that also adds
 		//information for the WordObject in the wordObjects ArrayList
 		int objectId = super.addObject( (Object3D ) wordObject );
@@ -769,7 +769,7 @@ public class Room extends World {
 	 * @param bubble
 	 * @return
 	 */
-	public int addObject( Bubble bubble ) {
+	public int addObject( BBBubble bubble ) {
 		//Extra function for adding a bubble to the Room
 		int objectId = super.addObject( (Object3D ) bubble );
 		Log.i( "olsontl", "Bubble id when created: " + objectId );
@@ -781,8 +781,8 @@ public class Room extends World {
 	 * @param id
 	 * @return
 	 */
-	public WordObject getWordObject( int id ) {
-		for ( WordObject wordObject : wordObjects ) {
+	public BBWordObject getWordObject( int id ) {
+		for ( BBWordObject wordObject : wordObjects ) {
 			if ( wordObject.getObjectId() == id )
 				return wordObject;
 		}
@@ -799,7 +799,7 @@ public class Room extends World {
 	/**
 	 * @return
 	 */
-	public ArrayList<WordObject> getWordObjects() {
+	public ArrayList<BBWordObject> getWordObjects() {
 		return wordObjects;
 	}
 	
@@ -808,7 +808,7 @@ public class Room extends World {
 	 * @return
 	 */
 	public boolean isBubbleType( int id ) {
-		for ( Bubble bubble : bubbleObjects ) {
+		for ( BBBubble bubble : bubbleObjects ) {
 			if ( bubble.getObjectId() == id ) {
 				return true;
 			}
@@ -819,7 +819,7 @@ public class Room extends World {
 	/**
 	 * @return
 	 */
-	public Bubble getLastBubble() {
+	public BBBubble getLastBubble() {
 		return bubbleObjects.get( bubbleObjects.size()-1 );
 	}
 	

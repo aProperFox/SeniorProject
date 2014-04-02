@@ -6,7 +6,7 @@ import com.threed.jpct.Mesh;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
-public class WordObject extends Object3D {
+public class BBWordObject extends Object3D {
 	/**
 	 * 
 	 */
@@ -24,11 +24,11 @@ public class WordObject extends Object3D {
 	/**
 	 * @param obj
 	 */
-	public WordObject( WordObject obj ) {
+	public BBWordObject( BBWordObject obj ) {
 		super( obj.toObject3D() );
 		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
-		names[Translator.ENGLISH] = obj.getName( Translator.ENGLISH );
+		names[BBTranslator.ENGLISH] = obj.getName( BBTranslator.ENGLISH );
 		this.article = obj.getArticle();
 	}
 	
@@ -38,10 +38,10 @@ public class WordObject extends Object3D {
 	 * @param name
 	 * @param article
 	 */
-	public WordObject( Object3D obj, SimpleVector rotationAxis, String name, int article ) {
+	public BBWordObject( Object3D obj, SimpleVector rotationAxis, String name, int article ) {
 		super( obj );
 		isStatic = true;
-		names[Translator.ENGLISH] = name;
+		names[BBTranslator.ENGLISH] = name;
 		this.article = article;
 		rotateBy( rotationAxis );
 		setMaxDimension();
@@ -137,8 +137,8 @@ public class WordObject extends Object3D {
 		 * TODO: setting for language
 		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
 		 */
-		names[Translator.ENGLISH] = name;
-		names[Translator.SPANISH] = Translator.translateToLanguage( name, Translator.SPANISH );
+		names[BBTranslator.ENGLISH] = name;
+		names[BBTranslator.SPANISH] = BBTranslator.translateToLanguage( name, BBTranslator.SPANISH );
 	}
 	
 	/**
@@ -160,7 +160,7 @@ public class WordObject extends Object3D {
 	/**
 	 * @param room
 	 */
-	public void removeObject( Room room ) {
+	public void removeObject( BBRoom room ) {
 		room.removeObject( objectId );
 	}
 	

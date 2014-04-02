@@ -4,7 +4,7 @@ import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.SimpleVector;
 
-public class Bubble extends WordObject {
+public class BBBubble extends BBWordObject {
 
 	
 	/**
@@ -24,7 +24,7 @@ public class Bubble extends WordObject {
 	 * @param article
 	 * @param timeInMillis
 	 */
-	public Bubble( SimpleVector translation, int article, long timeInMillis ) {
+	public BBBubble( SimpleVector translation, int article, long timeInMillis ) {
 		super( Primitives.getSphere( 5.0f ), new SimpleVector( 0, 0, 0 ), "Bubble", article );
 		
 		timeCreated = timeInMillis;

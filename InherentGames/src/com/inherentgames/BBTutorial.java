@@ -1,6 +1,5 @@
 package com.inherentgames;
 
-import java.lang.reflect.Field;
 import java.util.Properties;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -14,7 +13,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -23,15 +21,14 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 import com.bulletphysics.dynamics.RigidBody;
 import com.threed.jpct.Camera;
@@ -39,11 +36,12 @@ import com.threed.jpct.Interact2D;
 import com.threed.jpct.Logger;
 import com.threed.jpct.SimpleVector;
 
-
-public class GameScreen extends Activity {
-	private static GameScreen master = null;
-	private Context context;
+@SuppressLint( "NewApi" )
+public class BBTutorial extends Activity {
     
+	private BBAssetsPropertyReader assetsPropertyReader;
+	private Properties config;
+	
 	private GLSurfaceView mGLView;
 	private BBRenderer renderer = null;
 	
@@ -54,13 +52,18 @@ public class GameScreen extends Activity {
 	
 	private boolean isShootMode = true;
 	private boolean isViewMode = false;
+	private int moveProperties = 5;
+	
+	private long lastPressedWattson;
 	
 	private int width;
 	private int height;
-	private Toast load;
 	
 	private Drawable icon;
 	
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onCreate( android.os.Bundle )
+	 */
 	// Stops Eclipse from complaining about new API calls
 	@SuppressWarnings( "deprecation" )
 	@SuppressLint( { "InlinedApi", "NewApi" } )
@@ -71,13 +74,19 @@ public class GameScreen extends Activity {
 		
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
-		
-		context = this;
          
 		mGLView = new GLSurfaceView( getApplication() );
 		
+		// Enable Immersive mode (hides status and nav bar)
+		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
+			BB.setImmersiveMode( findViewById( Window.ID_ANDROID_CONTENT ), getWindow().getDecorView() );
+		}
+		
 		width = BB.getWidth();
 		height = BB.getHeight();
+		
+		assetsPropertyReader = new BBAssetsPropertyReader();
+		config = assetsPropertyReader.getProperties( "config.properties" );
 		
 		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 			
@@ -93,16 +102,11 @@ public class GameScreen extends Activity {
 			}
 		} );
 		
-		SharedPreferences settings = getSharedPreferences( MenuScreen.PREFERENCES, 0 );
-		int levelNum = settings.getInt( "loadLevel", 1 );
-		Log.i( "GameScreen", "Current level is: " + levelNum );
-		load = Toast.makeText( context, R.string.load_level, Toast.LENGTH_LONG );
-        load.show();
-        
-		renderer = new BBRenderer( width, height, levelNum );
+		renderer = new BBRenderer( width, height, 0 );
 		mGLView.setRenderer( renderer );
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );
+		
 		
 		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
 		Bitmap bb=( (BitmapDrawable ) icon ).getBitmap();
@@ -151,54 +155,72 @@ public class GameScreen extends Activity {
 	*/
 	
 	
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onCreateOptionsMenu( android.view.Menu )
+	 */
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		if ( MenuScreen.isDevMode ) {
-		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate( R.menu.menu, menu );
-		}
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate( R.menu.menu, menu );
 	    return true;
 	}
 	
-	
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onPause()
+	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
 		mGLView.onPause();
 	}
 	
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onResume()
+	 */
 	@Override
 	protected void onResume() {
-		renderer.setRoomNum( getSharedPreferences( MenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 ) );
-		load.show();
 		super.onResume();
-		//renderer.setTextures();
 		mGLView.onResume();
-		// Enable Immersive mode (hides status and nav bar)
-		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-			BB.setImmersiveMode( mGLView, getWindow().getDecorView() );
-		}
 	}
 
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onStop()
+	 */
 	@Override
 	protected void onStop() {
 		super.onStop();
 	}
 	
+	/* ( non-Javadoc )
+	 * @see android.app.Activity#onTouchEvent( android.view.MotionEvent )
+	 */
 	public boolean onTouchEvent( MotionEvent me ) {
-		switch( me.getAction() & MotionEvent.ACTION_MASK ) {
+		if ( me.getAction() == MotionEvent.ACTION_DOWN && moveProperties > 0 ) {
+			xpos = me.getX();
+			ypos = me.getY();
+			if ( xpos < width/5 && xpos > 0 && ypos > 0 && ypos < width/5 ) {
+				if ( lastPressedWattson < System.currentTimeMillis() - 1500 ) {
+					moveProperties = renderer.iterateWattson();
+					lastPressedWattson = System.currentTimeMillis();
+					isViewMode = false;
+					isShootMode = false;
+				}
+				return true;
+			}
+		}
+		if ( moveProperties <= 2 ) {
+			switch( me.getAction() & MotionEvent.ACTION_MASK ) {
 	    	
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX( 0 );
 				ypos = me.getY( 0 );
-				//Fire button
-				if ( xpos < ( 3 * width/16 ) && xpos > width/16 && ypos > ( height - ( 3 * width/16 ) ) && ypos < height - width/16 ) {
+				if ( xpos < ( 3 * width/16 ) && xpos > width/16 && ypos > ( height - ( 3 * width/16 ) ) && ypos < height - width/16 && ( moveProperties == 2 || moveProperties <= 0 ) ) {
 					isViewMode = false;
 					isShootMode = true;
 					renderer.setFireButtonState( true );
 				}
-				//Pause button
-				else if ( xpos < width && xpos > width-( width/10 ) && ypos > 0 && ypos < width/10 ) {
+				
+				else if ( xpos < width && xpos > width-( width/10 ) && ypos > 0 && ypos < width/10 && moveProperties == 0 ) {
 					isViewMode = false;
 					isShootMode = false;
 					renderer.setPauseButtonState();
@@ -243,7 +265,6 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_UP:
-    			Log.d( "GameScreen", "Action Up" );
 				xpos = -1;
 				ypos = -1;
 				renderer.horizontalSwipe = 0;
@@ -254,6 +275,15 @@ public class GameScreen extends Activity {
 				return true;
 			
     		case MotionEvent.ACTION_POINTER_UP:
+    			/*
+    			 * May work to get exact screen size in inches
+    			 * 
+    			DisplayMetrics dm = new DisplayMetrics();
+    		    getWindowManager().getDefaultDisplay().getMetrics( dm );
+    		    double x = Math.pow( dm.widthPixels/dm.xdpi, 2 );
+    		    double y = Math.pow( dm.heightPixels/dm.ydpi, 2 );
+    		    double screenInches = Math.sqrt( x+y );
+    			*/
     			Log.d( "GameScreen", "Action Pointer Up" );
 				xpos = -1;
 				ypos = -1;
@@ -262,10 +292,22 @@ public class GameScreen extends Activity {
 				float xd = me.getX( 1 ) - firstX;
 				float yd = me.getY( 1 ) - firstY;
 				if ( yd < ( -height/5 ) && Math.abs( xd ) < width/6 ) {
-					renderer.loadBubble( WordObject.MASCULINE );
+					if ( moveProperties != -2 ) {
+						renderer.loadBubble( BBWordObject.MASCULINE );
+						moveProperties = renderer.iterateWattson();
+						Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
+					}
+					else
+						return false;
 				}
 				else if ( yd > ( height/5 ) && Math.abs( xd ) < width/6 ) {
-					renderer.loadBubble( WordObject.FEMININE );
+					if ( moveProperties != -1 ) {
+						renderer.loadBubble( BBWordObject.FEMININE );
+						moveProperties = renderer.iterateWattson();
+						Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
+					}
+					else
+						return false;
 				}
 				else {
 					return true;
@@ -274,6 +316,7 @@ public class GameScreen extends Activity {
 				SimpleVector dir = Interact2D.reproject2D3DWS( cam, renderer.getFrameBuffer(), width/2, height/2 );
 				dir.scalarMul( -70 );
 				RigidBody body = renderer.shoot( cam.getPosition() );
+				Log.d( "Tutorial", "Bubble Shot!" );
 				if ( body != null ) {
 					Vector3f force = new Vector3f( -dir.x*2, dir.y*2, dir.z*2 );
 					body.activate( true );
@@ -286,15 +329,19 @@ public class GameScreen extends Activity {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
-					renderer.horizontalSwipe = ( xd / -( width/5f ) );
-					renderer.verticalSwipe = ( yd / -( height/5f ) );
-    					
+    				Camera cam1 = renderer.getCam();
+    				SimpleVector dir1 = Interact2D.reproject2D3DWS( cam1, renderer.getFrameBuffer(), width/2, height/2 );
+    				if ( isViewMode && moveProperties == 0 ) {
+    					renderer.horizontalSwipe = ( xd / -( width/5f ) );
+    					renderer.verticalSwipe = ( yd / -( height/5f ) );
+    				}
     				xpos = me.getX();
     				ypos = me.getY();
     			}
 
 				return true;
 		
+		}
 		}
 		try {
 			Thread.sleep( 15 );
@@ -304,42 +351,13 @@ public class GameScreen extends Activity {
 		return super.onTouchEvent( me );
 	}
 	
-	@Override
-    public boolean onOptionsItemSelected( MenuItem item ) {
-		try {
-        switch ( item.getItemId() ) {
-        case R.id.inc_object_x:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 1, 0, 0 );
-        	break;
-        case R.id.inc_object_z:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, 1 );
-        	break;
-        case R.id.dec_object_x:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( -1, 0, 0 );
-        	break;
-        case R.id.dec_object_z:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, -1 );
-        	break;
-        case R.id.inc_object_y:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 1, 0 );
-        	break;
-        case R.id.dec_object_y:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, -1, 0 );
-        	return true;
-        case R.id.inc_obj:
-        	renderer.currentObjectId = renderer.objects.nextElement().getID();
-        	Log.d( "GameScreen", "New Object is: " + renderer.getWorld().getObject( renderer.currentObjectId ).getName() );
-        	return true;
-        }
-        Log.d( "GameScreen", "New object location: " + renderer.getWorld().getObject( renderer.currentObjectId ).getTranslation() );
-		}catch ( Exception e ) {
-			e.printStackTrace();
-		}
-        return super.onOptionsItemSelected( item );
-    }
 	
+	/**
+	 * @return
+	 */
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
 	
 }
+

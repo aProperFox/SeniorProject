@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 
-public class LoadingScreen extends Activity {
+public class BBLoadingScreen extends Activity {
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -19,11 +19,11 @@ public class LoadingScreen extends Activity {
             @Override
             public void run() {
                     //new activity
-                Intent i = new Intent( LoadingScreen.this, GameScreen.class );
+                Intent i = new Intent( BBLoadingScreen.this, BBGameScreen.class );
                 startActivity( i );
  
                 // activity closed
-                LoadingScreen.this.finish();
+                BBLoadingScreen.this.finish();
             }
         }, 3000 );
     }

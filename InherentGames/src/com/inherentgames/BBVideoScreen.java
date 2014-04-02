@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.VideoView;
 
-public class VideoScreen extends Activity {
+public class BBVideoScreen extends Activity {
 	VideoView videoView;
 	
 	private boolean shouldLoadMap = false;
@@ -26,7 +26,7 @@ public class VideoScreen extends Activity {
         setContentView( R.layout.video_screen );
         
         Intent intent = getIntent();
-        final String message = intent.getStringExtra( MenuScreen.EXTRA_MESSAGE );
+        final String message = intent.getStringExtra( BBMenuScreen.EXTRA_MESSAGE );
         
         videoView = ( VideoView )findViewById( R.id.VideoView );
         View root = videoView.getRootView();
@@ -55,13 +55,13 @@ public class VideoScreen extends Activity {
             public void onCompletion( MediaPlayer mp ) 
             {
             	if ( shouldLoadMap ) {
-            		Intent intent = new Intent( VideoScreen.this, MapScreen.class );
+            		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
             		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
                     startActivity( intent );
                     finish();
             	}
             	else {
-            		Intent intent = new Intent( VideoScreen.this, GameScreen.class );
+            		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
                     intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
                     startActivity( intent );
                     finish();
@@ -76,12 +76,12 @@ public class VideoScreen extends Activity {
 	public boolean onTouchEvent( MotionEvent me ) {
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
 			if ( shouldLoadMap ) {
-        		Intent intent = new Intent( VideoScreen.this, MapScreen.class );
+        		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
                 startActivity( intent );
                 finish();
         	}
         	else {
-        		Intent intent = new Intent( VideoScreen.this, GameScreen.class );
+        		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
                 intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
                 startActivity( intent );
                 finish();

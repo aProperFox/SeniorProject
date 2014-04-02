@@ -4,7 +4,7 @@ import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.Texture;
 
-public class Renderer2D {
+public class BBRenderer2D {
 	private FrameBuffer fb;
 	private BBTextureManager tm;
 
@@ -17,7 +17,7 @@ public class Renderer2D {
 	/**
 	 * @param fb
 	 */
-	public Renderer2D( FrameBuffer fb ) {
+	public BBRenderer2D( FrameBuffer fb ) {
 		tm = BBTextureManager.getInstance();
 		this.fb = fb;
 	}
