@@ -35,18 +35,13 @@ public class BBMenuScreen extends Activity {
 	private SoundPool soundPool;
 	private SparseIntArray soundPoolMap;
 	private int soundID = 1;
-
-	private Context context;
-	
-	private int easterEggCount;
-	private boolean canEasterEggPlay;
 	
 	private int buttonTextColor;
 	private Typeface typeface;
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	public static final String PREFERENCES = "BABBLE_PREF";
-	public static final boolean isDevMode = true;
+	public static final boolean isDevMode = false;
 	private Button playButton;
 	
 	
@@ -56,10 +51,6 @@ public class BBMenuScreen extends Activity {
         super.onCreate( savedInstanceState );
    
         Log.d( "MenuScreen", "onCreate called" );
-		
-		context = this;
-		easterEggCount = 0;
-		canEasterEggPlay = true;
 		
 		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 		requestWindowFeature( Window.FEATURE_NO_TITLE );
@@ -154,26 +145,6 @@ public class BBMenuScreen extends Activity {
             
             
     }
-	
-	public boolean onTouchEvent( MotionEvent me ) {
-		float xpos = me.getX();
-		float ypos = me.getY();
-		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
-			if ( xpos > BB.width*.264 && xpos < BB.width*.443 && ypos> BB.height*.075 && ypos < BB.height*.313 ) {
-				easterEggCount++;
-			}
-		}
-		if ( easterEggCount >= 3 && canEasterEggPlay == true ) {
-			mp.stop();
-			mp.release();
-			mp = MediaPlayer.create( context, R.raw.fly_haircut );
-            mp.start();
-            canEasterEggPlay = false;
-            Toast toast = Toast.makeText( context, R.string.easter_egg, Toast.LENGTH_LONG );
-            toast.show();
-		}
-		return true;
-	}
 	
 	@Override
 	public void onPause() {

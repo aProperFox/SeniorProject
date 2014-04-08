@@ -12,7 +12,6 @@ import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.inherentgames.BBWordObject.Gender;
-import com.threed.jpct.GLSLShader;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
@@ -31,6 +30,14 @@ public class BBRoom extends World {
 	private BBTextureManager tm;
 	protected SkyBox skybox;
 	
+	public static enum Level { TUTORIAL, CLASSROOM, DINER, STREET; 
+		public Level getNext() {
+	     return this.ordinal() < Level.values().length - 1
+	         ? Level.values()[this.ordinal() + 1]
+	         : null;
+	   }	
+	};
+	
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
 	protected BBWall wall;
 	protected BBFloor floor;
@@ -40,7 +47,7 @@ public class BBRoom extends World {
 	private ArrayList<BBBubble> bubbleObjects;
 	private ArrayList<BBWordObject> wordObjects;
 	private ArrayList<BBWordObject> roomObjects;
-	private ArrayList<String> roomObjectWords;
+	protected ArrayList<String> roomObjectWords;
 	
 	private float height, width, length;
 	
@@ -57,7 +64,7 @@ public class BBRoom extends World {
 	 * @param context
 	 * @param tm
 	 */
-	public BBRoom( int roomId ) {
+	public BBRoom( Level roomId ) {
 		
 		tm = BBTextureManager.getInstance();
 		
@@ -89,11 +96,13 @@ public class BBRoom extends World {
 	 * @param roomNum
 	 * @return
 	 */
-	public SimpleVector getLightLocation( int roomNum ) {
+	public SimpleVector getLightLocation( Level roomNum ) {
 		//Get light location vector based on Room Id
 		switch( roomNum ) {
-		case 0:
+		case TUTORIAL:
 			return new SimpleVector( 0, -20, 0 );
+		case STREET:
+			return new SimpleVector( 0, -195, 0 );
 		}
 		//default light location
 		return new SimpleVector( 0, -20, 0 );
@@ -133,16 +142,12 @@ public class BBRoom extends World {
 	/**
 	 * @param room
 	 */
-	public void setSurfaces( int room ) {
-		//If room id is not defined in getWallNumByRoom, returns an error
-		if ( getWallNumByRoomId( room ) == -1 ) {
-			Log.i( "Room", "Invalid room number" );
-		}
+	public void setSurfaces( Level room ) {
 		BBWall wall;
 		//set walls by room number
 		switch( room ) {
 
-		case 0:
+		case TUTORIAL:
 			
 			//First wall
 			wall = new BBWall( new SimpleVector( 0, 0, 75 ), 80, 50, "TutorialWall" );
@@ -178,7 +183,7 @@ public class BBRoom extends World {
 			
 			break;
 			
-		case 1:		
+		case CLASSROOM:		
 
 			height = 60;
 			length = 180;
@@ -217,7 +222,7 @@ public class BBRoom extends World {
 			
 			break;
 			
-		case 2:
+		case DINER:
 			
 			//First wall
 			wall = new BBWall( new SimpleVector( 0, 0, 75 ), 130, 50, "Room1Wall0" );
@@ -252,7 +257,7 @@ public class BBRoom extends World {
 			
 			break;
 			
-		case 3:
+		case STREET:
 			
 			try {
 				Bitmap bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.skybox_left ) ), 1024, 1024 );
@@ -274,6 +279,19 @@ public class BBRoom extends World {
 				tm.addTexture( "SkyboxBottom", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room3wall0 ) ), 512, 512 );
+				tm.addTexture( "Room3Wall0", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room3wall1 ) ), 512, 512 );
+				tm.addTexture( "Room3Wall1", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room3wall2 ) ), 512, 512 );
+				tm.addTexture( "Room3Wall2", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room3wall3 ) ), 512, 512 );
+				tm.addTexture( "Room3Wall3", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.street ) ), 512, 512 );
 				tm.addTexture( "Street", new Texture( bitmap, true ) );
 				bitmap.recycle();
@@ -283,7 +301,28 @@ public class BBRoom extends World {
 			}
 			
 			skybox = new SkyBox( "SkyboxLeft", "SkyboxFront", "SkyboxRight", "SkyboxBack", "SkyboxTop", "SkyboxBottom", 200f );
-			floor = new BBFloor( new SimpleVector( 200, 10, 200 ), 0 );
+			//First wall
+			wall = new BBWall( new SimpleVector( 0, -15, 95 ), 190, 50, "Room3Wall0" );
+			walls.add( wall.getWall() );
+			walls.get( 0 ).setTexture( "Room3Wall0" );
+			bodies.add( wall.getBody() );
+			//Second wall
+			wall = new BBWall( new SimpleVector( 95, -15, 0 ), 190, 50, "Room3Wall1" );
+			walls.add( wall.getWall() );
+			walls.get( 1 ).setTexture( "Room3Wall1" );
+			bodies.add( wall.getBody() );
+			//Third wall
+			wall = new BBWall( new SimpleVector( 0, -15, -95 ), 190, 50, "Room3Wall2" );
+			walls.add( wall.getWall() );
+			walls.get( 2 ).setTexture( "Room3Wall2" );
+			bodies.add( wall.getBody() );
+			//Fourth wall
+			wall = new BBWall( new SimpleVector( -95, -15, 0 ), 190, 50, "Room3Wall3" );
+			walls.add( wall.getWall() );
+			walls.get( 3 ).setTexture( "Room3Wall3" );
+			bodies.add( wall.getBody() );
+			 
+			floor = new BBFloor( new SimpleVector( 190, 10, 190 ), 0 );
 			floor.setTexture( "Street" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
@@ -296,7 +335,7 @@ public class BBRoom extends World {
 	/**
 	 * @param roomId
 	 */
-	public void setObjects( int roomId ) {
+	public void setObjects( Level roomId ) {
 		/*
 		 * TODO: add color to WordObjects when camera is aimed at them
 		Object3D box = Primitives.getBox( 5.0f,  1.0f );
@@ -305,7 +344,7 @@ public class BBRoom extends World {
 		*/
 		roomObjectWords = new ArrayList<String>();
 		switch ( roomId ) {
-		case 0:
+		case TUTORIAL:
 			
 			try {
 				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room0/desk.obj" ),
@@ -318,12 +357,13 @@ public class BBRoom extends World {
 				
 			}
 			
-			addWordObject( -25, -6, 60, roomObjects.get( 0 ), "Desk" );
+			addWordObject( -27, -6, 60, roomObjects.get( 0 ), "Desk" );
+			addWordObject( 0, -6, 60, roomObjects.get( 0 ), "Desk" );
 			addWordObject( 25, 2, 60, roomObjects.get( 1 ), "Chair" );
 			
 			break;
 			
-		case 1:
+		case CLASSROOM:
 			
 			try {
 				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room0/desk.obj" ),
@@ -391,7 +431,7 @@ public class BBRoom extends World {
 			
 			break;
 			
-		case 2:
+		case DINER:
 			
 			try {
 				long startTime = System.currentTimeMillis();
@@ -493,7 +533,7 @@ public class BBRoom extends World {
 
 			break;
 			
-		case 3: 
+		case STREET: 
 			
 			try {
 				long startTime = System.currentTimeMillis();
@@ -807,22 +847,6 @@ public class BBRoom extends World {
 	public SimpleVector toSimpleVector( Vector3f vector ) {
 		//Converts a Vector3f to a SimpleVector
 		return new SimpleVector( vector.x, vector.y, vector.z );
-	}
-	
-	/**
-	 * @param room
-	 * @return
-	 */
-	public int getWallNumByRoomId( int room ) {
-		//Returns the number of walls defined per room ( Currently only
-		//implementable with 4 )
-		int num = -1;
-		switch( room ) {
-		default:
-			num = 4;
-		}
-		
-		return num;
 	}
 	
 	/**

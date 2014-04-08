@@ -23,6 +23,7 @@ import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.Clock;
+import com.inherentgames.BBRoom.Level;
 import com.inherentgames.BBWordObject.Gender;
 import com.threed.jpct.Camera;
 import com.threed.jpct.Interact2D;
@@ -52,7 +53,6 @@ public class BBGame {
 	protected BBRoom world;
 	protected Camera cam;
 	private Light sun1;
-	private Light sun2;
 	private SimpleVector V;
 	
 	// Sound
@@ -71,7 +71,7 @@ public class BBGame {
 	/* Internal parameters */
 	
 	// Track the current room number
-	private int level = 1;
+	private Level level = Level.CLASSROOM;
 	
 	// Track whether the current level is the tutorial
 	protected boolean isTutorial;
@@ -95,7 +95,7 @@ public class BBGame {
 	protected int captured = 0;
 	
 	// Track the amount of time left in the game
-	private long timeLeft;
+	protected long timeLeft;
 	
 	// Track time the game will end
 	protected long endTime;
@@ -115,28 +115,21 @@ public class BBGame {
 	// TODO: Move to BBTutorial for now, but ideally to a language file
 	// Tutorial text
 	protected String wattsonPhrases[][] = {
-			{"Hi, Hopscotch! I'm your translator, Wattson.", "I'm here to show you how to travel through time.", "Click me to begin!"},
-			{"This is your Chronopsyonic Quantum Destabilizer.", "It shoots bubbles that capture objects in a quantum field", "to propel you back in time."},
-			{"While holding down the fire button, you enable", "the destabilizer's charge sequence, allowing it to fire.", "Try holding the button!"},
-			{"It's an incredible piece of technology!", "But it's uh... not exactly umm...",  ""},
-			{".....legal.", "", ""},
-			{"But not to worry! I'm sure you'll be fine", "so long as the cops don't see you use it.", ""},
-			{"Holding the fire button and swiping up shoots", "a blue bubble. Try it now!", ""},
-			{"Good show! Now try firing a red bubble by", "holding the fire button and swiping down", ""},
-			{"Excellent! Now shoot a bubble at the desk to capture it", "but be careful! If you shoot the wrong bubble you risk", "getting teleported back to the future at 88 mph!"},
-			{"You got it! Just two more pieces of advice", "till you're off to save the world!", ""},
-			{"This is your fuel gauge. It fills up with every", "object you capture. Once it's full, you can time travel!", ""},
-			{"The Chronospyonic Quantum Destabilizer can only", "keep you in quantum stasis for a limited time so be quick!", ""},
-			{"The further you travel back in time, the harder", "it will be for the CQD to hold you in stasis.", "In the present there is no time limit."},
-			{"You're the only one who can retrieve all the universal", "translators that are being sent to the past.", ""},
-			{"Help us Hopscotch Krono, you're language's", "only hope.", ""}
+		{"Hi, Hopscotch! I'm your translator, Wattson.", "I'm here to show you how to travel through time.", "Tap me to begin!"},
+		{ "Slide your finger to look around", "", ""},
+		//log time, then aim at object and disable movement
+		{"Nice Job!", "Capture the object in a bubble shot by your", "Chronopsyonic Quantum Destabilizer."},
+		{"Very Good!", "If the bubble color doesn't match the object", "color, you will lose precious time!"},
+		//Have another blue object and shoot a red bubble at it
+		{"You're on a time limit, so don't let", "the clock run out!", ""},
+		{"Excellent!","Capture one of each object in a room to travel", "through time!" }
 	};
 	
 	// Variables used to track current tutorial messages being displayed
 	protected ArrayList<String> wattsonText = new ArrayList<String>();
 	protected int wattsonTextIterator;
 	protected boolean hasCompletedSteps = false;
-	protected int[] screenItems = {0, 5, 4, 4, 3, 5, -3, -2, -1, 5, 5, 5, 2, 2, 5};
+	protected int wattsonPrivileges = 1;
 	
 	public BBGame() {
 		// Initialize texture manager
@@ -148,7 +141,7 @@ public class BBGame {
 		tm.addTexture( "gui_font", text );
 		
 		// Load loading texture
-		tm.addTexture( "loading_splash", new Texture( BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.cover1 ) ), 1024, 1024 ), true ) );
+		tm.addTexture( "loading_splash", new Texture( BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.loading ) ), 1024, 1024 ), true ) );
 		
 		// Initialize resource loading runnable
 		loader = new Runnable() {
@@ -192,7 +185,7 @@ public class BBGame {
 	// Sets up the tutorial
 	private void prepareTutorial() {
 		// Is tutorial?
-		if ( level == 0 ) {
+		if ( level == Level.TUTORIAL ) {
 			isTutorial = true;
 			wattsonText.add( wattsonPhrases[0][0] );
 			wattsonText.add( wattsonPhrases[0][1] );
@@ -265,8 +258,8 @@ public class BBGame {
 				tm.addTexture( "ArrowRight", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_left ) ), 64, 32 );
-				tm.addTexture( "ArrowLeft", new Texture( bitmap, true ) );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_down ) ), 32, 64 );
+				tm.addTexture( "ArrowDown", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.filter ) ), 64, 64 );
@@ -291,7 +284,7 @@ public class BBGame {
 		try {
 			long startTime = System.currentTimeMillis();
 			switch( level ) {
-				case 0:
+				case TUTORIAL:
 					
 					// Can probably delete if, since tutorial now mandatory
 					if ( !tm.containsTexture( "Escritorio" ) ) {
@@ -317,7 +310,7 @@ public class BBGame {
 					Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 					
 					break;
-				case 1:
+				case CLASSROOM:
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.chalkboard ) ), 256, 256 );
 					tm.addTexture( "Chalkboard", new Texture( bitmap, true ) );
 					bitmap.recycle();
@@ -391,7 +384,7 @@ public class BBGame {
 					Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 					
 					break;
-				case 2:
+				case DINER:
 					
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.money1 ) ), 512, 256 );
 					tm.addTexture( "Money", new Texture( bitmap, true ) );
@@ -455,7 +448,7 @@ public class BBGame {
 					Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 					break;
 					
-				case 3:
+				case STREET:
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.map ) ), 256, 512 );
 					tm.addTexture( "Map", new Texture( bitmap, true ) );
 					bitmap.recycle();
@@ -528,11 +521,8 @@ public class BBGame {
 		
 		// Set up lighting
 		sun1 = new Light( world );
-		sun1.setPosition( new SimpleVector( 0, -20, world.getLength()/2 ) );
+		sun1.setPosition( new SimpleVector(world.getLightLocation(level)) );
 		sun1.setIntensity( 250, 250, 250 );
-		sun2 = new Light( world );
-		sun2.setPosition( new SimpleVector( 0, -20, -world.getLength()/2 ) );
-		sun2.setIntensity( 250, 250, 250 );
 		
 		// Set up the camera for the scene
 		cam = world.getCamera();
@@ -608,6 +598,18 @@ public class BBGame {
 			physicsWorld.stepSimulation( ms / 1000000.0f );
 		} catch ( NullPointerException e ) {
 			Log.e( "BBRenderer", "jBulletPhysics threw a NullPointerException." );
+		}
+		
+		// Update time bar
+		if ( !isTutorial && !BBMenuScreen.isDevMode) {
+			if ( !isPaused ) {
+				if ( endTime - System.currentTimeMillis() > 0 ) {
+					timeLeft = (endTime - System.currentTimeMillis() )/1000;
+					Log.d("BBGame", "timeLeft = " + timeLeft);
+				} else {
+					levelLose();
+				}
+			}
 		}
 		
 		// TODO: Check the efficiency of this
@@ -715,28 +717,24 @@ public class BBGame {
 	public int iterateWattson() {
 		wattsonText.clear();
 		if ( !hasCompletedSteps ) {
-			wattsonTextIterator ++;
-			if ( wattsonTextIterator > screenItems.length -1 ) {
-				wattsonTextIterator = 0;
-			}
+			wattsonTextIterator++;
 			wattsonText.add( wattsonPhrases[wattsonTextIterator][0] );
 			wattsonText.add( wattsonPhrases[wattsonTextIterator][1] );
 			wattsonText.add( wattsonPhrases[wattsonTextIterator][2] );
 			
-			int lastItem = screenItems[screenItems.length - 1];
-			for ( int i = screenItems.length - 1; i > 0; i-- ) {
-				screenItems[i] = screenItems[i-1];
+			if(wattsonTextIterator < 4){
+				wattsonPrivileges = wattsonPrivileges << 1;
 			}
-			screenItems[0] = lastItem;
-			lastItem = screenItems[screenItems.length-1];
-			if ( lastItem == 0 )
+			else if(wattsonTextIterator == 4){
+				wattsonPrivileges = 1;
+			}
+			else{
+				wattsonPrivileges = 14;
 				hasCompletedSteps = true;
-			if ( lastItem == -3 )
-				lastItem = -1;
-			Log.d( "BBRenderer", "Iterating Wattson, and return value of: " + lastItem );
-			return lastItem;
+			}
+			Log.d( "BBRenderer", "Iterating Wattson, and return value of: " + wattsonPrivileges );
 		}
-		return 0;
+		return wattsonPrivileges;
 	}
 	
 	/**
@@ -843,10 +841,10 @@ public class BBGame {
 	public void setPauseButtonState() {
 		if ( pauseButtonState == "pauseButton" ) {
 			isPaused = true;
-			timeLeft = endTime - System.currentTimeMillis();
+			timeLeft = (endTime - System.currentTimeMillis())/1000;
 			pauseButtonState = "pauseButtonPressed";
 		} else {
-			endTime = System.currentTimeMillis() + timeLeft;
+			endTime = System.currentTimeMillis() + (timeLeft*1000);
 			isPaused = false;
 			pauseButtonState = "pauseButton";
 		}
@@ -857,9 +855,26 @@ public class BBGame {
 	 */
 	// Checks if the player has won the level
 	public boolean hasWonLevel() {
-		int captured = bubbleWords.size();
-		int total = world.getNumWordObjects();
+		int total = world.roomObjectWords.size();
 		
+		int tempCaptured = 0;
+		
+		for(String word : world.roomObjectWords){
+			if(bubbleWords.contains(word)){
+				tempCaptured++;
+			}
+		}
+		
+		captured = tempCaptured;
+		  		
+		if(isTutorial){
+			if(wattsonPrivileges == 8){
+				cam.lookAt(new SimpleVector(0,0.1,1));
+			}
+			else if(wattsonPrivileges == 14){
+				cam.lookAt(new SimpleVector(0,0,1));
+			}
+		}
 		if ( captured != total )
 			return false;
 		else
@@ -872,6 +887,7 @@ public class BBGame {
 	// TODO: Check to make sure there are no gross inefficiencies, also handle activity changes correctly
 	// Handles the player winning the level
 	public void levelWin() {
+		bubbleWords.clear(); 
 		SharedPreferences settings = BB.context.getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		bubbleTex = "bubbleBlue";
     	if ( isTutorial ) {
@@ -891,10 +907,10 @@ public class BBGame {
                 }
             } );
     	} else {
-    		level++;
+    		level = level.getNext();
     		  
-    		if ( settings.getInt( "nextLevel", 0 ) < level )
-    			settings.edit().putInt( "nextLevel", level ).commit();
+    		if ( settings.getInt( "nextLevel", 0 ) < level.ordinal() )
+    			settings.edit().putInt( "nextLevel", level.ordinal() ).commit();
     		
             world.dispose();
     		handler.post( new Runnable() {
@@ -904,7 +920,7 @@ public class BBGame {
 	        		Intent intent = new Intent( BB.context, BBGameScreen.class );
 	        	    intent.setClass( BB.context, BBVideoScreen.class );
 	        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-	        	    intent.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic" + ( level - 1 ) + "b" );
+	        	    intent.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic" + ( level.ordinal() - 1 ) + "b" );
 	        	    BB.context.startActivity( intent );
 	        	    loading = true;
 	            }
@@ -936,7 +952,7 @@ public class BBGame {
 	/**
 	 * @param num
 	 */
-	public void setLevel( int num ) {
+	public void setLevel( Level num ) {
 		level = num;
 	}
 }

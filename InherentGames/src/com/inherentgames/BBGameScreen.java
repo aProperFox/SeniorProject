@@ -3,6 +3,7 @@ package com.inherentgames;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.inherentgames.BBRoom.Level;
 import com.inherentgames.BBWordObject.Gender;
 
 
@@ -75,8 +77,6 @@ public class BBGameScreen extends Activity {
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		int levelNum = settings.getInt( "loadLevel", 1 );
 		Log.i( "GameScreen", "Current level is: " + levelNum );
-		loadingText = Toast.makeText( BB.context, R.string.load_level, Toast.LENGTH_LONG );
-        loadingText.show();
         
         // Initialize the game object
         game = BBGame.getInstance();
@@ -154,10 +154,7 @@ public class BBGameScreen extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		game.setLevel( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 ) );
-		if ( game.loading )
-			loadingText.show();
-		//renderer.setTextures();
+		game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
 		mGLView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {

@@ -13,6 +13,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -47,6 +48,7 @@ public class BBMapScreen extends Activity {
 				setContentView( R.layout.stage3 );
 				break;
 		}
+		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 	}
 	
 	@SuppressLint("InlinedApi")
