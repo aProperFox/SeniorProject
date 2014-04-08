@@ -9,11 +9,9 @@ import android.content.res.AssetManager;
 import android.util.Log;
 
 public class BBAssetsPropertyReader {
-       private Context context;
        private Properties properties;
 
        public BBAssetsPropertyReader() {
-              this.context = BB.getAppContext();
               /**
                * Constructs a new Properties object.
                */
@@ -28,7 +26,7 @@ public class BBAssetsPropertyReader {
                       * application's package. AssetManager Provides access to an
                       * application's raw asset files;
                       */
-                     AssetManager assetManager = context.getAssets();
+                     AssetManager assetManager = BB.context.getAssets();
                      /**
                       * Open an asset using ACCESS_STREAMING mode. This
                       */
@@ -39,7 +37,6 @@ public class BBAssetsPropertyReader {
                      properties.load( inputStream );
 
               } catch ( IOException e ) {
-                     // TODO Auto-generated catch block
                      Log.e( "AssetsPropertyReader", e.toString() );
               }
               return properties;

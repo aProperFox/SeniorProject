@@ -1,63 +1,46 @@
 package com.inherentgames;
 
-import java.lang.reflect.Field;
-import java.util.Properties;
-
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
-import javax.vecmath.Vector3f;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.bulletphysics.dynamics.RigidBody;
-import com.threed.jpct.Camera;
-import com.threed.jpct.Interact2D;
-import com.threed.jpct.Logger;
-import com.threed.jpct.SimpleVector;
+import com.inherentgames.BBWordObject.Gender;
 
 
 public class BBGameScreen extends Activity {
-	private static BBGameScreen master = null;
-	private Context context;
     
+	// Library objects
 	private GLSurfaceView mGLView;
-	private BBRenderer renderer = null;
+	protected BBGame game;
+	protected BBRenderer renderer = null;
 	
+	// Internal Parameters
 	private float xpos = -1;
 	private float ypos = -1;
 	private float firstX;
 	private float firstY;
-	
-	private boolean isShootMode = true;
-	private boolean isViewMode = false;
-	
-	private int width;
-	private int height;
-	private Toast load;
+	// TODO: Need to move this to the BBGame class
+	private boolean isShootMode = false;
+	private Toast loadingText;
 	
 	private Drawable icon;
 	
@@ -65,20 +48,15 @@ public class BBGameScreen extends Activity {
 	@SuppressWarnings( "deprecation" )
 	@SuppressLint( { "InlinedApi", "NewApi" } )
 	protected void onCreate( Bundle savedInstanceState ) {
-		Logger.log( "onCreate" );
-		
 		super.onCreate( savedInstanceState );
 		
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
-		context = this;
-         
+		// Create OpenGL view
 		mGLView = new GLSurfaceView( getApplication() );
 		
-		width = BB.getWidth();
-		height = BB.getHeight();
-		
+		// TODO: Figure out what this actually does
 		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 			
 			@Override
@@ -93,31 +71,38 @@ public class BBGameScreen extends Activity {
 			}
 		} );
 		
+		// Load stored preferences
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		int levelNum = settings.getInt( "loadLevel", 1 );
 		Log.i( "GameScreen", "Current level is: " + levelNum );
-		load = Toast.makeText( context, R.string.load_level, Toast.LENGTH_LONG );
-        load.show();
+		loadingText = Toast.makeText( BB.context, R.string.load_level, Toast.LENGTH_LONG );
+        loadingText.show();
         
-		renderer = new BBRenderer( width, height, levelNum );
+        // Initialize the game object
+        game = BBGame.getInstance();
+        // Initialize the OpenGL renderer
+		renderer = new BBRenderer();
+		// Assign the OpenGL renderer to this view
 		mGLView.setRenderer( renderer );
+		// Prevent screen from turning off (after idling)
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );
 		
+		// TODO: Figure out what this code actually does and why it's in this section of the class
 		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
-		Bitmap bb=( (BitmapDrawable ) icon ).getBitmap();
+		Bitmap bb = ((BitmapDrawable) icon).getBitmap();
 
 		int iconWidth = bb.getWidth();
 		int iconHeight = bb.getHeight();           
 		  
-		float scaleWidth = ( (float ) width/8 ) / iconWidth;
-		float scaleHeight = ( (float ) width/8 ) / iconHeight;
-
+		float scaleWidth = ((float) BB.width / 8) / iconWidth;
+		float scaleHeight = ((float) BB.width / 8) / iconHeight;
 
 		Matrix matrix = new Matrix();
 		matrix.postScale( scaleWidth, scaleHeight );
 
 		Bitmap resultBitmap = Bitmap.createBitmap( bb, 0, 0, iconWidth, iconHeight, matrix, true );
+		// TODO: Do something about the deprecated stuff
 		icon = new BitmapDrawable( resultBitmap );
 		
 	}
@@ -150,7 +135,6 @@ public class BBGameScreen extends Activity {
 	}
 	*/
 	
-	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		if ( BBMenuScreen.isDevMode ) {
@@ -169,9 +153,10 @@ public class BBGameScreen extends Activity {
 	
 	@Override
 	protected void onResume() {
-		renderer.setRoomNum( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 ) );
-		load.show();
 		super.onResume();
+		game.setLevel( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 ) );
+		if ( game.loading )
+			loadingText.show();
 		//renderer.setTextures();
 		mGLView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
@@ -185,23 +170,23 @@ public class BBGameScreen extends Activity {
 		super.onStop();
 	}
 	
+	// Handle touch events during the game
 	public boolean onTouchEvent( MotionEvent me ) {
 		switch( me.getAction() & MotionEvent.ACTION_MASK ) {
 	    	
+			// First finger pressed down
     		case MotionEvent.ACTION_DOWN:
 				xpos = me.getX( 0 );
 				ypos = me.getY( 0 );
-				//Fire button
-				if ( xpos < ( 3 * width/16 ) && xpos > width/16 && ypos > ( height - ( 3 * width/16 ) ) && ypos < height - width/16 ) {
-					isViewMode = false;
+				// Pressed fire button
+				if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 ) {
 					isShootMode = true;
-					renderer.setFireButtonState( true );
+					game.setFireButtonState( true );
 				}
-				//Pause button
-				else if ( xpos < width && xpos > width-( width/10 ) && ypos > 0 && ypos < width/10 ) {
-					isViewMode = false;
+				// Pressed pause button
+				else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10 ) {
 					isShootMode = false;
-					renderer.setPauseButtonState();
+					game.setPauseButtonState();
 					final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
 
 					AlertDialog.Builder builder = new AlertDialog.Builder( this );
@@ -210,10 +195,10 @@ public class BBGameScreen extends Activity {
 					builder.setItems( items, new DialogInterface.OnClickListener() {
 					    public void onClick( DialogInterface dialog, int item ) {
 							if ( items[item]==getString( R.string.c_resume ) ) {
-								renderer.setPauseButtonState();
+								game.setPauseButtonState();
 							}
 							else if ( items[item]==getString( R.string.c_settings ) ) {
-								renderer.setPauseButtonState();
+								game.setPauseButtonState();
 								/*
 								Intent intent = new Intent( context, Settings.class );
 								startActivity( intent );
@@ -227,68 +212,61 @@ public class BBGameScreen extends Activity {
 					AlertDialog alert = builder.create();
 					alert.show();
 					
-				}
-				
-				else {
-					isViewMode = true;
+				// Pressed anywhere else
+				} else {
 					isShootMode = false;
 				}
-				
 				return true;
-			
-    		case MotionEvent.ACTION_POINTER_DOWN:
+			// Second or later finger pressed down
+			case MotionEvent.ACTION_POINTER_DOWN:
 				firstX = me.getX( 1 );
 				firstY = me.getY( 1 );
-				isViewMode = false;
+				isShootMode = true;
 				return true;
-			
+			// First finger released
     		case MotionEvent.ACTION_UP:
     			Log.d( "GameScreen", "Action Up" );
 				xpos = -1;
 				ypos = -1;
-				renderer.horizontalSwipe = 0;
-				renderer.verticalSwipe = 0;
+				game.horizontalSwipe = 0;
+				game.verticalSwipe = 0;
 				isShootMode = false;
-				isViewMode = true;
-				renderer.setFireButtonState( false );
+				game.setFireButtonState( false );
 				return true;
-			
+			// Second or later finger released
     		case MotionEvent.ACTION_POINTER_UP:
     			Log.d( "GameScreen", "Action Pointer Up" );
 				xpos = -1;
 				ypos = -1;
-				renderer.horizontalSwipe = 0;
-				renderer.verticalSwipe = 0;
+				game.horizontalSwipe = 0;
+				game.verticalSwipe = 0;
 				float xd = me.getX( 1 ) - firstX;
 				float yd = me.getY( 1 ) - firstY;
-				if ( yd < ( -height/5 ) && Math.abs( xd ) < width/6 ) {
-					renderer.loadBubble( BBWordObject.MASCULINE );
+				// Swipe up indicates masculine
+				if ( yd < ( -BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
+					game.setGender( Gender.MASCULINE );
 				}
-				else if ( yd > ( height/5 ) && Math.abs( xd ) < width/6 ) {
-					renderer.loadBubble( BBWordObject.FEMININE );
+				// Swipe down indicates feminine
+				else if ( yd > ( BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
+					game.setGender( Gender.FEMININE );
 				}
+				// Neither indicates nothing
 				else {
 					return true;
 				}
-				Camera cam = renderer.getCam();
-				SimpleVector dir = Interact2D.reproject2D3DWS( cam, renderer.getFrameBuffer(), width/2, height/2 );
-				dir.scalarMul( -70 );
-				RigidBody body = renderer.shoot( cam.getPosition() );
-				if ( body != null ) {
-					Vector3f force = new Vector3f( -dir.x*2, dir.y*2, dir.z*2 );
-					body.activate( true );
-					body.setLinearVelocity( force );
-				}
+				// Shoot bubble accordingly
+				game.shootBubble();
 				return true;
-			
+			// Finger moved
+			// Note: Here, we're only using this event for panning around, not for swiping up/down to shoot bubbles
     		case MotionEvent.ACTION_MOVE:
-    			if ( isViewMode ) {
+    			if ( !isShootMode ) {
     				xd = me.getX() - xpos;
     				yd = me.getY() - ypos;
 
-					renderer.horizontalSwipe = ( xd / -( width/5f ) );
-					renderer.verticalSwipe = ( yd / -( height/5f ) );
-    					
+					game.horizontalSwipe = ( xd / -( BB.width/5f ) );
+					game.verticalSwipe = ( yd / -( BB.height/5f ) );
+					
     				xpos = me.getX();
     				ypos = me.getY();
     			}
@@ -297,7 +275,7 @@ public class BBGameScreen extends Activity {
 		
 		}
 		try {
-			Thread.sleep( 15 );
+			Thread.sleep( 10 );
 		} catch ( Exception e ) {
 			//No need
 		}
@@ -305,39 +283,41 @@ public class BBGameScreen extends Activity {
 	}
 	
 	@Override
+	// Debugging purposes
     public boolean onOptionsItemSelected( MenuItem item ) {
 		try {
-        switch ( item.getItemId() ) {
-        case R.id.inc_object_x:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 1, 0, 0 );
-        	break;
-        case R.id.inc_object_z:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, 1 );
-        	break;
-        case R.id.dec_object_x:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( -1, 0, 0 );
-        	break;
-        case R.id.dec_object_z:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 0, -1 );
-        	break;
-        case R.id.inc_object_y:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, 1, 0 );
-        	break;
-        case R.id.dec_object_y:
-        	renderer.getWorld().getObject( renderer.currentObjectId ).translate( 0, -1, 0 );
-        	return true;
-        case R.id.inc_obj:
-        	renderer.currentObjectId = renderer.objects.nextElement().getID();
-        	Log.d( "GameScreen", "New Object is: " + renderer.getWorld().getObject( renderer.currentObjectId ).getName() );
-        	return true;
-        }
-        Log.d( "GameScreen", "New object location: " + renderer.getWorld().getObject( renderer.currentObjectId ).getTranslation() );
+	        switch ( item.getItemId() ) {
+		        case R.id.inc_object_x:
+		        	game.world.getObject( game._currentObjectId ).translate( 1, 0, 0 );
+		        	break;
+		        case R.id.inc_object_z:
+		        	game.world.getObject( game._currentObjectId ).translate( 0, 0, 1 );
+		        	break;
+		        case R.id.dec_object_x:
+		        	game.world.getObject( game._currentObjectId ).translate( -1, 0, 0 );
+		        	break;
+		        case R.id.dec_object_z:
+		        	game.world.getObject( game._currentObjectId ).translate( 0, 0, -1 );
+		        	break;
+		        case R.id.inc_object_y:
+		        	game.world.getObject( game._currentObjectId ).translate( 0, 1, 0 );
+		        	break;
+		        case R.id.dec_object_y:
+		        	game.world.getObject( game._currentObjectId ).translate( 0, -1, 0 );
+		        	return true;
+		        case R.id.inc_obj:
+		        	game._currentObjectId = game.objects.nextElement().getID();
+		        	Log.d( "GameScreen", "New Object is: " + game.world.getObject( game._currentObjectId ).getName() );
+		        	return true;
+	        }
+	        Log.d( "GameScreen", "New object location: " + game.world.getObject( game._currentObjectId ).getTranslation() );
 		}catch ( Exception e ) {
 			e.printStackTrace();
 		}
         return super.onOptionsItemSelected( item );
     }
 	
+	// Used to indicate to Android system to perform an optimization
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}

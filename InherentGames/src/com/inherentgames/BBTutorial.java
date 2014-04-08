@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.Window;
 
 import com.bulletphysics.dynamics.RigidBody;
+import com.inherentgames.BBWordObject.Gender;
 import com.threed.jpct.Camera;
 import com.threed.jpct.Interact2D;
 import com.threed.jpct.Logger;
@@ -43,7 +44,8 @@ public class BBTutorial extends Activity {
 	private Properties config;
 	
 	private GLSurfaceView mGLView;
-	private BBRenderer renderer = null;
+	private BBRenderer renderer;
+	private BBGame game;
 	
 	private float xpos = -1;
 	private float ypos = -1;
@@ -55,9 +57,6 @@ public class BBTutorial extends Activity {
 	private int moveProperties = 5;
 	
 	private long lastPressedWattson;
-	
-	private int width;
-	private int height;
 	
 	private Drawable icon;
 	
@@ -82,9 +81,6 @@ public class BBTutorial extends Activity {
 			BB.setImmersiveMode( findViewById( Window.ID_ANDROID_CONTENT ), getWindow().getDecorView() );
 		}
 		
-		width = BB.getWidth();
-		height = BB.getHeight();
-		
 		assetsPropertyReader = new BBAssetsPropertyReader();
 		config = assetsPropertyReader.getProperties( "config.properties" );
 		
@@ -102,7 +98,8 @@ public class BBTutorial extends Activity {
 			}
 		} );
 		
-		renderer = new BBRenderer( width, height, 0 );
+		renderer = new BBRenderer();
+		game = BBGame.getInstance();
 		mGLView.setRenderer( renderer );
 		mGLView.setKeepScreenOn( true );
 		setContentView( mGLView );
@@ -114,8 +111,8 @@ public class BBTutorial extends Activity {
 		int iconWidth = bb.getWidth();
 		int iconHeight = bb.getHeight();           
 		  
-		float scaleWidth = ( (float ) width/8 ) / iconWidth;
-		float scaleHeight = ( (float ) width/8 ) / iconHeight;
+		float scaleWidth = ( (float ) BB.width/8 ) / iconWidth;
+		float scaleHeight = ( (float ) BB.width/8 ) / iconHeight;
 
 
 		Matrix matrix = new Matrix();
@@ -198,9 +195,9 @@ public class BBTutorial extends Activity {
 		if ( me.getAction() == MotionEvent.ACTION_DOWN && moveProperties > 0 ) {
 			xpos = me.getX();
 			ypos = me.getY();
-			if ( xpos < width/5 && xpos > 0 && ypos > 0 && ypos < width/5 ) {
+			if ( xpos < BB.width/5 && xpos > 0 && ypos > 0 && ypos < BB.width/5 ) {
 				if ( lastPressedWattson < System.currentTimeMillis() - 1500 ) {
-					moveProperties = renderer.iterateWattson();
+					moveProperties = game.iterateWattson();
 					lastPressedWattson = System.currentTimeMillis();
 					isViewMode = false;
 					isShootMode = false;
@@ -211,137 +208,125 @@ public class BBTutorial extends Activity {
 		if ( moveProperties <= 2 ) {
 			switch( me.getAction() & MotionEvent.ACTION_MASK ) {
 	    	
-    		case MotionEvent.ACTION_DOWN:
-				xpos = me.getX( 0 );
-				ypos = me.getY( 0 );
-				if ( xpos < ( 3 * width/16 ) && xpos > width/16 && ypos > ( height - ( 3 * width/16 ) ) && ypos < height - width/16 && ( moveProperties == 2 || moveProperties <= 0 ) ) {
-					isViewMode = false;
-					isShootMode = true;
-					renderer.setFireButtonState( true );
-				}
-				
-				else if ( xpos < width && xpos > width-( width/10 ) && ypos > 0 && ypos < width/10 && moveProperties == 0 ) {
-					isViewMode = false;
-					isShootMode = false;
-					renderer.setPauseButtonState();
-					final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
-
-					AlertDialog.Builder builder = new AlertDialog.Builder( this );
-					builder.setIcon( icon );
-					builder.setTitle( getString( R.string.c_title ) );
-					builder.setItems( items, new DialogInterface.OnClickListener() {
-					    public void onClick( DialogInterface dialog, int item ) {
-							if ( items[item]==getString( R.string.c_resume ) ) {
-								renderer.setPauseButtonState();
-							}
-							else if ( items[item]==getString( R.string.c_settings ) ) {
-								renderer.setPauseButtonState();
-								/*
-								Intent intent = new Intent( context, Settings.class );
-								startActivity( intent );
-								*/
-							}
-							else if ( items[item]==getString( R.string.c_exit ) ) {
-								finish();
-							}
-					    }
-					} );
-					AlertDialog alert = builder.create();
-					alert.show();
+	    		case MotionEvent.ACTION_DOWN:
+					xpos = me.getX( 0 );
+					ypos = me.getY( 0 );
+					if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 && ( moveProperties == 2 || moveProperties <= 0 ) ) {
+						isViewMode = false;
+						isShootMode = true;
+						game.setFireButtonState( true );
+					} else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10 && moveProperties == 0 ) {
+						isViewMode = false;
+						isShootMode = false;
+						game.setPauseButtonState();
+						final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
+	
+						AlertDialog.Builder builder = new AlertDialog.Builder( this );
+						builder.setIcon( icon );
+						builder.setTitle( getString( R.string.c_title ) );
+						builder.setItems( items, new DialogInterface.OnClickListener() {
+						    public void onClick( DialogInterface dialog, int item ) {
+								if ( items[item]==getString( R.string.c_resume ) ) {
+									game.setPauseButtonState();
+								}
+								else if ( items[item]==getString( R.string.c_settings ) ) {
+									game.setPauseButtonState();
+									/*
+									Intent intent = new Intent( context, Settings.class );
+									startActivity( intent );
+									*/
+								}
+								else if ( items[item]==getString( R.string.c_exit ) ) {
+									finish();
+								}
+						    }
+						} );
+						AlertDialog alert = builder.create();
+						alert.show();
+						
+					} else {
+						isViewMode = true;
+						isShootMode = false;
+					}
 					
-				}
-				
-				else {
-					isViewMode = true;
-					isShootMode = false;
-				}
-				
-				return true;
-			
-    		case MotionEvent.ACTION_POINTER_DOWN:
-				firstX = me.getX( 1 );
-				firstY = me.getY( 1 );
-				isViewMode = false;
-				return true;
-			
-    		case MotionEvent.ACTION_UP:
-				xpos = -1;
-				ypos = -1;
-				renderer.horizontalSwipe = 0;
-				renderer.verticalSwipe = 0;
-				isShootMode = false;
-				isViewMode = true;
-				renderer.setFireButtonState( false );
-				return true;
-			
-    		case MotionEvent.ACTION_POINTER_UP:
-    			/*
-    			 * May work to get exact screen size in inches
-    			 * 
-    			DisplayMetrics dm = new DisplayMetrics();
-    		    getWindowManager().getDefaultDisplay().getMetrics( dm );
-    		    double x = Math.pow( dm.widthPixels/dm.xdpi, 2 );
-    		    double y = Math.pow( dm.heightPixels/dm.ydpi, 2 );
-    		    double screenInches = Math.sqrt( x+y );
-    			*/
-    			Log.d( "GameScreen", "Action Pointer Up" );
-				xpos = -1;
-				ypos = -1;
-				renderer.horizontalSwipe = 0;
-				renderer.verticalSwipe = 0;
-				float xd = me.getX( 1 ) - firstX;
-				float yd = me.getY( 1 ) - firstY;
-				if ( yd < ( -height/5 ) && Math.abs( xd ) < width/6 ) {
-					if ( moveProperties != -2 ) {
-						renderer.loadBubble( BBWordObject.MASCULINE );
-						moveProperties = renderer.iterateWattson();
-						Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
-					}
-					else
-						return false;
-				}
-				else if ( yd > ( height/5 ) && Math.abs( xd ) < width/6 ) {
-					if ( moveProperties != -1 ) {
-						renderer.loadBubble( BBWordObject.FEMININE );
-						moveProperties = renderer.iterateWattson();
-						Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
-					}
-					else
-						return false;
-				}
-				else {
 					return true;
-				}
-				Camera cam = renderer.getCam();
-				SimpleVector dir = Interact2D.reproject2D3DWS( cam, renderer.getFrameBuffer(), width/2, height/2 );
-				dir.scalarMul( -70 );
-				RigidBody body = renderer.shoot( cam.getPosition() );
-				Log.d( "Tutorial", "Bubble Shot!" );
-				if ( body != null ) {
-					Vector3f force = new Vector3f( -dir.x*2, dir.y*2, dir.z*2 );
-					body.activate( true );
-					body.setLinearVelocity( force );
-				}
-				return true;
-			
-    		case MotionEvent.ACTION_MOVE:
-    			if ( isViewMode ) {
-    				xd = me.getX() - xpos;
-    				yd = me.getY() - ypos;
-
-    				Camera cam1 = renderer.getCam();
-    				SimpleVector dir1 = Interact2D.reproject2D3DWS( cam1, renderer.getFrameBuffer(), width/2, height/2 );
-    				if ( isViewMode && moveProperties == 0 ) {
-    					renderer.horizontalSwipe = ( xd / -( width/5f ) );
-    					renderer.verticalSwipe = ( yd / -( height/5f ) );
-    				}
-    				xpos = me.getX();
-    				ypos = me.getY();
-    			}
-
-				return true;
+				
+	    		case MotionEvent.ACTION_POINTER_DOWN:
+					firstX = me.getX( 1 );
+					firstY = me.getY( 1 );
+					isViewMode = false;
+					return true;
+				
+	    		case MotionEvent.ACTION_UP:
+					xpos = -1;
+					ypos = -1;
+					game.horizontalSwipe = 0;
+					game.verticalSwipe = 0;
+					isShootMode = false;
+					isViewMode = true;
+					game.setFireButtonState( false );
+					return true;
+				
+	    		case MotionEvent.ACTION_POINTER_UP:
+	    			/*
+	    			 * May work to get exact screen size in inches
+	    			 * 
+	    			DisplayMetrics dm = new DisplayMetrics();
+	    		    getWindowManager().getDefaultDisplay().getMetrics( dm );
+	    		    double x = Math.pow( dm.widthPixels/dm.xdpi, 2 );
+	    		    double y = Math.pow( dm.heightPixels/dm.ydpi, 2 );
+	    		    double screenInches = Math.sqrt( x+y );
+	    			*/
+	    			Log.d( "GameScreen", "Action Pointer Up" );
+					xpos = -1;
+					ypos = -1;
+					game.horizontalSwipe = 0;
+					game.verticalSwipe = 0;
+					float xd = me.getX( 1 ) - firstX;
+					float yd = me.getY( 1 ) - firstY;
+					if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+						if ( moveProperties != -2 ) {
+							game.setGender( Gender.MASCULINE );
+							moveProperties = game.iterateWattson();
+							Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
+						}
+						else
+							return false;
+					}
+					else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+						if ( moveProperties != -1 ) {
+							game.setGender( Gender.FEMININE );
+							moveProperties = game.iterateWattson();
+							Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
+						}
+						else
+							return false;
+					}
+					else {
+						return true;
+					}
+					game.shootBubble();
+					Log.d( "Tutorial", "Bubble Shot!" );
+					return true;
+				
+	    		case MotionEvent.ACTION_MOVE:
+	    			if ( isViewMode ) {
+	    				xd = me.getX() - xpos;
+	    				yd = me.getY() - ypos;
+	
+	    				Camera cam1 = game.getCam();
+	    				SimpleVector dir1 = Interact2D.reproject2D3DWS( cam1, renderer.getFrameBuffer(), BB.width/2, BB.height/2 );
+	    				if ( isViewMode && moveProperties == 0 ) {
+	    					game.horizontalSwipe = ( xd / -( BB.width/5f ) );
+	    					game.verticalSwipe = ( yd / -( BB.height/5f ) );
+	    				}
+	    				xpos = me.getX();
+	    				ypos = me.getY();
+	    			}
+	
+					return true;
 		
-		}
+			}
 		}
 		try {
 			Thread.sleep( 15 );

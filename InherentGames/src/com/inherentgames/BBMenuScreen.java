@@ -39,8 +39,6 @@ public class BBMenuScreen extends Activity {
 	private Context context;
 	
 	private int easterEggCount;
-	private int width;
-	private int height;
 	private boolean canEasterEggPlay;
 	
 	private int buttonTextColor;
@@ -55,107 +53,104 @@ public class BBMenuScreen extends Activity {
 	@SuppressLint( "NewApi" )
 	@Override
     protected void onCreate( Bundle savedInstanceState ) {
-            super.onCreate( savedInstanceState );
-       
-            Log.d( "MenuScreen", "onCreate called" );
-            
-            context = this;
-            easterEggCount = 0;
-            canEasterEggPlay = true;
-            
-            width = BB.getWidth();
-            height = BB.getHeight();
-            
-    		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
-            requestWindowFeature( Window.FEATURE_NO_TITLE );
-            setContentView( R.layout.menu_screen );
-            
-            try {
-	            mp = MediaPlayer.create( this, R.raw.time_pi_theme );
-	            mp.setLooping( true );
-	            mp.start();
-            } catch ( Exception e ) {
-            	Log.e( "MenuScreen", "Something went wrong with the MediaPlayer." );
-            }
-            
-            soundPool = new SoundPool( 4, AudioManager.STREAM_MUSIC, 100 );
-            soundPoolMap = new SparseIntArray();
-            soundPoolMap.put( soundID, soundPool.load( this, R.raw.bubble_up, 1 ) );
-            
-            buttonTextColor = Color.rgb( 156, 192, 207 );
-            
-            typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
-            
-            // click-handler for buttons
-            playButton = ( Button ) findViewById( R.id.playbutton );
-            setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
-            
-            SharedPreferences settings = getSharedPreferences( PREFERENCES, 0 );
-
-            if ( settings.getBoolean( "hasBeatenTutorial", false ) ) {     
-                playButton.setEnabled( false );
-                Log.d( "MenuScreen", "Disabling button" );
-            }
-            else {
-            	playButton.setEnabled( true );
-            	Log.d( "MenuScreen", "Enabling button" );
-            }
-            
-            playButton.setOnClickListener( new View.OnClickListener() {
-                    
-                    @Override
-                    public void onClick( View v ) {
-                    	AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE );
-                        float curVolume = audioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
-                        int priority = 1;
-                        int no_loop = 0;
-                        float normal_playback_rate = 1f;
-                        Intent i = new Intent( BBMenuScreen.this, BBMapScreen.class );
-                        startActivity( i );
-                        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-                        soundPool.play( soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate );
-                        
-                    	mp.stop();
-                    }
-            } );
-            
-            Button settingsButton = ( Button ) findViewById( R.id.settingsbutton );
-            setButtonConfig( settingsButton, getString( R.string.settings_button ).toUpperCase(Locale.US) );
-            
-            settingsButton.setOnClickListener( new View.OnClickListener() {
-                    
-                    @Override
-                    public void onClick( View v ) {
-                        Intent i = new Intent( BBMenuScreen.this, BBSettings.class );
-                        startActivity( i );
-                    }
-            } );
-            
-            
-            Button tutorialButton = ( Button ) findViewById( R.id.tutorialbutton );
-            setButtonConfig( tutorialButton, getString( R.string.tutorial_button ).toUpperCase(Locale.US) );
-            
-            tutorialButton.setOnClickListener( new View.OnClickListener() {
-                    
-                    @Override
-                    public void onClick( View v ) {
-                        Intent i = new Intent( BBMenuScreen.this, BBTutorial.class );
-                        startActivity( i );
-                    }
-            } );
-            
-            
-            Button storeButton = ( Button ) findViewById( R.id.storebutton );
-            setButtonConfig( storeButton, getString( R.string.store_button ).toUpperCase(Locale.US) );
-            
-            storeButton.setOnClickListener( new View.OnClickListener() {
-                    
-                    @Override
-                    public void onClick( View v ) {
-                        Intent i = new Intent( BBMenuScreen.this, BBStore.class );
-                        startActivity( i );
-                    }
-            } );
+        super.onCreate( savedInstanceState );
+   
+        Log.d( "MenuScreen", "onCreate called" );
+		
+		context = this;
+		easterEggCount = 0;
+		canEasterEggPlay = true;
+		
+		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
+		requestWindowFeature( Window.FEATURE_NO_TITLE );
+		setContentView( R.layout.menu_screen );
+		
+		try {
+		    mp = MediaPlayer.create( this, R.raw.time_pi_theme );
+		    mp.setLooping( true );
+		    mp.start();
+		} catch ( Exception e ) {
+			Log.e( "MenuScreen", "Something went wrong with the MediaPlayer." );
+		}
+		
+		soundPool = new SoundPool( 4, AudioManager.STREAM_MUSIC, 100 );
+		soundPoolMap = new SparseIntArray();
+		soundPoolMap.put( soundID, soundPool.load( this, R.raw.bubble_up, 1 ) );
+		
+		buttonTextColor = Color.rgb( 156, 192, 207 );
+		
+		typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
+		
+		// click-handler for buttons
+		playButton = ( Button ) findViewById( R.id.playbutton );
+		setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
+		
+		SharedPreferences settings = getSharedPreferences( PREFERENCES, 0 );
+		
+		if ( settings.getBoolean( "hasBeatenTutorial", false ) ) {     
+		playButton.setEnabled( false );
+		Log.d( "MenuScreen", "Disabling button" );
+		}
+		else {
+			playButton.setEnabled( true );
+			Log.d( "MenuScreen", "Enabling button" );
+		}
+		
+		playButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		        	AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE );
+		            float curVolume = audioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
+		            int priority = 1;
+		            int no_loop = 0;
+		            float normal_playback_rate = 1f;
+		            Intent i = new Intent( BBMenuScreen.this, BBMapScreen.class );
+		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		            soundPool.play( soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate );
+		            
+		        	mp.stop();
+		        }
+		} );
+		
+		Button settingsButton = ( Button ) findViewById( R.id.settingsbutton );
+		setButtonConfig( settingsButton, getString( R.string.settings_button ).toUpperCase(Locale.US) );
+		
+		settingsButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            Intent i = new Intent( BBMenuScreen.this, BBSettings.class );
+		            startActivity( i );
+		        }
+		} );
+		
+		
+		Button tutorialButton = ( Button ) findViewById( R.id.tutorialbutton );
+		setButtonConfig( tutorialButton, getString( R.string.tutorial_button ).toUpperCase(Locale.US) );
+		
+		tutorialButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            Intent i = new Intent( BBMenuScreen.this, BBTutorial.class );
+		            startActivity( i );
+		        }
+		} );
+		
+		
+		Button storeButton = ( Button ) findViewById( R.id.storebutton );
+		setButtonConfig( storeButton, getString( R.string.store_button ).toUpperCase(Locale.US) );
+		
+		storeButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            Intent i = new Intent( BBMenuScreen.this, BBStore.class );
+		            startActivity( i );
+		        }
+		} );
             
             
     }
@@ -164,7 +159,7 @@ public class BBMenuScreen extends Activity {
 		float xpos = me.getX();
 		float ypos = me.getY();
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
-			if ( xpos > width*.264 && xpos < width*.443 && ypos> height*.075 && ypos < height*.313 ) {
+			if ( xpos > BB.width*.264 && xpos < BB.width*.443 && ypos> BB.height*.075 && ypos < BB.height*.313 ) {
 				easterEggCount++;
 			}
 		}

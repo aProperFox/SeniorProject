@@ -11,14 +11,23 @@ public class BBWordObject extends Object3D {
 	 * 
 	 */
 	private static final long serialVersionUID = -4088731260124106298L;
-	public static final int MASCULINE = 0;
-	public static final int FEMININE = 1;
 	
+	// Define valid genders and classifications
+	public static enum Gender { MASCULINE, FEMININE };
+	public static enum Classification { WORD_OBJECT, BUBBLE };
+	
+	// Tracks whether this object is moving around (i.e., inside a bubble or not)
 	private boolean isStatic;
 	private float maxDimension;
 	private int objectId = -1;
-	private int article;
+	// Tracks the gender of this object
+	protected Gender article;
+	// Stores the name of the object in all relevant languages
 	private String names[] = new String[2];
+	// Tracks what type of object this is
+	// Note: This is only used to distinguish between a BBBubble that is a child of 
+	//       this type, or a regular BBWordObject.
+	protected Classification type = Classification.WORD_OBJECT;
 	
 	
 	/**
@@ -28,8 +37,12 @@ public class BBWordObject extends Object3D {
 		super( obj.toObject3D() );
 		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
-		names[BBTranslator.ENGLISH] = obj.getName( BBTranslator.ENGLISH );
+		names[BBTranslator.Language.ENGLISH] = obj.getName( BBTranslator.Language.ENGLISH );
 		this.article = obj.getArticle();
+		// Saves calculating transformation matrix until lazy transformations are disabled again, improving performance
+		enableLazyTransformations();
+		// Indicates that other objects can collide into this object
+		setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 	}
 	
 	/**
@@ -38,13 +51,17 @@ public class BBWordObject extends Object3D {
 	 * @param name
 	 * @param article
 	 */
-	public BBWordObject( Object3D obj, SimpleVector rotationAxis, String name, int article ) {
+	public BBWordObject( Object3D obj, SimpleVector rotationAxis, String name, Gender article ) {
 		super( obj );
 		isStatic = true;
-		names[BBTranslator.ENGLISH] = name;
+		names[BBTranslator.Language.ENGLISH] = name;
 		this.article = article;
 		rotateBy( rotationAxis );
 		setMaxDimension();
+		// Saves calculating transformation matrix until lazy transformations are disabled again, improving performance
+		enableLazyTransformations();
+		// Indicates that other objects can collide into this object
+		setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 	}
 	
 	/**
@@ -66,35 +83,6 @@ public class BBWordObject extends Object3D {
 	 */
 	public void setMaxDimension() {
 		long startTime = System.currentTimeMillis();
-		/*
-		PolygonManager polyMan = this.getPolygonManager();
-		int polygons = polyMan.getMaxPolygonID();
-		SimpleVector minVerts = new SimpleVector( 1000, 1000, 1000 );
-		SimpleVector maxVerts = new SimpleVector( -1000, -1000, -1000 );
-		for ( int i = 0; i < polygons; i++ ) {
-			for ( int j = 0; j < 3; j++ ) {
-				if ( minVerts.x > polyMan.getTransformedVertex( i, j ).x )
-					minVerts.x = polyMan.getTransformedVertex( i, j ).x;
-				if ( maxVerts.x < polyMan.getTransformedVertex( i, j ).x )
-					maxVerts.x = polyMan.getTransformedVertex( i, j ).x;
-				if ( minVerts.y > polyMan.getTransformedVertex( i, j ).y )
-					minVerts.y = polyMan.getTransformedVertex( i, j ).y;
-				if ( maxVerts.y < polyMan.getTransformedVertex( i, j ).y )
-					maxVerts.y = polyMan.getTransformedVertex( i, j ).y;
-				if ( minVerts.z > polyMan.getTransformedVertex( i, j ).z )
-					minVerts.z = polyMan.getTransformedVertex( i, j ).z;
-				if ( maxVerts.z < polyMan.getTransformedVertex( i, j ).z )
-					maxVerts.z = polyMan.getTransformedVertex( i, j ).z;
-			}
-		}
-		SimpleVector dimensions = new SimpleVector( maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z );
-		if ( dimensions.x > dimensions.z &&dimensions.x > dimensions.y )
-			maxDimension = dimensions.x;
-		else if ( dimensions.z > dimensions.x && dimensions.z > dimensions.y )
-			maxDimension = dimensions.z;
-		else
-			maxDimension = dimensions.y;
-			*/
 		Mesh mesh = this.getMesh();
 		maxDimension = getMax( mesh.getBoundingBox() );
 		Log.d( "WordObject", "Checking dimensions took " + ( System.currentTimeMillis()-startTime ) + " milliseconds." );
@@ -124,7 +112,7 @@ public class BBWordObject extends Object3D {
 	/**
 	 * @return
 	 */
-	public int getArticle() {
+	public Gender getArticle() {
 		return article;
 	}
 	
@@ -137,8 +125,8 @@ public class BBWordObject extends Object3D {
 		 * TODO: setting for language
 		 * replace Translator.ENGLISH and Translator.SPANISH with global language parameters
 		 */
-		names[BBTranslator.ENGLISH] = name;
-		names[BBTranslator.SPANISH] = BBTranslator.translateToLanguage( name, BBTranslator.SPANISH );
+		names[BBTranslator.Language.ENGLISH] = name;
+		names[BBTranslator.Language.SPANISH] = BBTranslator.translateToLanguage( name, BBTranslator.Language.SPANISH );
 	}
 	
 	/**

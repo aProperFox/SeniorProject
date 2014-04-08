@@ -3,9 +3,13 @@ package com.inherentgames;
 import android.util.Log;
 
 public class BBTranslator {
-	//Language values
-	public static final int ENGLISH = 0;
-	public static final int SPANISH = 1;
+	
+	// Define valid language values
+	public class Language { 
+		public static final int ENGLISH = 0;
+		public static final int SPANISH = 1;
+	}
+	
 	
 	private static String wordList[][] = {	
 		//Room 0-1

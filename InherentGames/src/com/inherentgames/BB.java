@@ -13,9 +13,9 @@ import android.view.WindowManager;
 
 public class BB extends Application {
 
-    private static Context context;
-    private static int width;
-    private static int height;
+    protected static Context context;
+    protected static int width;
+    protected static int height;
 
     @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
@@ -37,18 +37,6 @@ public class BB extends Application {
 			width = size.x;
 			height = size.y;
 		}
-    }
-    
-    public static int getWidth() {
-    	return BB.width;
-    }
-    
-    public static int getHeight() {
-    	return BB.height;
-    }
-
-    public static Context getAppContext() {
-        return BB.context;
     }
     
     @TargetApi(Build.VERSION_CODES.KITKAT)

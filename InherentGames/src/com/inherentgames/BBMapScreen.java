@@ -23,7 +23,6 @@ public class BBMapScreen extends Activity {
 	ImageButton stage2;
 	Button stage3;
 	
-	int width, height;
 	int levelNum;
 	
 	@SuppressWarnings( "deprecation" )
@@ -31,10 +30,6 @@ public class BBMapScreen extends Activity {
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
-		
-		width = BB.getWidth();
-		height = BB.getHeight();
-		
 
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		levelNum = settings.getInt( "nextLevel", 1 );
@@ -68,7 +63,7 @@ public class BBMapScreen extends Activity {
 		float xpos = me.getX();
 		float ypos = me.getY();
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
-			if ( xpos > width*.13 && xpos < width*.33 && ypos > height*0.162 && ypos < height*0.4 ) {
+			if ( xpos > BB.width*.13 && xpos < BB.width*.33 && ypos > BB.height*0.162 && ypos < BB.height*0.4 ) {
 				getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 1 ).commit();
                 Intent i = new Intent( BBMapScreen.this, BBVideoScreen.class );
                 i.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic1a" );
@@ -76,7 +71,7 @@ public class BBMapScreen extends Activity {
                 finish();
 			}
 			
-			else if ( xpos > width*.4 && xpos < width*.6 && ypos > height*0.618 && ypos < height*0.88 ) {
+			else if ( xpos > BB.width*.4 && xpos < BB.width*.6 && ypos > BB.height*0.618 && ypos < BB.height*0.88 ) {
 				if ( levelNum > 1 ) {
 					getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 2 ).commit();
                     Intent i = new Intent( BBMapScreen.this, BBVideoScreen.class );
@@ -86,7 +81,7 @@ public class BBMapScreen extends Activity {
 				}
 			}
 			
-			else if ( xpos > width*.675 && xpos < width*.88 && ypos > height*0.176 && ypos < height*0.44 ) {
+			else if ( xpos > BB.width*.675 && xpos < BB.width*.88 && ypos > BB.height*0.176 && ypos < BB.height*0.44 ) {
 				if ( levelNum > 2 ) {
 					getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 3 ).commit();
                     Intent i = new Intent( BBMapScreen.this, BBGameScreen.class );
