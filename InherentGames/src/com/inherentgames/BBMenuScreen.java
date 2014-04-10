@@ -40,8 +40,9 @@ public class BBMenuScreen extends Activity {
 	private Typeface typeface;
 	
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
+	public static String ANIMATION = "DOWN";
 	public static final String PREFERENCES = "BABBLE_PREF";
-	public static final boolean isDevMode = false;
+	public static final boolean isDevMode = true;
 	private Button playButton;
 	
 	
@@ -114,6 +115,7 @@ public class BBMenuScreen extends Activity {
 		        public void onClick( View v ) {
 		            Intent i = new Intent( BBMenuScreen.this, BBSettings.class );
 		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
 		        }
 		} );
 		
@@ -127,6 +129,7 @@ public class BBMenuScreen extends Activity {
 		        public void onClick( View v ) {
 		            Intent i = new Intent( BBMenuScreen.this, BBTutorial.class );
 		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
 		        }
 		} );
 		
@@ -140,6 +143,7 @@ public class BBMenuScreen extends Activity {
 		        public void onClick( View v ) {
 		            Intent i = new Intent( BBMenuScreen.this, BBStore.class );
 		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_right, R.anim.slide_out_right );
 		        }
 		} );
             
@@ -174,6 +178,16 @@ public class BBMenuScreen extends Activity {
 		}
 		super.onResume();
 
+		// Check for animation message
+		if ( BBMenuScreen.ANIMATION == "LEFT" ){
+			overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
+		} else if ( BBMenuScreen.ANIMATION == "RIGHT" ) {
+			overridePendingTransition( R.anim.slide_in_right, R.anim.slide_out_right );
+		} else if ( BBMenuScreen.ANIMATION == "DOWN" ) {
+			overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
+		} else {
+			overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		}
 		
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {

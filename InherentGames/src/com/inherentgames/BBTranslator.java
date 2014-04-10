@@ -35,12 +35,15 @@ public class BBTranslator {
 		{"Table", "Mesa"},
 		//Room 3
 		{"Address", "Direccion"},
+		{"Bicycle", "Bicicleta"},
 		{"Bus", "Autobus"},
 		{"Car", "Coche"},
 		{"Map", "Mapa"},
+		{"Police", "Policia"},
 		{"Sign", "Senal"},
 		{"Taxi", "Taxi"},
 		{"Traffic_Light", "Semaforo"},
+		{"Trash", "Basura"},
 	};
 
 	/**

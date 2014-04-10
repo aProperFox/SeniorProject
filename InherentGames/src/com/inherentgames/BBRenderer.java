@@ -41,10 +41,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	
 	private int arrowX;
 	private int arrowY;
-	private int arrowImageWidth;
-	private int arrowImageHeight;
-	private int arrowScreenWidth;
-	private int arrowScreenHeight;
 	
 	private String arrowState = "ArrowUp";
 	
@@ -72,16 +68,12 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		tm = BBTextureManager.getInstance();
 		game = BBGame.getInstance();
 		
-		letterWidth = BB.width / 96;
+		letterWidth = BB.width / 85;
 		
 		fuelHeight = 0;
 		
 		arrowX = BB.width / 12;
 		arrowY = BB.height / 10 + BB.width / 6;
-		arrowImageWidth = 32;
-		arrowImageHeight = 64;
-		arrowScreenWidth = BB.width / 12;
-		arrowScreenHeight = BB.width / 6;
 	}
 	
 	// Triggered when the view port is created
@@ -170,7 +162,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			
 			fuelHeight = (int) (((float) game.captured / game.world.roomObjectWords.size()) * (BB.height * 0.75));
 			timeHeight = (int) (((game.timeLeft/100.0f) * (BB.height * 0.76)));
-			Log.d("BBRenderer", "timeHeight = " + timeHeight);
+			
 			// Render the HUD/sprite elements
 			display2DGameInfo();
 			/*
@@ -217,25 +209,33 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Pause Button
 				blitImage( game.pauseButtonState, w-w/30, w/35, 128, 128, w/15, w/15, 100 );
 				// Dynamic fuel/time bars
-				blitImageBottomUp( "FuelBar", (int) (w * 0.909), h/2, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
+				//blitImageBottomUp( "FuelBar", (int) (w * 0.909), h/2, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
 				blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), BB.height/2, 16, 512, BB.width/38, (int)timeHeight, (int) ( BB.height*0.76 ), 100 );
 				// Score bars 
 				blitImage( "ScoreBars", w-( w/16 ), h/2, 128, 512, w/8, ( int )( h*0.9 ), 100 );
-				blitImage( "ScoreArrow", (int) (w * 0.9) , (int) (h * 0.881 - fuelHeight), 32, 32, w / 38, w / 38, 100 );
+				
 				
 			} else {
 				// Pause Button
 				blitImage( game.pauseButtonState, w-w/30, w/35, 128, 128, w/15, w/15, 100 );
 				
-				if ( game.wattsonPrivileges >= 2 ) {
+				if ( (game.wattsonPrivileges & 1) != 0 ) {
+					blitImage( "Filter", w/2, h/2, 64, 64, w, h, 10 );
 				}
 				else {
-					blitImage( "Filter", w/2, h/2, 64, 64, w, h, 10 );
+					
 				}
 				displayScreenItem( fb, game.wattsonPrivileges );
 			}
-			if( ( game.wattsonPrivileges & 2) == 0)
-				blitImage( arrowState, arrowX, arrowY, arrowImageWidth, arrowImageHeight, arrowScreenWidth, arrowScreenHeight, 100 );
+			if( ( game.wattsonPrivileges & 2) == 0 ) {
+				if ( arrowState == "ArrowRight" ) {
+					blitImage( arrowState, arrowX + game.arrowMod, arrowY, 128, 128, BB.width / 8, BB.width / 8, 100 );
+				} else if (arrowState == "NoArrow" ){
+					
+				} else {
+					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
+				}
+			}
 			//Info Bar
 			//Has extra 1 px hang if using real size? Decremented to 127x127
 			blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
@@ -270,11 +270,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
 			
 			//Dynamic fuel/time bars
-			blitImageBottomUp( "FuelBar", (int) (w * 0.909), h/2, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
+			//blitImageBottomUp( "FuelBar", (int) (w * 0.909), h/2, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
 			blitImageBottomUp( "TimeBar", (int) (w * 0.966), h/2, 16, 512, w/38, (int) timeHeight, (int) (h * 0.76), 100 );
 			//Score bars
 			blitImage( "ScoreBars", w-( w/16 ), h/2, 128, 512, w/8, ( int )( h*0.9 ), 100 );
-			blitImage( "ScoreArrow", (int) (w * 0.9), (int) (h * 0.881 - fuelHeight), 32, 32, w/38, w/38, 100 );
 		
 		}
 		
@@ -301,10 +300,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			case 1:
 				arrowX = BB.width / 12;
 				arrowY = BB.height / 10 + BB.width / 6;
-				arrowImageWidth = 32;
-				arrowImageHeight = 64;
-				arrowScreenWidth = BB.width / 12;
-				arrowScreenHeight = BB.width / 6;
 				arrowState = "ArrowUp";
 				break;
 			case 2:
@@ -318,10 +313,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				if ( isLastItem ) {
 					arrowX = ( int )( w/3.5f );
 					arrowY = h - ( w/8 );
-					arrowImageWidth = 64;
-					arrowImageHeight = 32;
-					arrowScreenWidth = w/6;
-					arrowScreenHeight = w/12;
 					arrowState = "ArrowLeft";
 				}
 				break;
@@ -333,28 +324,24 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				 
 				 //Dynamic fuel bar
 				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), BB.height/2, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
-				 blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
+				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
 				 blitImage("ScoreBars", BB.width-( BB.width/16 ), BB.height/2, 128, 512, BB.width/8, (int)( BB.height*0.9 ), 100 );
-				 blitImage("ScoreArrow", (int)( BB.width*0.9 ), (int)(( BB.height*0.881 )- fuelHeight), 32, 32, BB.width/38, BB.width/38, 100 );
+				
 				 if ( game.fireButtonState == "fireButton" ) {
 					 arrowX = BB.width/8;
 					 arrowY = 4*BB.height/8;
-					 arrowImageWidth = 32;
-					 arrowImageHeight = 64;
-					 arrowScreenWidth = BB.width/12;
-					 arrowScreenHeight = BB.width/6;
 					 arrowState = "ArrowDown";
 					 }
-					 else {
-					 arrowX = 9*BB.width/12;
-					 arrowY = BB.height/10 + BB.width/6;
-					 arrowImageWidth = 32;
-					 arrowImageHeight = 64;
-					 arrowScreenWidth = BB.width/12;
-					 arrowScreenHeight = BB.width/6;
-					 arrowState = "ArrowUp";
-					 
+				 else {
+					 arrowState = "NoArrow";
+					 game.handDir = -1;
+					 if ( game.handTransparency != 0 ) {
+						 blitImage( "Hand", 9 * BB.width / 12, (BB.height / 2) + game.handMod, 128, 128, BB.width/8, BB.width/8, game.handTransparency );
+					 } else {
+						 
 					 }
+				 
+				 }
 				 //Fire Button
 				 blitImage( game.fireButtonState, BB.width/8, BB.height-( BB.width/8 ), 128, 128, BB.width/8, BB.width/8, 10 );
 				 //Bubble image
@@ -365,35 +352,36 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			case 8:
 				 //Dynamic fuel bar
 				 blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), BB.height/2, 16, 512, BB.width/38, (int) timeHeight, (int) ( BB.height*0.76 ), 100 );
-				 blitImageBottomUp( "FuelBar", (int) ( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int) ( BB.height*0.76 ), 100 );
+				 //blitImageBottomUp( "FuelBar", (int) ( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int) ( BB.height*0.76 ), 100 );
 				 blitImage( "ScoreBars", BB.width-( BB.width/16 ), BB.height/2, 128, 512, BB.width/8, (int) ( BB.height*0.9 ), 100 );
-				 blitImage( "ScoreArrow", (int) ( BB.width*0.9 ), (int) (( BB.height*0.881 )- fuelHeight), 32, 32, BB.width/38, BB.width/38, 100 );
 				 if ( game.fireButtonState == "fireButton" ) {
 					  arrowX = BB.width/8;
 					  arrowY = 4*BB.height/8;
-					  arrowImageWidth = 32;
-					  arrowImageHeight = 64;
-					  arrowScreenWidth = BB.width/12;
-					  arrowScreenHeight = BB.width/6;
 					  arrowState = "ArrowDown";
 				  }
 	  			 else {
-	  				  arrowX = 9*BB.width/12;
-	  				  arrowY = BB.height/10 + BB.width/6;
-	  				  arrowImageWidth = 32;
-	  				  arrowImageHeight = 64;
-	  				  arrowScreenWidth = BB.width/12;
-	  				  arrowScreenHeight = BB.width/6;
-	  				  arrowState = "ArrowDown";
-	  				 
+					 arrowState = "NoArrow";
+					 game.handDir = 1;
+					 if ( game.handTransparency != 0) {
+						 blitImage( "Hand", 9 * BB.width / 12, (BB.height / 2) + game.handMod, 128, 128, BB.width / 8, BB.width / 8, game.handTransparency );
+					 } else {
+						 
+					 }
 	  			 }
   				 //Fire Button
-  				 blitImage( game.fireButtonState, BB.width/8, BB.height-( BB.width/8 ), 128, 128, BB.width/8, BB.width/8, 10 );
+  				 blitImage( game.fireButtonState, BB.width / 8, BB.height - (BB.width / 8), 128, 128, BB.width / 8, BB.width / 8, 10 );
   				 //Bubble image
-  				 blitImage( game.bubbleTex, BB.width/2, BB.height, 256, 256, BB.width/3, BB.width/3, 5 );
+  				 blitImage( game.bubbleTex, BB.width / 2, BB.height, 256, 256, BB.width / 3, BB.width / 3, 5 );
   				 //Bubble text
-  				 blitText( game.world.getBubbleArticle(), BB.width/2-BB.width/25, BB.height-BB.width/10, BB.width/25, BB.height/10, RGBColor.WHITE );
+  				 blitText( game.world.getBubbleArticle(), BB.width / 2 - BB.width/25, BB.height - BB.width / 10, BB.width / 25, BB.height / 10, RGBColor.WHITE );
   				 break;
+			case 17:
+				 blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), BB.height/2, 16, 512, BB.width/38, (int) timeHeight, (int) ( BB.height*0.76 ), 100 );
+				 blitImage("ScoreBars", BB.width-( BB.width/16 ), BB.height/2, 128, 512, BB.width/8, (int)( BB.height*0.9 ), 100 );
+				arrowX = BB.width / 12;
+				arrowY = BB.height / 10 + BB.width / 6;
+				arrowState = "ArrowUp";
+				break;
 			default:
 				break;
 		}
@@ -428,6 +416,11 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		return new Vector3f( maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z );
 	}
 	
+	public void displayLoadingPage() {
+		loadingWorld.draw( fb );
+		blitImage("loading_splash", BB.width/2, BB.height/2, 1024, 1024, BB.width, BB.height, 100);
+		fb.display();
+	}
 	
 	/**
 	 * @param vector

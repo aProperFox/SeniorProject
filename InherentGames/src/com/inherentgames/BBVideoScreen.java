@@ -41,6 +41,7 @@ public class BBVideoScreen extends Activity {
         }
         else
         	shouldLoadMap = false;
+
         
         root.setBackgroundColor( Color.BLACK );
         		

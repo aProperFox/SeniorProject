@@ -30,7 +30,7 @@ public class BBRoom extends World {
 	private BBTextureManager tm;
 	protected SkyBox skybox;
 	
-	public static enum Level { TUTORIAL, CLASSROOM, DINER, STREET; 
+	public static enum Level { TUTORIAL, CLASSROOM, DINER, STREET, BEACH; 
 		public Level getNext() {
 	     return this.ordinal() < Level.values().length - 1
 	         ? Level.values()[this.ordinal() + 1]
@@ -292,8 +292,8 @@ public class BBRoom extends World {
 				tm.addTexture( "Room3Wall3", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.street ) ), 512, 512 );
-				tm.addTexture( "Street", new Texture( bitmap, true ) );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room3floor ) ), 512, 512 );
+				tm.addTexture( "Room3Floor", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 			} catch( Exception e ) {
@@ -323,7 +323,7 @@ public class BBRoom extends World {
 			bodies.add( wall.getBody() );
 			 
 			floor = new BBFloor( new SimpleVector( 190, 10, 190 ), 0 );
-			floor.setTexture( "Street" );
+			floor.setTexture( "Room3Floor" );
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
 			
@@ -538,53 +538,72 @@ public class BBRoom extends World {
 			try {
 				long startTime = System.currentTimeMillis();
 				
-				//Address = 0 ( la dirección )
+				// Address = 0 ( la dirección )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/address.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/address.mtl" ), 20.0f ) ), 
 						new SimpleVector( 0, 0, 0 ), "Address", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'address' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//Bus = 1 ( el autobús )
+				// Bicycle = 1 ( la bicicleta )
+				//roomObjects.add( new BBWordObject( Object3D.mergeAll(
+				//		Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/bicycle.obj" ),
+				//		BB.context.getResources().getAssets().open( "raw/room3/bicycle.mtl" ), 0.35f ) ), 
+				//		new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bicycle", Gender.FEMININE ) );
+				// Bus = 2 ( el autobús )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/bus.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/bus.mtl" ), 1.3f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Bus", Gender.MASCULINE ) );
 				Log.d( "Room", "Loading object 'bus' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//Car = 2 ( el coche )
+				// Car = 3 ( el coche )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/car.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/car.mtl" ), 3.5f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Car", Gender.MASCULINE ) );
 				Log.d( "Room", "Loading object 'car' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//Map = 3 ( el mapa )
+				// Map = 4 ( el mapa )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/map.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/map.mtl" ), 1.0f ) ), 
 						new SimpleVector( (float )Math.PI/2, 0, 0 ), "Map", Gender.MASCULINE ) );
 				Log.d( "Room", "Loading object 'map' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//sign = 4 ( la señal )
+				// Police = 3 ( la policía )
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
+						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/police.obj" ),
+						BB.context.getResources().getAssets().open( "raw/room3/police.mtl" ), 3.5f ) ), 
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Police", Gender.MASCULINE ) );
+				Log.d( "Room", "Loading object 'car' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
+				startTime = System.currentTimeMillis();
+				// Sign = 6 ( la señal )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/street_sign.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/street_sign.mtl" ), 0.5f ) ), 
 						new SimpleVector( (float )Math.PI, 0, 0 ), "StreetSign", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'sign' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//taxi = 5 ( la taxi )
+				// Taxi = 7 ( la taxi )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/taxi.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/taxi.mtl" ), 2.5f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Taxi", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'taxi' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
-				//traffic light = 6 ( el semáforo )
+				// Traffic light = 8 ( el semáforo )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/traffic_light.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/traffic_light.mtl" ), 0.35f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Traffic_Light", Gender.MASCULINE ) );
+				// Trash = 9 ( la basura )
+				roomObjects.add( new BBWordObject( Object3D.mergeAll(
+						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/trashcan.obj" ),
+						BB.context.getResources().getAssets().open( "raw/room3/trashcan.mtl" ), 3.5f ) ), 
+						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Trash", Gender.MASCULINE ) );
+				Log.d( "Room", "Loading object 'car' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
+				startTime = System.currentTimeMillis();
 
 			} catch ( IOException e ) {
 				// TODO Auto-generated catch block
@@ -593,19 +612,19 @@ public class BBRoom extends World {
 			
 			//Address 0
 			addWordObject( 20, 0f, 10, roomObjects.get( 0 ), "Address" );
-			//Bus 1
+			//Bus 2
 			addWordObject( -54, 8f, 13, roomObjects.get( 1 ), "Bus", new SimpleVector( 0, ( float )Math.PI, 0 ) );
-			//Car 2
+			//Car 3
 			addWordObject( -30, 8f, -23, roomObjects.get( 2 ), "Car", new SimpleVector( 0, ( float )Math.PI/2, 0 ) );
-			//Map 3
+			//Map 4
 			addWordObject( 4, -1f, -20, roomObjects.get( 3 ), "Map" );
-			//Street sign 4
-			addWordObject( -25, -1f, -19, roomObjects.get( 4 ), "Sign" );
-			//Taxi 5
-			addWordObject( 20, 7f, 10, roomObjects.get( 5 ), "Taxi", new SimpleVector( 0, ( float )Math.PI, 0 ) );
-			//Traffic Light 6
-			addWordObject( -70, -3f, -20, roomObjects.get( 6 ), "Traffic_Light", new SimpleVector( 0, ( float )Math.PI, 0 ) );
-			addWordObject( -23, -3f, 22, roomObjects.get( 6 ), "Traffic_Light" );
+			//Street sign 6
+			addWordObject( -25, -1f, -19, roomObjects.get( 5 ), "Sign" );
+			//Taxi 7
+			addWordObject( 20, 7f, 10, roomObjects.get( 6 ), "Taxi", new SimpleVector( 0, ( float )Math.PI, 0 ) );
+			//Traffic Light 8
+			addWordObject( -70, -3f, -20, roomObjects.get( 7 ), "Traffic_Light", new SimpleVector( 0, ( float )Math.PI, 0 ) );
+			addWordObject( -23, -3f, 22, roomObjects.get( 7 ), "Traffic_Light" );
 			break;
 		}
 		Loader.clearCache();
