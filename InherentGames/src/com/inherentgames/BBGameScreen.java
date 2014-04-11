@@ -17,12 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.Window;
-import android.widget.Toast;
-
 import com.inherentgames.BBRoom.Level;
-import com.inherentgames.BBWordObject.Gender;
 
 
 public class BBGameScreen extends Activity {
@@ -32,11 +28,12 @@ public class BBGameScreen extends Activity {
 	protected BBRenderer renderer;
 	protected BBGame game;
 	protected AlertDialog.Builder builder;
-	
 	private Drawable icon;
 	
+	// Internal parameters
+	private boolean isTutorial = false;
+	
 	// Stops Eclipse from complaining about new API calls
-	@SuppressWarnings( "deprecation" )
 	@SuppressLint( { "InlinedApi", "NewApi" } )
 	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
@@ -44,7 +41,7 @@ public class BBGameScreen extends Activity {
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
-		// Create OpenGL view (which in turn creates the renderer)
+		// Create OpenGL view
 		glView = new BBGLView( this );
 		// Initialize the renderer
 		renderer = new BBRenderer();
@@ -73,11 +70,8 @@ public class BBGameScreen extends Activity {
 		int levelNum = settings.getInt( "loadLevel", 1 );
 		Log.i( "GameScreen", "Current level is: " + levelNum );
         
-		// Set the activity's content view to the OpenGL view
-		setContentView( glView );
-		
-		// TODO: Figure out what this code actually does and why it's in this section of the class
-		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
+		// So much code just to create an icon
+		icon = BB.context.getResources().getDrawable( R.drawable.pause_button_pressed );
 		Bitmap bb = ((BitmapDrawable) icon).getBitmap();
 
 		int iconWidth = bb.getWidth();
@@ -93,29 +87,32 @@ public class BBGameScreen extends Activity {
 		// TODO: Do something about the deprecated stuff
 		icon = new BitmapDrawable( resultBitmap );
 		
-		// Define an the pause menu
-		final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
+		// Define the pause menu
+		final CharSequence[] items = {BB.context.getString( R.string.c_resume ), BB.context.getString( R.string.c_settings ), BB.context.getString( R.string.c_exit )};
 
-		builder = new AlertDialog.Builder( this );
+		builder = new AlertDialog.Builder( BB.context );
 		builder.setIcon( icon );
-		builder.setTitle( getString( R.string.c_title ) );
+		builder.setTitle( BB.context.getString( R.string.c_title ) );
 		builder.setItems( items, new DialogInterface.OnClickListener() {
 		    public void onClick( DialogInterface dialog, int item ) {
-				if ( items[item] == getString( R.string.c_resume ) ) {
+				if ( items[item] == BB.context.getString( R.string.c_resume ) ) {
 					game.setPauseButtonState();
 				}
-				else if ( items[item] == getString( R.string.c_settings ) ) {
+				else if ( items[item] == BB.context.getString( R.string.c_settings ) ) {
 					game.setPauseButtonState();
 					/*
 					Intent intent = new Intent( context, Settings.class );
 					startActivity( intent );
 					*/
 				}
-				else if ( items[item] == getString( R.string.c_exit ) ) {
+				else if ( items[item] == BB.context.getString( R.string.c_exit ) ) {
 					finish();
 				}
 		    }
 		} );
+		
+		// Set the activity's content view to the OpenGL view
+		setContentView( glView );
 	}
 	
 	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
@@ -165,7 +162,15 @@ public class BBGameScreen extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
+		
+		// Load appropriate level (or tutorial)
+		isTutorial = getIntent().getBooleanExtra( "tutorial", false ); 
+        if ( isTutorial ) {
+        	game.setLevel( Level.TUTORIAL );
+        } else {
+        	game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
+        }
+        
 		glView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
@@ -215,18 +220,27 @@ public class BBGameScreen extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-	   Log.d( "Tutorial", "onBackPressed Called" );
-	   Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
-	   startActivity( setIntent );
-	   BBMenuScreen.ANIMATION = "DOWN";
-	   // Dispose tutorial world, provided it has been loaded
-	   game.loading = true;
+		Log.d( "BBGameScreen", "onBackPressed Called" );
+		BBMenuScreen.ANIMATION = "DOWN";
+		if ( isTutorial ) {
+			finish();
+		} else {
+			Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
+			setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
+			startActivity( setIntent );
+			// Dispose tutorial world, provided it has been loaded
+			game.loading = true;
+		}
 	}
 	
 	// Used to indicate to Android system to perform an optimization
 	protected boolean isFullscreenOpaque() {
 		return true;
+	}
+	
+	protected void showPauseMenu() {
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 }

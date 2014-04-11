@@ -6,9 +6,14 @@ import java.util.Enumeration;
 
 import javax.vecmath.Vector3f;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -71,7 +76,7 @@ public class BBGame {
 	/* Internal parameters */
 	
 	// Track the current room number
-	private Level level = Level.CLASSROOM;
+	protected Level level = Level.CLASSROOM;
 	
 	// Track whether the current level is the tutorial
 	protected boolean isTutorial;
@@ -181,6 +186,8 @@ public class BBGame {
 		
 		// Initialize the clock
 		clock = new Clock();
+		
+		
 	}
 	
 	// Allows for the singleton design pattern
@@ -504,6 +511,10 @@ public class BBGame {
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.basura ) ), 256, 256 );
 					tm.addTexture( "Basura", new Texture( bitmap, true ) );
 					bitmap.recycle();
+					
+					break;
+				case BEACH:
+					break;
 			}
 		
 		} catch( Exception e ) {
@@ -1044,4 +1055,6 @@ public class BBGame {
 	public void setLevel( Level num ) {
 		level = num;
 	}
+	
+	
 }

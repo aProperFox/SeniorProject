@@ -64,6 +64,7 @@ public class BBVideoScreen extends Activity {
             	else {
             		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
                     intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+                    intent.putExtra( "tutorial", false );
                     startActivity( intent );
                     finish();
             	}

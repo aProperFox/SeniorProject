@@ -7,6 +7,7 @@ import javax.vecmath.Vector3f;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.android.texample2.GLText;
@@ -55,9 +56,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	private static int charWidth = 9;
 	private static int charPerLine = 32;
 	
-	/*private float[] mProjMatrix = new float[16];
+	private float[] mProjMatrix = new float[16];
 	private float[] mVMatrix = new float[16];
-	private float[] mVPMatrix = new float[16];*/
+	private float[] mVPMatrix = new float[16];
 	
 	/**
 	 * @param c
@@ -82,7 +83,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	// Triggered when the view port is created
 	public void onSurfaceCreated( GL10 unused, EGLConfig config ) {
 		glText = new GLText( BB.context.getAssets() );
-		glText.load( "futura-normal.ttf", 14, 2, 2 );
+		glText.load( "futura-normal.ttf", 44, 2, 2 );
 		
 		// enable texture + alpha blending
 		GLES20.glEnable(GLES20.GL_BLEND);
@@ -130,6 +131,24 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			
 		} );
 		
+		float ratio = (float) BB.width / BB.height;
+		
+		if (BB.width > BB.height) {
+			Matrix.frustumM(mProjMatrix, 0, -ratio, ratio, -1, 1, 1, 10);
+		}
+		else {
+			Matrix.frustumM(mProjMatrix, 0, -1, 1, -1/ratio, 1/ratio, 1, 10);
+		}
+
+		int useForOrtho = Math.min(BB.width, BB.height);
+
+		//TODO: Is this wrong?
+		Matrix.orthoM(mVMatrix, 0,
+				-useForOrtho/2,
+				useForOrtho/2,
+				-useForOrtho/2,
+				useForOrtho/2, 0.1f, 100f);
+		
 	}
 	
 	// Triggers every clock cycle / time the system wants to draw a frame
@@ -140,8 +159,11 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		
 		// Render loading screen if the game is loading
 		if ( game.loading ) {
+			/*
+			Matrix.multiplyMM(mVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
 			
-			/*Matrix.multiplyMM(mVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
+			glText.drawTexture( BB.width/2, BB.height/2, mVPMatrix );
+			
 			glText.begin( 0.0f, 0.0f, 1.0f, 1.0f, mVPMatrix );
 			glText.draw( "Loading...", 50, 200 );
 			glText.end();*/

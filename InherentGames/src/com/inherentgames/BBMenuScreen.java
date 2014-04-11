@@ -19,12 +19,10 @@ import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 
 @SuppressLint( "NewApi" )
@@ -73,7 +71,7 @@ public class BBMenuScreen extends Activity {
 		
 		typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
 		
-		// click-handler for buttons
+		// Click handler for buttons
 		playButton = ( Button ) findViewById( R.id.playbutton );
 		setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
 		
@@ -127,7 +125,8 @@ public class BBMenuScreen extends Activity {
 		        
 		        @Override
 		        public void onClick( View v ) {
-		            Intent i = new Intent( BBMenuScreen.this, BBTutorial.class );
+		            Intent i = new Intent( BBMenuScreen.this, BBGameScreen.class );
+		            i.putExtra( "tutorial", true );
 		            startActivity( i );
 		            overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
 		        }

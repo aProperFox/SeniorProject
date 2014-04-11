@@ -33,9 +33,9 @@ public class BBTutorial extends Activity {
 	//private Properties config;
 
 	// Library objects
-	private GLSurfaceView mGLView;
+	private GLSurfaceView glView;
 	protected BBGame game;
-	protected BBRenderer renderer = null;
+	protected BBRenderer renderer;
 	
 	// Internal Parameters
 	private float xpos = -1;
@@ -63,8 +63,6 @@ public class BBTutorial extends Activity {
 
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
-         
-		mGLView = new GLSurfaceView( getApplication() );
 
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
@@ -74,7 +72,7 @@ public class BBTutorial extends Activity {
 		//assetsPropertyReader = new BBAssetsPropertyReader();
 		//config = assetsPropertyReader.getProperties( "config.properties" );
 
-		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
+		/*glView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 
 			@Override
 			public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display ) {
@@ -86,18 +84,20 @@ public class BBTutorial extends Activity {
 				egl.eglChooseConfig( display, attributes, configs, 1, result );
 				return configs[0];
 			}
-		} );
+		} );*/
+		
+		// Create OpenGL view
+		glView = new BBGLView( this );
+		// Initialize the OpenGL renderer
+		renderer = new BBRenderer();
+		// Assign the OpenGL renderer to this view
+		glView.setRenderer( renderer );
 		
         // Initialize the game object
         game = BBGame.getInstance();
-        game.setLevel(Level.TUTORIAL);
-        // Initialize the OpenGL renderer
-		renderer = new BBRenderer();
-		// Assign the OpenGL renderer to this view
-		mGLView.setRenderer( renderer );
-		// Prevent screen from turning off (after idling)
-		mGLView.setKeepScreenOn( true );
-		setContentView( mGLView );
+        game.setLevel( Level.TUTORIAL );
+        
+		setContentView( glView );
 
 
 		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
@@ -163,7 +163,7 @@ public class BBTutorial extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mGLView.onPause();
+		glView.onPause();
 	}
 
 	/* ( non-Javadoc )
@@ -173,10 +173,10 @@ public class BBTutorial extends Activity {
 	protected void onResume() {
 		super.onResume();
 		game.setLevel( Level.TUTORIAL );
-		mGLView.onResume();
+		glView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-			BB.setImmersiveMode( mGLView, getWindow().getDecorView() );
+			BB.setImmersiveMode( glView, getWindow().getDecorView() );
 		}
 	}
 
@@ -192,156 +192,14 @@ public class BBTutorial extends Activity {
 	 * @see android.app.Activity#onTouchEvent( android.view.MotionEvent )
 	 */
 	public boolean onTouchEvent( MotionEvent me ) {
-		if ( me.getAction() == MotionEvent.ACTION_DOWN && (game.wattsonPrivileges & 1) != 0 ) {
-			xpos = me.getX();
-			ypos = me.getY();
-			if ( xpos < BB.width/5 && xpos > 0 && ypos > 0 && ypos < BB.width/5 ) {
-
-				game.iterateWattson();
-				isShootMode = false;
-				return true;
-			}
-		}
-		if ((game.wattsonPrivileges & 1) == 0) {
-			switch( me.getAction() & MotionEvent.ACTION_MASK ) {
-
-    		case MotionEvent.ACTION_DOWN:
-				xpos = me.getX( 0 );
-				ypos = me.getY( 0 );
-				//press fire button
-				if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 && (game.wattsonPrivileges & 12) != 0 ) {
-					isShootMode = true;
-					game.setFireButtonState( true );
-				}
-				//press pause button
-				else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10) {
-					isShootMode = false;
-					game.setPauseButtonState();
-					final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
-
-					AlertDialog.Builder builder = new AlertDialog.Builder( this );
-					builder.setIcon( icon );
-					builder.setTitle( getString( R.string.c_title ) );
-					builder.setItems( items, new DialogInterface.OnClickListener() {
-					    public void onClick( DialogInterface dialog, int item ) {
-							if ( items[item]==getString( R.string.c_resume ) ) {
-								game.setPauseButtonState();
-							}
-							else if ( items[item]==getString( R.string.c_settings ) ) {
-								game.setPauseButtonState();
-								/*
-								Intent intent = new Intent( context, Settings.class );
-								startActivity( intent );
-								*/
-							}
-							else if ( items[item]==getString( R.string.c_exit ) ) {
-								finish();
-							}
-					    }
-					} );
-					AlertDialog alert = builder.create();
-					alert.show();
-
-				}
-
-				else {
-					isShootMode = false;
-				}
-
-				return true;
-
-    		case MotionEvent.ACTION_POINTER_DOWN:
-				firstX = me.getX( 1 );
-				firstY = me.getY( 1 );
-				return true;
-
-    		case MotionEvent.ACTION_UP:
-				xpos = -1;
-				ypos = -1;
-				game.horizontalSwipe = 0;
-				game.verticalSwipe = 0;
-				isShootMode = false;
-				game.setFireButtonState( false );
-				return true;
-
-    		case MotionEvent.ACTION_POINTER_UP:
-    			/*
-    			 * May work to get exact screen size in inches
-    			 * 
-    			DisplayMetrics dm = new DisplayMetrics();
-    		    getWindowManager().getDefaultDisplay().getMetrics( dm );
-    		    double x = Math.pow( dm.BB.widthPixels/dm.xdpi, 2 );
-    		    double y = Math.pow( dm.BB.heightPixels/dm.ydpi, 2 );
-    		    double screenInches = Math.sqrt( x+y );
-    			*/
-    			Log.d( "GameScreen", "Action Pointer Up" );
-				xpos = -1;
-				ypos = -1;
-				game.horizontalSwipe = 0;
-				game.verticalSwipe = 0;
-				float xd = me.getX( 1 ) - firstX;
-				float yd = me.getY( 1 ) - firstY;
-				if ( isShootMode ){
-					if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
-						// If you can shoot, set the gender
-						if ( (game.wattsonPrivileges & 4) != 0 ) {
-							game.setGender( BBWordObject.Gender.MASCULINE );
-							game.iterateWattson();
-	
-							Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
-						}
-						else
-							return false;
-					}
-					else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
-						// If you can shoot, set the gender
-						if ( (game.wattsonPrivileges & 8) != 0 ) {
-							game.setGender( BBWordObject.Gender.FEMININE );
-							game.iterateWattson();
-							Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
-						}
-						else
-							return false;
-					}
-					else {
-						return true;
-					}
-				}
-				game.shootBubble();
-
-				return true;
-
-    		case MotionEvent.ACTION_MOVE:
-    			if ( !isShootMode ) {
-    				xd = me.getX() - xpos;
-    				yd = me.getY() - ypos;
-    				
-    				if( (game.wattsonPrivileges & 2) != 0  && lastPressedWattson == 0){
-						lastPressedWattson = System.currentTimeMillis();
-					}
-    				
-    				if(lastPressedWattson != 0 && lastPressedWattson < System.currentTimeMillis() - 3000){
-    					game.iterateWattson();
-    					lastPressedWattson = 0;
-    				}
-    				if( (game.wattsonPrivileges & 2) != 0 ){
-	    				game.horizontalSwipe = ( xd / -( BB.width/5f ) );
-						game.verticalSwipe = ( yd / -( BB.height/5f ) );
-    				}
-					
-    				xpos = me.getX();
-    				ypos = me.getY();
-    			}
-
-				return true;
-
-		}
-		}
-		try {
+		
+		
+		/*try {
 			Thread.sleep( 10 );
 		} catch ( Exception e ) {
 			//No need
-		}
+		}*/
+		
 		return super.onTouchEvent( me );
 	}
 
@@ -357,7 +215,7 @@ public class BBTutorial extends Activity {
 	public void onBackPressed() {
 	   Log.d( "Tutorial", "onBackPressed Called" );
 	   Intent setIntent = new Intent( BBTutorial.this, BBMenuScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 	   startActivity( setIntent );
 	   BBMenuScreen.ANIMATION = "RIGHT";
 	   // Dispose tutorial world, provided it has been loaded

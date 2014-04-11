@@ -1,17 +1,13 @@
 package com.inherentgames;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -26,7 +22,6 @@ public class BBMapScreen extends Activity {
 	
 	int levelNum;
 	
-	@SuppressWarnings( "deprecation" )
 	@SuppressLint( "NewApi" )
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
@@ -117,7 +112,7 @@ public class BBMapScreen extends Activity {
 	public void onBackPressed() {
 	   Log.d( "MapScreen", "onBackPressed Called" );
 	   Intent setIntent = new Intent( BBMapScreen.this, BBMenuScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 	   BBMenuScreen.ANIMATION = "DOWN";
 	   startActivity( setIntent );
 	}
