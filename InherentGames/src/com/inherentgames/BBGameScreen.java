@@ -1,9 +1,5 @@
 package com.inherentgames;
 
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLDisplay;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,18 +28,10 @@ import com.inherentgames.BBWordObject.Gender;
 public class BBGameScreen extends Activity {
     
 	// Library objects
-	private GLSurfaceView mGLView;
+	protected GLSurfaceView glView;
+	protected BBRenderer renderer;
 	protected BBGame game;
-	protected BBRenderer renderer = null;
-	
-	// Internal Parameters
-	private float xpos = -1;
-	private float ypos = -1;
-	private float firstX;
-	private float firstY;
-	// TODO: Need to move this to the BBGame class
-	private boolean isShootMode = false;
-	private Toast loadingText;
+	protected AlertDialog.Builder builder;
 	
 	private Drawable icon;
 	
@@ -56,11 +44,17 @@ public class BBGameScreen extends Activity {
 		// Remove title bar
 		this.requestWindowFeature( Window.FEATURE_NO_TITLE );
 		
-		// Create OpenGL view
-		mGLView = new GLSurfaceView( getApplication() );
+		// Create OpenGL view (which in turn creates the renderer)
+		glView = new BBGLView( this );
+		// Initialize the renderer
+		renderer = new BBRenderer();
+		glView.setRenderer( renderer );
+		
+		// Initialize the game object
+	    game = BBGame.getInstance();
 		
 		// TODO: Figure out what this actually does
-		mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
+		/*mGLView.setEGLConfigChooser( new GLSurfaceView.EGLConfigChooser() {
 			
 			@Override
 			public EGLConfig chooseConfig( EGL10 egl, EGLDisplay display ) {
@@ -72,22 +66,15 @@ public class BBGameScreen extends Activity {
 				egl.eglChooseConfig( display, attributes, configs, 1, result );
 				return configs[0];
 			}
-		} );
+		} );*/
 		
 		// Load stored preferences
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		int levelNum = settings.getInt( "loadLevel", 1 );
 		Log.i( "GameScreen", "Current level is: " + levelNum );
         
-        // Initialize the game object
-        game = BBGame.getInstance();
-        // Initialize the OpenGL renderer
-		renderer = new BBRenderer();
-		// Assign the OpenGL renderer to this view
-		mGLView.setRenderer( renderer );
-		// Prevent screen from turning off (after idling)
-		mGLView.setKeepScreenOn( true );
-		setContentView( mGLView );
+		// Set the activity's content view to the OpenGL view
+		setContentView( glView );
 		
 		// TODO: Figure out what this code actually does and why it's in this section of the class
 		icon = getResources().getDrawable( R.drawable.pause_button_pressed );
@@ -106,6 +93,29 @@ public class BBGameScreen extends Activity {
 		// TODO: Do something about the deprecated stuff
 		icon = new BitmapDrawable( resultBitmap );
 		
+		// Define an the pause menu
+		final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
+
+		builder = new AlertDialog.Builder( this );
+		builder.setIcon( icon );
+		builder.setTitle( getString( R.string.c_title ) );
+		builder.setItems( items, new DialogInterface.OnClickListener() {
+		    public void onClick( DialogInterface dialog, int item ) {
+				if ( items[item] == getString( R.string.c_resume ) ) {
+					game.setPauseButtonState();
+				}
+				else if ( items[item] == getString( R.string.c_settings ) ) {
+					game.setPauseButtonState();
+					/*
+					Intent intent = new Intent( context, Settings.class );
+					startActivity( intent );
+					*/
+				}
+				else if ( items[item] == getString( R.string.c_exit ) ) {
+					finish();
+				}
+		    }
+		} );
 	}
 	
 	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
@@ -149,135 +159,23 @@ public class BBGameScreen extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mGLView.onPause();
+		glView.onPause();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
-		mGLView.onResume();
+		glView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
-			BB.setImmersiveMode( mGLView, getWindow().getDecorView() );
+			BB.setImmersiveMode( glView, getWindow().getDecorView() );
 		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-	}
-	
-	// Handle touch events during the game
-	public boolean onTouchEvent( MotionEvent me ) {
-		switch( me.getAction() & MotionEvent.ACTION_MASK ) {
-	    	
-			// First finger pressed down
-    		case MotionEvent.ACTION_DOWN:
-				xpos = me.getX( 0 );
-				ypos = me.getY( 0 );
-				// Pressed fire button
-				if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 ) {
-					isShootMode = true;
-					game.setFireButtonState( true );
-				}
-				// Pressed pause button
-				else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10 ) {
-					isShootMode = false;
-					game.setPauseButtonState();
-					final CharSequence[] items = {getString( R.string.c_resume ), getString( R.string.c_settings ), getString( R.string.c_exit )};
-
-					AlertDialog.Builder builder = new AlertDialog.Builder( this );
-					builder.setIcon( icon );
-					builder.setTitle( getString( R.string.c_title ) );
-					builder.setItems( items, new DialogInterface.OnClickListener() {
-					    public void onClick( DialogInterface dialog, int item ) {
-							if ( items[item]==getString( R.string.c_resume ) ) {
-								game.setPauseButtonState();
-							}
-							else if ( items[item]==getString( R.string.c_settings ) ) {
-								game.setPauseButtonState();
-								/*
-								Intent intent = new Intent( context, Settings.class );
-								startActivity( intent );
-								*/
-							}
-							else if ( items[item]==getString( R.string.c_exit ) ) {
-								finish();
-							}
-					    }
-					} );
-					AlertDialog alert = builder.create();
-					alert.show();
-					
-				// Pressed anywhere else
-				} else {
-					isShootMode = false;
-				}
-				return true;
-			// Second or later finger pressed down
-			case MotionEvent.ACTION_POINTER_DOWN:
-				firstX = me.getX( 1 );
-				firstY = me.getY( 1 );
-				isShootMode = true;
-				return true;
-			// First finger released
-    		case MotionEvent.ACTION_UP:
-    			Log.d( "GameScreen", "Action Up" );
-				xpos = -1;
-				ypos = -1;
-				game.horizontalSwipe = 0;
-				game.verticalSwipe = 0;
-				isShootMode = false;
-				game.setFireButtonState( false );
-				return true;
-			// Second or later finger released
-    		case MotionEvent.ACTION_POINTER_UP:
-    			Log.d( "GameScreen", "Action Pointer Up" );
-				xpos = -1;
-				ypos = -1;
-				game.horizontalSwipe = 0;
-				game.verticalSwipe = 0;
-				float xd = me.getX( 1 ) - firstX;
-				float yd = me.getY( 1 ) - firstY;
-				// Swipe up indicates masculine
-				if ( yd < ( -BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
-					game.setGender( Gender.MASCULINE );
-				}
-				// Swipe down indicates feminine
-				else if ( yd > ( BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
-					game.setGender( Gender.FEMININE );
-				}
-				// Neither indicates nothing
-				else {
-					return true;
-				}
-				// Shoot bubble accordingly
-				game.shootBubble();
-				return true;
-			// Finger moved
-			// Note: Here, we're only using this event for panning around, not for swiping up/down to shoot bubbles
-    		case MotionEvent.ACTION_MOVE:
-    			if ( !isShootMode ) {
-    				xd = me.getX() - xpos;
-    				yd = me.getY() - ypos;
-
-					game.horizontalSwipe = ( xd / -( BB.width/5f ) );
-					game.verticalSwipe = ( yd / -( BB.height/5f ) );
-					
-    				xpos = me.getX();
-    				ypos = me.getY();
-    			}
-
-				return true;
-		
-		}
-		try {
-			Thread.sleep( 10 );
-		} catch ( Exception e ) {
-			//No need
-		}
-		return super.onTouchEvent( me );
 	}
 	
 	@Override
@@ -319,7 +217,7 @@ public class BBGameScreen extends Activity {
 	public void onBackPressed() {
 	   Log.d( "Tutorial", "onBackPressed Called" );
 	   Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 	   startActivity( setIntent );
 	   BBMenuScreen.ANIMATION = "DOWN";
 	   // Dispose tutorial world, provided it has been loaded

@@ -5,8 +5,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+
+import com.android.texample2.GLText;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.IPaintListener;
 import com.threed.jpct.Object3D;
@@ -27,7 +30,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	
 	/* Internal parameters */
 	
-	//private GLText glText;
+	private GLText glText;
 	
 	// Represents the "cleared" background color of the frame buffer 
 	private RGBColor bg = new RGBColor( 255, 255, 255 );
@@ -77,23 +80,23 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	// Triggered when the view port is created
-	public void onSurfaceCreated( GL10 gl, EGLConfig config ) {
-		/*glText = new GLText( BB.getAppContext().getAssets() );
+	public void onSurfaceCreated( GL10 unused, EGLConfig config ) {
+		glText = new GLText( BB.context.getAssets() );
 		glText.load( "futura-normal.ttf", 14, 2, 2 );
 		
 		// enable texture + alpha blending
 		GLES20.glEnable(GLES20.GL_BLEND);
-		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);*/
+		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	// Triggered when the view port changes (e.g., by size)
-	public void onSurfaceChanged( GL10 gl, int w, int h ) {
+	public void onSurfaceChanged( GL10 unused, int w, int h ) {
 		// Clear the frame buffer if it's not clean
 		if ( fb != null ) {
 			fb.dispose();
 		}
 		// Initialize a new frame buffer with the new frame/screen size
-		fb = new FrameBuffer( gl, w, h );
+		fb = new FrameBuffer( w, h );
 		
 		// Create and render a dummy world for the loading screen
 		// Note: We need to do this because jPCT-AE won't allow us to blit 
@@ -130,7 +133,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	// Triggers every clock cycle / time the system wants to draw a frame
-	public void onDrawFrame( GL10 gl ) {
+	public void onDrawFrame( GL10 unused ) {
 		
 		// Clear the frame buffer
 		fb.clear( bg );
