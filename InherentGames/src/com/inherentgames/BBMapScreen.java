@@ -32,6 +32,9 @@ public class BBMapScreen extends Activity {
 	public void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
 
+        BBGame game = BBGame.getInstance();
+        game.loading = true;
+		
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		levelNum = settings.getInt( "nextLevel", 1 );
 		switch( levelNum ) {
@@ -54,6 +57,17 @@ public class BBMapScreen extends Activity {
 	@SuppressLint("InlinedApi")
 	public void onResume() {
 		super.onResume();
+		
+		// Check for animation message
+		if ( BBMenuScreen.ANIMATION == "LEFT" ){
+			overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
+		} else if ( BBMenuScreen.ANIMATION == "RIGHT" ) {
+			overridePendingTransition( R.anim.slide_in_right, R.anim.slide_out_right );
+		} else if ( BBMenuScreen.ANIMATION == "DOWN" ) {
+			overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
+		} else {
+			overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		}
 		
 		// Enable Immersive mode (hides status and nav bar)
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {
@@ -86,7 +100,8 @@ public class BBMapScreen extends Activity {
 			else if ( xpos > BB.width*.675 && xpos < BB.width*.88 && ypos > BB.height*0.176 && ypos < BB.height*0.44 ) {
 				if ( levelNum > 2 ) {
 					getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 3 ).commit();
-                    Intent i = new Intent( BBMapScreen.this, BBGameScreen.class );
+                    Intent i = new Intent( BBMapScreen.this, BBVideoScreen.class );
+                    i.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic3a" );
                     startActivity( i );
                     finish();
 				}
@@ -101,8 +116,9 @@ public class BBMapScreen extends Activity {
 	@Override
 	public void onBackPressed() {
 	   Log.d( "MapScreen", "onBackPressed Called" );
-	   Intent setIntent = new Intent( this, BBMenuScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+	   Intent setIntent = new Intent( BBMapScreen.this, BBMenuScreen.class );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   BBMenuScreen.ANIMATION = "DOWN";
 	   startActivity( setIntent );
 	}
 	

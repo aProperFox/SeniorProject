@@ -100,6 +100,17 @@ public class BBGame {
 	// Track time the game will end
 	protected long endTime;
 	
+	// Track the movement of the arrow
+	protected int arrowMod;
+	protected int arrowDir;
+	
+	// Track the movement of the hand
+	protected int handMod;
+	protected int handDir;
+	protected long handWaitEnd;
+	protected boolean moveHand;
+	protected int handTransparency;
+	
 	// Tracks horizontal and vertical swipe movement
 	protected float horizontalSwipe = 0;
 	protected float verticalSwipe = 0;
@@ -250,16 +261,20 @@ public class BBGame {
 				tm.addTexture( "ScoreArrow", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_up ) ), 32, 64 );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_up ) ), 128, 128 );
 				tm.addTexture( "ArrowUp", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_right ) ), 64, 32 );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_right ) ), 128, 128 );
 				tm.addTexture( "ArrowRight", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_down ) ), 32, 64 );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_down ) ), 128, 128 );
 				tm.addTexture( "ArrowDown", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.hand ) ), 128, 128 );
+				tm.addTexture( "Hand", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.filter ) ), 64, 64 );
@@ -462,6 +477,9 @@ public class BBGame {
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.direccion ) ), 256, 256 );
 					tm.addTexture( "Direccion", new Texture( bitmap, true ) );
 					bitmap.recycle();
+					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.bicicleta ) ), 256, 256 );
+					tm.addTexture( "Bicicleta", new Texture( bitmap, true ) );
+					bitmap.recycle();
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.autobus ) ), 256, 256 );
 					tm.addTexture( "Autobus", new Texture( bitmap, true ) );
 					bitmap.recycle();
@@ -471,6 +489,9 @@ public class BBGame {
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.mapa ) ), 256, 256 );
 					tm.addTexture( "Mapa", new Texture( bitmap, true ) );
 					bitmap.recycle();
+					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.policia ) ), 256, 256 );
+					tm.addTexture( "Policia", new Texture( bitmap, true ) );
+					bitmap.recycle();
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.senal ) ), 256, 256 );
 					tm.addTexture( "Senal", new Texture( bitmap, true ) );
 					bitmap.recycle();
@@ -479,6 +500,9 @@ public class BBGame {
 					bitmap.recycle();
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.semaforo ) ), 256, 256 );
 					tm.addTexture( "Semaforo", new Texture( bitmap, true ) );
+					bitmap.recycle();
+					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.basura ) ), 256, 256 );
+					tm.addTexture( "Basura", new Texture( bitmap, true ) );
 					bitmap.recycle();
 			}
 		
@@ -511,6 +535,16 @@ public class BBGame {
         soundPoolMap.put( 17, soundPool.load( BB.context, R.raw.plato, 1 ) );
         soundPoolMap.put( 18, soundPool.load( BB.context, R.raw.cuchara, 1 ) );
         soundPoolMap.put( 19, soundPool.load( BB.context, R.raw.mesa, 1 ) );
+        soundPoolMap.put( 20, soundPool.load( BB.context, R.raw.direccion, 1 ) );
+        soundPoolMap.put( 21, soundPool.load( BB.context, R.raw.bicicleta, 1 ) );
+        soundPoolMap.put( 22, soundPool.load( BB.context, R.raw.autobus, 1 ) );
+        soundPoolMap.put( 23, soundPool.load( BB.context, R.raw.coche, 1 ) );
+        soundPoolMap.put( 24, soundPool.load( BB.context, R.raw.mapa, 1 ) );
+        soundPoolMap.put( 25, soundPool.load( BB.context, R.raw.policia, 1 ) );
+        soundPoolMap.put( 26, soundPool.load( BB.context, R.raw.senal, 1 ) );
+        soundPoolMap.put( 27, soundPool.load( BB.context, R.raw.taxi, 1 ) );
+        soundPoolMap.put( 28, soundPool.load( BB.context, R.raw.semaforo, 1 ) );
+        soundPoolMap.put( 29, soundPool.load( BB.context, R.raw.basura, 1 ) );
 	}
 	
 	// Sets up the game (OpenGL) scene
@@ -565,8 +599,23 @@ public class BBGame {
 		// Set the level duration to be 100 seconds
 		endTime = System.currentTimeMillis() + 100000;
 		
+		// Set the time left (to ensure the tutorial has time)
+		timeLeft = 100;
+		
 		// Set the game state to "playing"
         isPaused = false;
+        
+        // Set the arrowMod to it's lowest (negative) point and arrow direction to move down (inc y)
+        arrowMod = -(BB.height / 20);
+        arrowDir = 1;
+        
+        // Set the handMod to it's highest (positive) point, and direction to move up (dec y)
+        handMod = BB.height / 5;
+        handDir = -1;
+        handWaitEnd = System.currentTimeMillis() + 3000;
+        moveHand = true;
+        handTransparency = 50;
+
 	}
 	
 	/**
@@ -611,6 +660,45 @@ public class BBGame {
 				}
 			}
 		}
+		
+		// Update arrow movement
+		if ( arrowDir > 0 ) {
+			arrowMod += BB.height / 200;
+		} else {
+			arrowMod -= BB.height / 200;
+		}
+		if ( Math.abs(arrowMod) >= BB.height / 20 ) {
+			arrowDir *= -1;
+		}
+		
+		// Update hand movement
+		if ( handDir > 0 && moveHand) {
+			handMod += BB.height / 150;
+		} else {
+			if ( moveHand ) {
+				handMod -= BB.height / 150;
+			}
+		}
+		if ( Math.abs(handMod) >= BB.height / 5 ) {
+			
+			handMod = BB.height / 5 * handDir;
+			
+			// Change transparency if not moving, hold still for 3 seconds
+			if ( System.currentTimeMillis() < handWaitEnd ) {
+				moveHand = false;
+				handTransparency = (handTransparency > 0) ? handTransparency - 1 :  0;
+			} else {
+				handMod *= -1;
+				handWaitEnd = System.currentTimeMillis() + 3000;
+				moveHand = true; 
+				handTransparency = 50;
+			}
+		} else {
+			moveHand = true;
+			handTransparency = 50;
+		}
+		Log.d("BBGame", "handTransparency: " + handTransparency);
+		
 		
 		// TODO: Check the efficiency of this
 		// Rotate objects floating in the bubbles
@@ -726,7 +814,7 @@ public class BBGame {
 				wattsonPrivileges = wattsonPrivileges << 1;
 			}
 			else if(wattsonTextIterator == 4){
-				wattsonPrivileges = 1;
+				wattsonPrivileges = 17;
 			}
 			else{
 				wattsonPrivileges = 14;
@@ -941,9 +1029,10 @@ public class BBGame {
             	Toast toast = Toast.makeText( BB.context, R.string.lose_level_title, Toast.LENGTH_LONG );
                 toast.show();
                 Intent intent = new Intent( BB.context, BBGameScreen.class );
-        	    intent.setClass( BB.context, BBMenuScreen.class );
+        	    intent.setClass( BB.context, BBMapScreen.class );
         	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         	    BB.context.startActivity( intent );
+        	    BBMenuScreen.ANIMATION = "DOWN";
         	    loading = true;
             }
         } );

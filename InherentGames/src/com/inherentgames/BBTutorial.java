@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -280,29 +281,31 @@ public class BBTutorial extends Activity {
 				game.verticalSwipe = 0;
 				float xd = me.getX( 1 ) - firstX;
 				float yd = me.getY( 1 ) - firstY;
-				if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
-					// If you can shoot, set the gender
-					if ( (game.wattsonPrivileges & 4) != 0 ) {
-						game.setGender( BBWordObject.Gender.MASCULINE );
-						game.iterateWattson();
-
-						Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
+				if ( isShootMode ){
+					if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+						// If you can shoot, set the gender
+						if ( (game.wattsonPrivileges & 4) != 0 ) {
+							game.setGender( BBWordObject.Gender.MASCULINE );
+							game.iterateWattson();
+	
+							Log.d( "Tutorial", "Blue bubble shot, iterating Wattson" );
+						}
+						else
+							return false;
 					}
-					else
-						return false;
-				}
-				else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
-					// If you can shoot, set the gender
-					if ( (game.wattsonPrivileges & 8) != 0 ) {
-						game.setGender( BBWordObject.Gender.FEMININE );
-						game.iterateWattson();
-						Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
+					else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+						// If you can shoot, set the gender
+						if ( (game.wattsonPrivileges & 8) != 0 ) {
+							game.setGender( BBWordObject.Gender.FEMININE );
+							game.iterateWattson();
+							Log.d( "Tutorial", "Red bubble shot, iterating Wattson" );
+						}
+						else
+							return false;
 					}
-					else
-						return false;
-				}
-				else {
-					return true;
+					else {
+						return true;
+					}
 				}
 				game.shootBubble();
 
@@ -350,4 +353,15 @@ public class BBTutorial extends Activity {
 		return true;
 	}
 
+	@Override
+	public void onBackPressed() {
+	   Log.d( "Tutorial", "onBackPressed Called" );
+	   Intent setIntent = new Intent( BBTutorial.this, BBMenuScreen.class );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   startActivity( setIntent );
+	   BBMenuScreen.ANIMATION = "RIGHT";
+	   // Dispose tutorial world, provided it has been loaded
+	   game.loading = true;
+	}
+	
 }

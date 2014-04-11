@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -313,6 +314,17 @@ public class BBGameScreen extends Activity {
 		}
         return super.onOptionsItemSelected( item );
     }
+	
+	@Override
+	public void onBackPressed() {
+	   Log.d( "Tutorial", "onBackPressed Called" );
+	   Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
+	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	   startActivity( setIntent );
+	   BBMenuScreen.ANIMATION = "DOWN";
+	   // Dispose tutorial world, provided it has been loaded
+	   game.loading = true;
+	}
 	
 	// Used to indicate to Android system to perform an optimization
 	protected boolean isFullscreenOpaque() {
