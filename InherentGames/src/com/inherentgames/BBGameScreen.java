@@ -28,6 +28,7 @@ public class BBGameScreen extends Activity {
 	protected BBRenderer renderer;
 	protected BBGame game;
 	protected AlertDialog.Builder builder;
+	protected AlertDialog alert;
 	private Drawable icon;
 	
 	// Internal parameters
@@ -90,13 +91,14 @@ public class BBGameScreen extends Activity {
 		// Define the pause menu
 		final CharSequence[] items = {BB.context.getString( R.string.c_resume ), BB.context.getString( R.string.c_settings ), BB.context.getString( R.string.c_exit )};
 
-		builder = new AlertDialog.Builder( BB.context );
+		builder = new AlertDialog.Builder( BBGameScreen.this );
 		builder.setIcon( icon );
 		builder.setTitle( BB.context.getString( R.string.c_title ) );
 		builder.setItems( items, new DialogInterface.OnClickListener() {
 		    public void onClick( DialogInterface dialog, int item ) {
 				if ( items[item] == BB.context.getString( R.string.c_resume ) ) {
 					game.setPauseButtonState();
+					dialog.cancel();
 				}
 				else if ( items[item] == BB.context.getString( R.string.c_settings ) ) {
 					game.setPauseButtonState();
@@ -110,6 +112,8 @@ public class BBGameScreen extends Activity {
 				}
 		    }
 		} );
+		
+		alert = builder.create();
 		
 		// Set the activity's content view to the OpenGL view
 		setContentView( glView );
@@ -181,6 +185,7 @@ public class BBGameScreen extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
+		
 	}
 	
 	@Override
@@ -225,11 +230,12 @@ public class BBGameScreen extends Activity {
 		if ( isTutorial ) {
 			finish();
 		} else {
-			Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
+			/*Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
 			setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 			startActivity( setIntent );
 			// Dispose tutorial world, provided it has been loaded
-			game.loading = true;
+			game.loading = true;*/
+			finish();
 		}
 	}
 	
@@ -239,7 +245,6 @@ public class BBGameScreen extends Activity {
 	}
 	
 	protected void showPauseMenu() {
-		AlertDialog alert = builder.create();
 		alert.show();
 	}
 	

@@ -27,8 +27,8 @@ public class BBMapScreen extends Activity {
 	public void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
 
-        BBGame game = BBGame.getInstance();
-        game.loading = true;
+        /*BBGame game = BBGame.getInstance();
+        game.loading = true;*/
 		
 		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		levelNum = settings.getInt( "nextLevel", 1 );
