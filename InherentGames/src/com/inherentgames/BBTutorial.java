@@ -58,7 +58,9 @@ public class BBTutorial extends Activity {
 	@SuppressLint( { "InlinedApi", "NewApi" } )
 	protected void onCreate( Bundle savedInstanceState ) {
 		Logger.log( "onCreate" );
-
+		
+		Log.d("BBTutorial", " Is still being used");
+		
 		super.onCreate( savedInstanceState );
 
 		// Remove title bar

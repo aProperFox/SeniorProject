@@ -33,4 +33,8 @@
     <string name="dec_object_y">Dec Obj y</string>
     <string name="inc_obj">Inc Obj</string>
     <string name="dec_obj">Dec Obj</string>
+    <string name="master_volume">Master Volume</string>
+   	<string name="main_menu">Return</string>
+	<string name="bgm_volume">Background Music Volume</string>
+	<string name="word_volume">Word Voice Volume</string>
 </resources>

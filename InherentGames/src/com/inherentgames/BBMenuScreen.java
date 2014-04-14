@@ -71,11 +71,31 @@ public class BBMenuScreen extends Activity {
 		
 		typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
 		
+		// Set button width and height variables
+		int buttonWidth = (int) (BB.width / 4.9f);
+		int buttonHeight = (int) (BB.height / 8.7f);
+		float buttonX = (BB.width / 1.2f) - buttonWidth / 2;
+		
 		// Click handler for buttons
 		playButton = ( Button ) findViewById( R.id.playbutton );
 		setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
 		
+		// Set location based on screen dimensions
+		playButton.setWidth( buttonWidth );
+		playButton.setHeight( buttonHeight );
+		playButton.setX( buttonX );
+		Log.d("BBMenuScreen", "button x is: " + playButton.getX());
+		playButton.setY( (BB.height / 2.204f) - buttonHeight / 2 );
+		Log.d("BBMenuScreen", "button y is: " + playButton.getY());
+		
 		SharedPreferences settings = getSharedPreferences( PREFERENCES, 0 );
+		
+		//Audio settings for bubble sounds
+    	AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE );
+        final float curVolume = audioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
+        final int priority = 1;
+        final int no_loop = 0;
+        final float normal_playback_rate = 1f;
 		
 		if ( settings.getBoolean( "hasBeatenTutorial", false ) ) {     
 		playButton.setEnabled( false );
@@ -90,11 +110,7 @@ public class BBMenuScreen extends Activity {
 		        
 		        @Override
 		        public void onClick( View v ) {
-		        	AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE );
-		            float curVolume = audioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
-		            int priority = 1;
-		            int no_loop = 0;
-		            float normal_playback_rate = 1f;
+
 		            Intent i = new Intent( BBMenuScreen.this, BBMapScreen.class );
 		            startActivity( i );
 		            overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
@@ -106,6 +122,12 @@ public class BBMenuScreen extends Activity {
 		
 		Button settingsButton = ( Button ) findViewById( R.id.settingsbutton );
 		setButtonConfig( settingsButton, getString( R.string.settings_button ).toUpperCase(Locale.US) );
+		
+		// Set location based on screen dimensions
+		settingsButton.setX( buttonX );
+		settingsButton.setY( (BB.height / 1.349f) - buttonHeight / 2 );
+		settingsButton.setWidth( buttonWidth );
+		settingsButton.setHeight( buttonHeight );
 		
 		settingsButton.setOnClickListener( new View.OnClickListener() {
 		        
@@ -121,6 +143,12 @@ public class BBMenuScreen extends Activity {
 		Button tutorialButton = ( Button ) findViewById( R.id.tutorialbutton );
 		setButtonConfig( tutorialButton, getString( R.string.tutorial_button ).toUpperCase(Locale.US) );
 		
+		// Set location based on screen dimensions
+		tutorialButton.setX( buttonX );
+		tutorialButton.setY( (BB.height / 1.674f) - buttonHeight / 2 );
+		tutorialButton.setWidth( buttonWidth );
+		tutorialButton.setHeight( buttonHeight );
+		
 		tutorialButton.setOnClickListener( new View.OnClickListener() {
 		        
 		        @Override
@@ -129,12 +157,20 @@ public class BBMenuScreen extends Activity {
 		            i.putExtra( "tutorial", true );
 		            startActivity( i );
 		            overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
+		            soundPool.play( soundID, curVolume, curVolume, priority, no_loop, normal_playback_rate );
 		        }
 		} );
 		
 		
 		Button storeButton = ( Button ) findViewById( R.id.storebutton );
 		setButtonConfig( storeButton, getString( R.string.store_button ).toUpperCase(Locale.US) );
+		
+		// Set location based on screen dimensions
+		storeButton.setX( buttonX );
+		storeButton.setY( (BB.height / 1.13f) - buttonHeight / 2 );
+		Log.d("BBMenuScreen", "button y is: " + storeButton.getY());
+		storeButton.setWidth( buttonWidth );
+		storeButton.setHeight( buttonHeight );
 		
 		storeButton.setOnClickListener( new View.OnClickListener() {
 		        

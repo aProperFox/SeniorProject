@@ -62,12 +62,12 @@ public class BBGLView extends GLSurfaceView {
 						xpos = me.getX( 0 );
 						ypos = me.getY( 0 );
 						// Press fire button
-						if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 && (game.wattsonPrivileges & 12) != 0 ) {
+						if ( game.fireButton.includes((int) xpos, (int) ypos) ) {
 							isShootMode = true;
-							game.setFireButtonState( true );
+							game.fireButton.swapState();
 						}
 						// Press pause button
-						else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10) {
+						else if ( game.pauseButton.includes((int) xpos, (int) ypos)) {
 							isShootMode = false;
 							game.setPauseButtonState();
 							gameScreen.showPauseMenu();
@@ -91,7 +91,8 @@ public class BBGLView extends GLSurfaceView {
 						game.horizontalSwipe = 0;
 						game.verticalSwipe = 0;
 						isShootMode = false;
-						game.setFireButtonState( false );
+						if ( game.fireButton.isActive() )
+							game.fireButton.swapState();
 						return true;
 		
 		    		case MotionEvent.ACTION_POINTER_UP:
@@ -178,12 +179,12 @@ public class BBGLView extends GLSurfaceView {
 					xpos = me.getX( 0 );
 					ypos = me.getY( 0 );
 					// Pressed fire button
-					if ( xpos < ( 3 * BB.width/16 ) && xpos > BB.width/16 && ypos > ( BB.height - ( 3 * BB.width/16 ) ) && ypos < BB.height - BB.width/16 ) {
+					if ( game.fireButton.includes((int) xpos, (int) ypos) ) {
 						isShootMode = true;
-						game.setFireButtonState( true );
+						game.fireButton.swapState();
 					}
 					// Pressed pause button
-					else if ( xpos < BB.width && xpos > BB.width-( BB.width/10 ) && ypos > 0 && ypos < BB.width/10 ) {
+					else if ( game.pauseButton.includes((int) xpos, (int) ypos) ) {
 						isShootMode = false;
 						game.setPauseButtonState();
 						gameScreen.showPauseMenu();
@@ -207,7 +208,8 @@ public class BBGLView extends GLSurfaceView {
 					game.horizontalSwipe = 0;
 					game.verticalSwipe = 0;
 					isShootMode = false;
-					game.setFireButtonState( false );
+					if ( game.fireButton.isActive() )
+						game.fireButton.swapState();
 					return true;
 				// Second or later finger released
 	    		case MotionEvent.ACTION_POINTER_UP:
