@@ -116,9 +116,12 @@ public class BBGame {
 	protected float verticalSwipe = 0;
 	
 	// Track the states of the fire button, pause button, and bubbles
-	protected String fireButtonState = "fireButton";
 	protected String bubbleTex = "bubbleBlue";
-	protected String pauseButtonState = "pauseButton";
+
+	
+	// Track the states and positions of fire button and pause button;
+	protected BBButton fireButton;
+	protected BBButton pauseButton;
 	
 	// Debugging option to track "current" object
 	protected int _currentObjectId;
@@ -129,7 +132,7 @@ public class BBGame {
 		{"Hi, Hopscotch! I'm your translator, Wattson.", "I'm here to show you how to travel through time.", "Tap me to begin!"},
 		{ "Slide your finger to look around", "", ""},
 		//log time, then aim at object and disable movement
-		{"Nice Job!", "Capture the object in a bubble shot by your", "Chronopsyonic Quantum Destabilizer."},
+		{"Nice Job! Capture the object in a bubble shot", "by your Chronopsyonic Quantum Destabilizer.", "(hold the fire button with one thumb, swipe with the other)"},
 		{"Very Good!", "If the bubble color doesn't match the object", "color, you will lose precious time!"},
 		//Have another blue object and shoot a red bubble at it
 		{"You're on a time limit, so don't let", "the clock run out!", ""},
@@ -229,18 +232,18 @@ public class BBGame {
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.firebutton ) ), 128, 128 );
-				tm.addTexture( "fireButton", new Texture( bitmap, true ) );
+				tm.addTexture( "FireButton", new Texture( bitmap, true ) );
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.firebuttonpressed ) ), 128, 128 );
-				tm.addTexture( "fireButtonPressed", new Texture( bitmap, true ) );
+				tm.addTexture( "FireButtonPressed", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pause_button ) ), 128, 128 );
-				tm.addTexture( "pauseButton", new Texture( bitmap, true ) );
+				tm.addTexture( "PauseButton", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pause_button_pressed ) ), 128, 128 );
-				tm.addTexture( "pauseButtonPressed", new Texture( bitmap, true ) );
+				tm.addTexture( "PauseButtonPressed", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.word_bar ) ), 16, 512 );
@@ -265,10 +268,6 @@ public class BBGame {
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_up ) ), 128, 128 );
 				tm.addTexture( "ArrowUp", new Texture( bitmap, true ) );
-				bitmap.recycle();
-				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_right ) ), 128, 128 );
-				tm.addTexture( "ArrowRight", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.arrow_down ) ), 128, 128 );
@@ -618,9 +617,15 @@ public class BBGame {
         // Set the handMod to it's highest (positive) point, and direction to move up (dec y)
         handMod = BB.height / 5;
         handDir = -1;
-        handWaitEnd = System.currentTimeMillis() + 3000;
+        handWaitEnd = System.currentTimeMillis() + 2000;
         moveHand = true;
         handTransparency = 50;
+        
+        // Setup pause and fire buttons
+    	pauseButton = new BBButton( BB.width - BB.width / 30, BB.width / 35, BB.width / 15, BB.width / 15, 
+    			"PauseButton", "PauseButtonPressed");
+    	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
+    			"FireButton", "FireButtonPressed");
 
 	}
 	
@@ -679,10 +684,10 @@ public class BBGame {
 		
 		// Update hand movement
 		if ( handDir > 0 && moveHand) {
-			handMod += BB.height / 150;
+			handMod += BB.height / 100;
 		} else {
 			if ( moveHand ) {
-				handMod -= BB.height / 150;
+				handMod -= BB.height / 100;
 			}
 		}
 		if ( Math.abs(handMod) >= BB.height / 5 ) {
@@ -695,7 +700,7 @@ public class BBGame {
 				handTransparency = (handTransparency > 0) ? handTransparency - 1 :  0;
 			} else {
 				handMod *= -1;
-				handWaitEnd = System.currentTimeMillis() + 3000;
+				handWaitEnd = System.currentTimeMillis() + 2000;
 				moveHand = true; 
 				handTransparency = 50;
 			}
@@ -790,19 +795,6 @@ public class BBGame {
 			bubbleTex = "bubbleRed";
 		else
 			bubbleTex = "bubbleBlue";
-	}
-	
-	/**
-	 * @param isPressed
-	 */
-	// Sets the fire button state
-	public void setFireButtonState( boolean isPressed ) {
-		if ( isPressed ) {
-			fireButtonState = "fireButtonPressed";
-		}
-		else {
-			fireButtonState = "fireButton";
-		}
 	}
 	
 	/**
@@ -933,14 +925,12 @@ public class BBGame {
 	 */
 	// Sets the pause button state
 	public void setPauseButtonState() {
-		if ( pauseButtonState == "pauseButton" ) {
+		if ( pauseButton.swapState() ) {
 			isPaused = true;
 			timeLeft = (endTime - System.currentTimeMillis())/1000;
-			pauseButtonState = "pauseButtonPressed";
 		} else {
 			endTime = System.currentTimeMillis() + (timeLeft*1000);
 			isPaused = false;
-			pauseButtonState = "pauseButton";
 		}
 	}
 	
@@ -981,10 +971,12 @@ public class BBGame {
 	// TODO: Check to make sure there are no gross inefficiencies, also handle activity changes correctly
 	// Handles the player winning the level
 	public void levelWin() {
-		bubbleWords.clear(); 
+		bubbleWords.clear();
+
 		SharedPreferences settings = BB.context.getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		bubbleTex = "bubbleBlue";
     	if ( isTutorial ) {
+
     		Log.d( "BBRenderer", "Setting hasBeatenTutorial" );
     		settings.edit().putBoolean( "hasBeatenTutorial", true ).commit();
     		
@@ -1001,8 +993,9 @@ public class BBGame {
                 }
             } );
     	} else {
-    		level = level.getNext();
-    		  
+    		
+    		level = level.getNext();  
+    		
     		if ( settings.getInt( "nextLevel", 0 ) < level.ordinal() )
     			settings.edit().putInt( "nextLevel", level.ordinal() ).commit();
     		

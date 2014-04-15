@@ -139,26 +139,31 @@ public final class R {
         public static final int word_bar=0x7f02006c;
     }
     public static final class id {
-        public static final int VideoView=0x7f0b000a;
-        public static final int ball=0x7f0b000b;
-        public static final int dec_object_x=0x7f0b000f;
-        public static final int dec_object_y=0x7f0b0012;
-        public static final int dec_object_z=0x7f0b0010;
-        public static final int delete_data=0x7f0b000c;
+        public static final int VideoView=0x7f0b000f;
+        public static final int ball=0x7f0b0010;
+        public static final int bgmseekBar=0x7f0b000c;
+        public static final int dec_object_x=0x7f0b0014;
+        public static final int dec_object_y=0x7f0b0017;
+        public static final int dec_object_z=0x7f0b0015;
+        public static final int delete_data=0x7f0b0011;
         public static final int exit=0x7f0b0004;
-        public static final int inc_obj=0x7f0b0013;
-        public static final int inc_object_x=0x7f0b000d;
-        public static final int inc_object_y=0x7f0b0011;
-        public static final int inc_object_z=0x7f0b000e;
+        public static final int inc_obj=0x7f0b0018;
+        public static final int inc_object_x=0x7f0b0012;
+        public static final int inc_object_y=0x7f0b0016;
+        public static final int inc_object_z=0x7f0b0013;
         public static final int loading=0x7f0b0000;
+        public static final int mvseekBar=0x7f0b000b;
+        public static final int mylayout=0x7f0b000a;
         public static final int playbutton=0x7f0b0008;
         public static final int resume=0x7f0b0009;
+        public static final int returnButton=0x7f0b000e;
         public static final int settings=0x7f0b0003;
         public static final int settingsbutton=0x7f0b0005;
         public static final int start=0x7f0b0001;
         public static final int storebutton=0x7f0b0007;
         public static final int tutorial=0x7f0b0002;
         public static final int tutorialbutton=0x7f0b0006;
+        public static final int wordseekBar=0x7f0b000d;
     }
     public static final class layout {
         public static final int loading_screen=0x7f030000;
@@ -166,11 +171,12 @@ public final class R {
         public static final int menu_screen=0x7f030002;
         public static final int popup=0x7f030003;
         public static final int popup_menu=0x7f030004;
-        public static final int splash=0x7f030005;
-        public static final int stage1=0x7f030006;
-        public static final int stage2=0x7f030007;
-        public static final int stage3=0x7f030008;
-        public static final int video_screen=0x7f030009;
+        public static final int settings=0x7f030005;
+        public static final int splash=0x7f030006;
+        public static final int stage1=0x7f030007;
+        public static final int stage2=0x7f030008;
+        public static final int stage3=0x7f030009;
+        public static final int video_screen=0x7f03000a;
     }
     public static final class menu {
         public static final int menu=0x7f0a0000;
@@ -217,6 +223,7 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f080000;
+        public static final int bgm_volume=0x7f080023;
         public static final int bt_txt=0x7f080007;
         public static final int btn_exit=0x7f080002;
         public static final int btn_newgame=0x7f080001;
@@ -241,6 +248,8 @@ public final class R {
         public static final int inc_object_z=0x7f08001a;
         public static final int load_level=0x7f080018;
         public static final int lose_level_title=0x7f08000a;
+        public static final int main_menu=0x7f080022;
+        public static final int master_volume=0x7f080021;
         public static final int ok=0x7f08000b;
         public static final int play_button=0x7f08000e;
         public static final int settings_button=0x7f080010;
@@ -249,6 +258,7 @@ public final class R {
         public static final int unavailable=0x7f080017;
         public static final int win_level_text=0x7f080009;
         public static final int win_level_title=0x7f080008;
+        public static final int word_volume=0x7f080024;
     }
     public static final class style {
         /** 

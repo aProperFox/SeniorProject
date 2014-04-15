@@ -103,9 +103,9 @@ public class BBRoom extends World {
 			return new SimpleVector( 0, -20, 0 );
 		case STREET:
 			return new SimpleVector( 0, -195, 0 );
+		default:
+			return new SimpleVector( 0, -20, 0 );
 		}
-		//default light location
-		return new SimpleVector( 0, -20, 0 );
 	}
 	
 	/**
@@ -327,6 +327,9 @@ public class BBRoom extends World {
 			bodies.add( floor.getBody() );
 			addObject( floor.getFloor() );
 			
+			break;
+		default:
+			Log.e("BBRoom", "Level " + room + " does not exist!");
 			break;
 		}
 		
@@ -625,6 +628,9 @@ public class BBRoom extends World {
 			//Traffic Light 8
 			addWordObject( -70, -3f, -20, roomObjects.get( 7 ), "Traffic_Light", new SimpleVector( 0, ( float )Math.PI, 0 ) );
 			addWordObject( -23, -3f, 22, roomObjects.get( 7 ), "Traffic_Light" );
+			break;
+		default:
+			Log.e("BBRoom", "Level " + roomId + " does not exist!");
 			break;
 		}
 		Loader.clearCache();

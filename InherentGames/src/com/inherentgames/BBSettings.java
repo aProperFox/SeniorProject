@@ -1,18 +1,63 @@
 package com.inherentgames;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class BBSettings extends Activity {
-	
-	
+public class BBSettings extends Activity implements OnSeekBarChangeListener{
+	LinearLayout myscreen;
+	SeekBar bgm, master, voice;
+	int bgmV, masterV, voiceV;
+	/*
 	@Override
-	public void onBackPressed() {
-	   Log.d( "Tutorial", "onBackPressed Called" );
-	   Intent setIntent = new Intent( BBSettings.this, BBMenuScreen.class );
-	   setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP );
-	   startActivity( setIntent );
-	   BBMenuScreen.ANIMATION = "UP";
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.settings);
+
+		myscreen=(LinearLayout)findViewById(R.id.mylayout);
+		bgm=(SeekBar)findViewById(R.id.bgmseekBar);
+		master=(SeekBar)findViewById(R.id.mvseekBar);
+		voice=(SeekBar)findViewById(R.id.wordseekBar);
+		bgm.setOnSeekBarChangeListener(this);
+		master.setOnSeekBarChangeListener(this);
+		voice.setOnSeekBarChangeListener(this);
+		Button returnButton = (Button) findViewById(R.id.returnButton);
+		returnButton.setOnClickListener(new View.OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Settings.this, MenuScreen.class);
+                startActivity(i);
+            }
+		});
 	}
+
+	public void updatevolume(){
+		bgmV = bgm.getProgress();
+		masterV = master.getProgress();
+		voiceV = voice.getProgress();
+
+	}
+	*/
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress,
+			boolean fromUser) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
