@@ -160,9 +160,10 @@ public final class R {
         public static final int settings=0x7f0b0003;
         public static final int settingsbutton=0x7f0b0005;
         public static final int start=0x7f0b0001;
-        public static final int storebutton=0x7f0b0007;
+        public static final int storebutton=0x7f0b0006;
+        public static final int swap_time=0x7f0b0019;
         public static final int tutorial=0x7f0b0002;
-        public static final int tutorialbutton=0x7f0b0006;
+        public static final int tutorialbutton=0x7f0b0007;
         public static final int wordseekBar=0x7f0b000d;
     }
     public static final class layout {
@@ -179,7 +180,8 @@ public final class R {
         public static final int video_screen=0x7f03000a;
     }
     public static final class menu {
-        public static final int menu=0x7f0a0000;
+        public static final int dev_menu=0x7f0a0000;
+        public static final int sponsor_menu=0x7f0a0001;
     }
     public static final class raw {
         public static final int autobus=0x7f050000;
@@ -254,6 +256,8 @@ public final class R {
         public static final int play_button=0x7f08000e;
         public static final int settings_button=0x7f080010;
         public static final int store_button=0x7f080011;
+        public static final int time_limit_disabled=0x7f080026;
+        public static final int time_limit_enabled=0x7f080025;
         public static final int tutorial_button=0x7f08000f;
         public static final int unavailable=0x7f080017;
         public static final int win_level_text=0x7f080009;

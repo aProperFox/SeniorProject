@@ -37,4 +37,6 @@
    	<string name="main_menu">Return</string>
 	<string name="bgm_volume">Background Music Volume</string>
 	<string name="word_volume">Word Voice Volume</string>
+	<string name="time_limit_enabled">Disable time limit</string>
+	<string name="time_limit_disabled">Enable time limit</string>
 </resources>

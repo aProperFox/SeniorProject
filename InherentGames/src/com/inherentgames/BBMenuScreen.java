@@ -40,7 +40,9 @@ public class BBMenuScreen extends Activity {
 	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
 	public static String ANIMATION = "DOWN";
 	public static final String PREFERENCES = "BABBLE_PREF";
-	public static final boolean isDevMode = true;
+	public static final boolean isDevMode = false;
+	public static boolean isSponsorMode = true;
+	public static boolean isTimeLimitenabled;
 	private Button playButton;
 	
 	
@@ -49,6 +51,16 @@ public class BBMenuScreen extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
    
+        // Ensure not both menus can be inflated
+        if ( isDevMode ) {
+        	isSponsorMode = false;
+        	isTimeLimitenabled = false;
+        } else {
+            // Turn on time limit by default
+        	isTimeLimitenabled = true;
+        }
+        
+        
         Log.d( "MenuScreen", "onCreate called" );
 		
 		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
@@ -153,7 +165,9 @@ public class BBMenuScreen extends Activity {
 		        
 		        @Override
 		        public void onClick( View v ) {
+		        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 0 ).commit();
 		            Intent i = new Intent( BBMenuScreen.this, BBGameScreen.class );
+		            i.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
 		            i.putExtra( "tutorial", true );
 		            startActivity( i );
 		            overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
@@ -276,7 +290,10 @@ public class BBMenuScreen extends Activity {
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		if ( BBMenuScreen.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate( R.menu.menu, menu );
+		    inflater.inflate( R.menu.dev_menu, menu );
+		} else if ( BBMenuScreen.isSponsorMode ) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate( R.menu.sponsor_menu, menu );
 		}
 	    return true;
 	}
@@ -289,6 +306,15 @@ public class BBMenuScreen extends Activity {
         	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().remove( "nextLevel" ).commit();
         	playButton.setEnabled( false );
         	return true;
+        case R.id.swap_time:
+        	BBMenuScreen.isTimeLimitenabled = !BBMenuScreen.isTimeLimitenabled;
+        	// Change menu item string
+        	if ( BBMenuScreen.isTimeLimitenabled ) {
+        		item.setTitle( R.string.time_limit_enabled );
+        	} else {
+        		item.setTitle( R.string.time_limit_disabled );
+        	}
+        	
         }
         return super.onOptionsItemSelected( item );
     }

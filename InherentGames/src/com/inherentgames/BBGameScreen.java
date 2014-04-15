@@ -151,7 +151,15 @@ public class BBGameScreen extends Activity {
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		if ( BBMenuScreen.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate( R.menu.menu, menu );
+		    inflater.inflate( R.menu.dev_menu, menu );
+		} else if ( BBMenuScreen.isSponsorMode ) {
+			MenuInflater inflater = getMenuInflater();
+			inflater.inflate( R.menu.sponsor_menu, menu );
+			if ( BBMenuScreen.isTimeLimitenabled ) {
+				menu.getItem(1).setTitle( R.string.time_limit_enabled );
+			} else {
+				menu.getItem(1).setTitle( R.string.time_limit_disabled );
+			}
 		}
 	    return true;
 	}
@@ -171,9 +179,15 @@ public class BBGameScreen extends Activity {
 		isTutorial = getIntent().getBooleanExtra( "tutorial", false ); 
         if ( isTutorial ) {
         	game.setLevel( Level.TUTORIAL );
+        	game.isTutorial = true;
         } else {
         	game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
         }
+        
+        // TODO: make this less horribly efficient
+        // Ensure tutorial is not loaded again
+        game.loading = true;
+        renderer = new BBRenderer();
         
 		glView.onResume();
 		// Enable Immersive mode (hides status and nav bar)
@@ -215,6 +229,15 @@ public class BBGameScreen extends Activity {
 		        	game._currentObjectId = game.objects.nextElement().getID();
 		        	Log.d( "GameScreen", "New Object is: " + game.world.getObject( game._currentObjectId ).getName() );
 		        	return true;
+		        case R.id.swap_time:
+		        	BBMenuScreen.isTimeLimitenabled = !BBMenuScreen.isTimeLimitenabled;
+		        	// Change menu item string
+		        	if ( BBMenuScreen.isTimeLimitenabled ) {
+		        		item.setTitle( R.string.time_limit_enabled );
+		        		game.endTime = System.currentTimeMillis() + (game.timeLeft*1000);
+		        	} else {
+		        		item.setTitle( R.string.time_limit_disabled );
+		        	}
 	        }
 	        Log.d( "GameScreen", "New object location: " + game.world.getObject( game._currentObjectId ).getTranslation() );
 		}catch ( Exception e ) {
@@ -227,16 +250,16 @@ public class BBGameScreen extends Activity {
 	public void onBackPressed() {
 		Log.d( "BBGameScreen", "onBackPressed Called" );
 		BBMenuScreen.ANIMATION = "DOWN";
-		if ( isTutorial ) {
+		/*if ( isTutorial ) {
 			finish();
 		} else {
-			/*Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
+			Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
 			setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 			startActivity( setIntent );
 			// Dispose tutorial world, provided it has been loaded
-			game.loading = true;*/
+			game.loading = true;
 			finish();
-		}
+		}*/
 	}
 	
 	// Used to indicate to Android system to perform an optimization

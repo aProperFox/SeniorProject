@@ -45,6 +45,10 @@ public class BBMapScreen extends Activity {
 				Log.i( "MapScreen", "Loading Level 3 map" );
 				setContentView( R.layout.stage3 );
 				break;
+			default:
+				Log.i( "MapScreen", "Loading Level 3 map" );
+				setContentView( R.layout.stage3 );
+				break;
 		}
 		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 	}

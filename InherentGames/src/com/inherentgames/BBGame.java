@@ -203,6 +203,7 @@ public class BBGame {
 		// Is tutorial?
 		if ( level == Level.TUTORIAL ) {
 			isTutorial = true;
+			wattsonText.clear();
 			wattsonText.add( wattsonPhrases[0][0] );
 			wattsonText.add( wattsonPhrases[0][1] );
 			wattsonText.add( wattsonPhrases[0][2] );
@@ -626,6 +627,7 @@ public class BBGame {
     			"PauseButton", "PauseButtonPressed");
     	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
+    	
 
 	}
 	
@@ -661,7 +663,7 @@ public class BBGame {
 		}
 		
 		// Update time bar
-		if ( !isTutorial && !BBMenuScreen.isDevMode) {
+		if ( !isTutorial && BBMenuScreen.isTimeLimitenabled ) {
 			if ( !isPaused ) {
 				if ( endTime - System.currentTimeMillis() > 0 ) {
 					timeLeft = (endTime - System.currentTimeMillis() )/1000;
@@ -708,7 +710,6 @@ public class BBGame {
 			moveHand = true;
 			handTransparency = 50;
 		}
-		Log.d("BBGame", "handTransparency: " + handTransparency);
 		
 		
 		// TODO: Check the efficiency of this
@@ -867,7 +868,10 @@ public class BBGame {
 					return 0;
 				}
 				else {
+					
+					// Wrong color guessed :-(
 					deleteBubble( bubble );
+					timeLeft -= 5;
 					return 0;
 				}
 			// Handle bubble-bubble collision
@@ -927,9 +931,11 @@ public class BBGame {
 	public void setPauseButtonState() {
 		if ( pauseButton.swapState() ) {
 			isPaused = true;
-			timeLeft = (endTime - System.currentTimeMillis())/1000;
+			if ( !isTutorial && BBMenuScreen.isTimeLimitenabled )
+				timeLeft = (endTime - System.currentTimeMillis())/1000;
 		} else {
-			endTime = System.currentTimeMillis() + (timeLeft*1000);
+			if ( !isTutorial && BBMenuScreen.isTimeLimitenabled )
+				endTime = System.currentTimeMillis() + (timeLeft*1000);
 			isPaused = false;
 		}
 	}
@@ -976,7 +982,7 @@ public class BBGame {
 		SharedPreferences settings = BB.context.getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
 		bubbleTex = "bubbleBlue";
     	if ( isTutorial ) {
-
+    		wattsonText.clear();
     		Log.d( "BBRenderer", "Setting hasBeatenTutorial" );
     		settings.edit().putBoolean( "hasBeatenTutorial", true ).commit();
     		
