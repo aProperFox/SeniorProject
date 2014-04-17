@@ -38,7 +38,7 @@ public class BBWordObject extends Object3D {
 		isStatic = true;
 		this.maxDimension = obj.getMaxDimension();
 		names[BBTranslator.Language.ENGLISH] = obj.getName( BBTranslator.Language.ENGLISH );
-		this.article = obj.getArticle();
+		this.article = obj.article;
 		// Saves calculating transformation matrix until lazy transformations are disabled again, improving performance
 		enableLazyTransformations();
 		// Indicates that other objects can collide into this object
@@ -107,13 +107,6 @@ public class BBWordObject extends Object3D {
 	 */
 	public int getObjectId() {
 		return objectId;
-	}
-	
-	/**
-	 * @return
-	 */
-	public Gender getArticle() {
-		return article;
 	}
 	
 	/* ( non-Javadoc )

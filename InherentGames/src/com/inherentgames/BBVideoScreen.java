@@ -1,14 +1,17 @@
 package com.inherentgames;
 
+import java.util.Set;
+
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -26,7 +29,7 @@ public class BBVideoScreen extends Activity {
         setContentView( R.layout.video_screen );
         
         Intent intent = getIntent();
-        final String message = intent.getStringExtra( BBMenuScreen.EXTRA_MESSAGE );
+        final String message = intent.getStringExtra( BB.EXTRA_MESSAGE );
         
         videoView = ( VideoView )findViewById( R.id.VideoView );
         View root = videoView.getRootView();
@@ -55,6 +58,13 @@ public class BBVideoScreen extends Activity {
             @Override
             public void onCompletion( MediaPlayer mp ) 
             {
+            	// Update comics played
+            	SharedPreferences settings = getSharedPreferences( BB.PREFERENCES , 0);
+            	Set<String> set = settings.getStringSet( "playedComics", BB.EMPTYSET);
+            	set.add(message);
+            	Log.d("BBVideoScreen", "Played comics: " + set);
+            	settings.edit().putStringSet( "playedComics", set).commit();
+            	
             	if ( shouldLoadMap ) {
             		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
             		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
@@ -76,6 +86,10 @@ public class BBVideoScreen extends Activity {
 	
 	@Override
 	public boolean onTouchEvent( MotionEvent me ) {
+		/*
+		 * Currently, video will not play if we have already played it
+		 * Leaving this code in case the sponsors want a 'skip' function
+		 *
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
 			if ( shouldLoadMap ) {
         		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
@@ -88,8 +102,10 @@ public class BBVideoScreen extends Activity {
                 startActivity( intent );
                 finish();
         	}
+        	
 		}
-			
+		*/
+		
 		return true;
 	}
 	

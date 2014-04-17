@@ -20,6 +20,9 @@ public class BBButton {
 	// Current image string
 	protected String currentImage;
 	
+	// May be useful for future implementation, if BBButton extends Button 
+	protected boolean canBePressed = true;
+	
 	public BBButton( int x, int y, int width, int height, String passiveImage, String activeImage ){
 		
 		// Set location
@@ -83,7 +86,7 @@ public class BBButton {
 	public boolean includes( int x, int y ) {
 		
 		// Check to see if point is located within button bounds
-		if ( x > (posX - width) && x < (posX + width) && y > (posY - height) && y < (posY + height) ) {
+		if ( x > (posX - width/2) && x < (posX + width/2) && y > (posY - height/2) && y < (posY + height/2) ) {
 			return true;
 		} else {
 			return false;

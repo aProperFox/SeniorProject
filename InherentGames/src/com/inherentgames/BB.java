@@ -1,13 +1,11 @@
 package com.inherentgames;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;
@@ -21,6 +19,15 @@ public class BB extends Application {
     protected static Context context;
     protected static int width;
     protected static int height;
+	
+	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
+	public static String ANIMATION = "DOWN";
+	public static final String PREFERENCES = "BABBLE_PREF";
+	public static final boolean isDevMode = false;
+	public static boolean isSponsorMode = true;
+	public static boolean isTimeLimitenabled;
+	// Empty set used as default for "playedComics"
+	public static Set<String> EMPTYSET;
 
     @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
@@ -29,6 +36,9 @@ public class BB extends Application {
         
         // Store application context
         BB.context = getApplicationContext();
+        
+        // Create empty set
+        EMPTYSET = new HashSet<String>();
         
         // Determine and store device width & height
         Display display = ((WindowManager) BB.context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

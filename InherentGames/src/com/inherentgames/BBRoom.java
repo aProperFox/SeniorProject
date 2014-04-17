@@ -12,6 +12,7 @@ import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.inherentgames.BBWordObject.Gender;
+import com.threed.jpct.GLSLShader;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
@@ -38,6 +39,8 @@ public class BBRoom extends World {
 	   }	
 	};
 	
+	protected Gender currentGender = Gender.MASCULINE;
+	
 	private ArrayList<Object3D> walls = new ArrayList<Object3D>();
 	protected BBWall wall;
 	protected BBFloor floor;
@@ -50,10 +53,14 @@ public class BBRoom extends World {
 	protected ArrayList<String> roomObjectWords;
 	
 	private float height, width, length;
+
+	// TODO: implement modes for checking objects
+	public static enum Mode { PEROBJECT, ALL };
 	
-	protected Gender currentGender = Gender.MASCULINE;
+	protected Mode gameMode;
+	protected int numRequiredObjects;
 	
-	//private GLSLShader shader;
+	private GLSLShader shader;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
 	private int cameraBoxId = 0;
@@ -82,13 +89,6 @@ public class BBRoom extends World {
 		}
 
 		setObjects( roomId );
-		
-		/*try {
-			shader = new GLSLShader( Loader.loadTextFile( BB.context.getAssets().open( "toon.vs" ) ), Loader.loadTextFile( BB.context.getAssets().open( "toon.fs" ) ) );
-		} catch ( IOException e1 ) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
 		
 	}
 	
@@ -297,7 +297,7 @@ public class BBRoom extends World {
 				bitmap.recycle();
 				
 			} catch( Exception e ) {
-				//TODO: log exception
+				e.printStackTrace();
 			}
 			
 			skybox = new SkyBox( "SkyboxLeft", "SkyboxFront", "SkyboxRight", "SkyboxBack", "SkyboxTop", "SkyboxBottom", 200f );
@@ -392,7 +392,6 @@ public class BBRoom extends World {
 				roomObjects.add( new BBWordObject( Object3D.mergeAll( Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room0/window.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room0/window.mtl" ), 1.0f ) ), new SimpleVector( 0, ( float )Math.PI/2.0f, 0 ), "Window", Gender.FEMININE ) );
 			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -489,7 +488,6 @@ public class BBRoom extends World {
 						BB.context.getResources().getAssets().open( "raw/room1/table.mtl" ), 1.5f ) ), new SimpleVector( (float )Math.PI, 0, 0 ), "Table", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'table' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 			
@@ -609,7 +607,6 @@ public class BBRoom extends World {
 				startTime = System.currentTimeMillis();
 
 			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 			
@@ -672,10 +669,10 @@ public class BBRoom extends World {
 		object.setOrigin( new SimpleVector( x, y, z ) );
 		object.setName( name );
 		object.rotateBy( rotateBy );
+		object.setTransparencyMode( Object3D.TRANSPARENCY_MODE_ADD );
 		object.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 		object.setCollisionOptimization( Object3D.COLLISION_DETECTION_OPTIMIZED );
 		object.calcTangentVectors();
-		//object.setShader( shader );
 		object.setSpecularLighting( true );
 		if ( tm.containsTexture( name ) && ( name != BBTranslator.translateToLanguage( name, BBTranslator.Language.SPANISH ) ) ) {
 			object.setTexture( name );
@@ -684,7 +681,7 @@ public class BBRoom extends World {
 			roomObjectWords.add( name );
 		}
 		object.build();
-		if ( object.getArticle() == Gender.FEMININE )
+		if ( object.article == Gender.FEMININE )
 			object.setAdditionalColor( 200, 0, 0 );
 		else
 			object.setAdditionalColor( 0, 0, 200 );

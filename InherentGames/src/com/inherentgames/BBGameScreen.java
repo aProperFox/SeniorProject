@@ -67,7 +67,7 @@ public class BBGameScreen extends Activity {
 		} );*/
 		
 		// Load stored preferences
-		SharedPreferences settings = getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
+		SharedPreferences settings = getSharedPreferences( BB.PREFERENCES, 0 );
 		int levelNum = settings.getInt( "loadLevel", 1 );
 		Log.i( "GameScreen", "Current level is: " + levelNum );
         
@@ -149,13 +149,13 @@ public class BBGameScreen extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		if ( BBMenuScreen.isDevMode ) {
+		if ( BB.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
 		    inflater.inflate( R.menu.dev_menu, menu );
-		} else if ( BBMenuScreen.isSponsorMode ) {
+		} else if ( BB.isSponsorMode ) {
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate( R.menu.sponsor_menu, menu );
-			if ( BBMenuScreen.isTimeLimitenabled ) {
+			if ( BB.isTimeLimitenabled ) {
 				menu.getItem(1).setTitle( R.string.time_limit_enabled );
 			} else {
 				menu.getItem(1).setTitle( R.string.time_limit_disabled );
@@ -164,6 +164,17 @@ public class BBGameScreen extends Activity {
 	    return true;
 	}
 	
+	// Modifying to ensure time limit option is always correct when menu selected
+	@Override
+	public boolean onPrepareOptionsMenu( Menu menu ) {
+		if ( BB.isTimeLimitenabled ) {
+			menu.getItem(1).setTitle( R.string.time_limit_enabled );
+		} else {
+			menu.getItem(1).setTitle( R.string.time_limit_disabled );
+		}
+		
+		return true;
+	}
 	
 	@Override
 	protected void onPause() {
@@ -181,12 +192,11 @@ public class BBGameScreen extends Activity {
         	game.setLevel( Level.TUTORIAL );
         	game.isTutorial = true;
         } else {
-        	game.setLevel( Level.values()[getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
+        	game.setLevel( Level.values()[getSharedPreferences( BB.PREFERENCES, 0 ).getInt( "loadLevel", 1 )] );
         }
         
         // TODO: make this less horribly efficient
         // Ensure tutorial is not loaded again
-        game.loading = true;
         renderer = new BBRenderer();
         
 		glView.onResume();
@@ -230,9 +240,9 @@ public class BBGameScreen extends Activity {
 		        	Log.d( "GameScreen", "New Object is: " + game.world.getObject( game._currentObjectId ).getName() );
 		        	return true;
 		        case R.id.swap_time:
-		        	BBMenuScreen.isTimeLimitenabled = !BBMenuScreen.isTimeLimitenabled;
+		        	BB.isTimeLimitenabled = !BB.isTimeLimitenabled;
 		        	// Change menu item string
-		        	if ( BBMenuScreen.isTimeLimitenabled ) {
+		        	if ( BB.isTimeLimitenabled ) {
 		        		item.setTitle( R.string.time_limit_enabled );
 		        		game.endTime = System.currentTimeMillis() + (game.timeLeft*1000);
 		        	} else {
@@ -249,17 +259,18 @@ public class BBGameScreen extends Activity {
 	@Override
 	public void onBackPressed() {
 		Log.d( "BBGameScreen", "onBackPressed Called" );
-		BBMenuScreen.ANIMATION = "DOWN";
-		/*if ( isTutorial ) {
+		BB.ANIMATION = "DOWN";
+		if ( isTutorial ) {
 			finish();
 		} else {
+			/*
 			Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
 			setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
 			startActivity( setIntent );
 			// Dispose tutorial world, provided it has been loaded
-			game.loading = true;
+			game.loading = true;*/
 			finish();
-		}*/
+		}
 	}
 	
 	// Used to indicate to Android system to perform an optimization

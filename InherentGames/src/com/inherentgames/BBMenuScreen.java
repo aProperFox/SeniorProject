@@ -1,6 +1,7 @@
 package com.inherentgames;
 
 import java.util.Locale;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -37,12 +38,6 @@ public class BBMenuScreen extends Activity {
 	private int buttonTextColor;
 	private Typeface typeface;
 	
-	public static final String EXTRA_MESSAGE = "VIDEO VALUE";
-	public static String ANIMATION = "DOWN";
-	public static final String PREFERENCES = "BABBLE_PREF";
-	public static final boolean isDevMode = false;
-	public static boolean isSponsorMode = true;
-	public static boolean isTimeLimitenabled;
 	private Button playButton;
 	
 	
@@ -52,14 +47,14 @@ public class BBMenuScreen extends Activity {
         super.onCreate( savedInstanceState );
    
         // Ensure not both menus can be inflated
-        if ( isDevMode ) {
-        	isSponsorMode = false;
-        	isTimeLimitenabled = false;
+        if ( BB.isDevMode ) {
+        	BB.isSponsorMode = false;
+        	BB.isTimeLimitenabled = false;
         } else {
             // Turn on time limit by default
-        	isTimeLimitenabled = true;
+        	BB.isTimeLimitenabled = true;
         }
-        
+
         
         Log.d( "MenuScreen", "onCreate called" );
 		
@@ -100,7 +95,7 @@ public class BBMenuScreen extends Activity {
 		playButton.setY( (BB.height / 2.204f) - buttonHeight / 2 );
 		Log.d("BBMenuScreen", "button y is: " + playButton.getY());
 		
-		SharedPreferences settings = getSharedPreferences( PREFERENCES, 0 );
+		SharedPreferences settings = getSharedPreferences( BB.PREFERENCES, 0 );
 		
 		//Audio settings for bubble sounds
     	AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE );
@@ -165,7 +160,7 @@ public class BBMenuScreen extends Activity {
 		        
 		        @Override
 		        public void onClick( View v ) {
-		        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().putInt( "loadLevel", 0 ).commit();
+		        	getSharedPreferences( BB.PREFERENCES, 0 ).edit().putInt( "loadLevel", 0 ).commit();
 		            Intent i = new Intent( BBMenuScreen.this, BBGameScreen.class );
 		            i.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
 		            i.putExtra( "tutorial", true );
@@ -217,7 +212,7 @@ public class BBMenuScreen extends Activity {
 		
 		Log.d( "MenuScreen", "Resuming Menu screen" );
 		
-		if ( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
+		if ( getSharedPreferences( BB.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
 			playButton.setEnabled( true );
 			Log.d( "MenuScreen", "Enabling button" );
 		}
@@ -228,11 +223,11 @@ public class BBMenuScreen extends Activity {
 		super.onResume();
 
 		// Check for animation message
-		if ( BBMenuScreen.ANIMATION == "LEFT" ){
+		if ( BB.ANIMATION == "LEFT" ){
 			overridePendingTransition( R.anim.slide_in_left, R.anim.slide_out_left );
-		} else if ( BBMenuScreen.ANIMATION == "RIGHT" ) {
+		} else if ( BB.ANIMATION == "RIGHT" ) {
 			overridePendingTransition( R.anim.slide_in_right, R.anim.slide_out_right );
-		} else if ( BBMenuScreen.ANIMATION == "DOWN" ) {
+		} else if ( BB.ANIMATION == "DOWN" ) {
 			overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
 		} else {
 			overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
@@ -259,7 +254,7 @@ public class BBMenuScreen extends Activity {
 	public void onStart() {
 		Log.d( "MenuScreen", "onStart" );
 		
-		if ( getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
+		if ( getSharedPreferences( BB.PREFERENCES, 0 ).getBoolean( "hasBeatenTutorial", false ) ) {
 			playButton.setEnabled( true );
 			Log.d( "MenuScreen", "Enabling button" );
 
@@ -288,28 +283,42 @@ public class BBMenuScreen extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		if ( BBMenuScreen.isDevMode ) {
+		if ( BB.isDevMode ) {
 		    MenuInflater inflater = getMenuInflater();
 		    inflater.inflate( R.menu.dev_menu, menu );
-		} else if ( BBMenuScreen.isSponsorMode ) {
+		} else if ( BB.isSponsorMode ) {
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate( R.menu.sponsor_menu, menu );
 		}
 	    return true;
 	}
 	
+	// Modifying to ensure time limit option is always correct when menu selected
+	@Override
+	public boolean onPrepareOptionsMenu( Menu menu ) {
+		if ( BB.isTimeLimitenabled ) {
+			menu.getItem(1).setTitle( R.string.time_limit_enabled );
+		} else {
+			menu.getItem(1).setTitle( R.string.time_limit_disabled );
+		}
+		
+		return true;
+	}
+	
 	@Override
     public boolean onOptionsItemSelected( MenuItem item ) {
         switch ( item.getItemId() ) {
         case R.id.delete_data:
-        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().remove( "hasBeatenTutorial" ).commit();
-        	getSharedPreferences( BBMenuScreen.PREFERENCES, 0 ).edit().remove( "nextLevel" ).commit();
+        	SharedPreferences settings = getSharedPreferences( BB.PREFERENCES, 0 );
+        	settings.edit().remove( "hasBeatenTutorial" ).commit();
+        	settings.edit().remove( "nextLevel" ).commit();
+        	settings.edit().remove( "playedComics" ).commit();
         	playButton.setEnabled( false );
         	return true;
         case R.id.swap_time:
-        	BBMenuScreen.isTimeLimitenabled = !BBMenuScreen.isTimeLimitenabled;
+        	BB.isTimeLimitenabled = !BB.isTimeLimitenabled;
         	// Change menu item string
-        	if ( BBMenuScreen.isTimeLimitenabled ) {
+        	if ( BB.isTimeLimitenabled ) {
         		item.setTitle( R.string.time_limit_enabled );
         	} else {
         		item.setTitle( R.string.time_limit_disabled );

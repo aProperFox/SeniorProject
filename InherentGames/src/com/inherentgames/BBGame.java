@@ -14,6 +14,7 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.Menu;
 import android.widget.Toast;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
@@ -79,6 +80,9 @@ public class BBGame {
 	// Tells whether the game is loading or running
 	protected boolean loading = true;
 	
+	// Track loading progress
+	protected int loadingProgress = 0;
+	
 	// Track whether the game is currently paused (in-game menu is showing)
 	protected boolean isPaused = false;
 	
@@ -118,10 +122,17 @@ public class BBGame {
 	// Track the states of the fire button, pause button, and bubbles
 	protected String bubbleTex = "bubbleBlue";
 
+	// Track the score
+	protected int score = 0;
+	
+	// Track multiplier
+	protected int streak;
+	protected int multiplier;
 	
 	// Track the states and positions of fire button and pause button;
 	protected BBButton fireButton;
 	protected BBButton pauseButton;
+	protected BBButton scoreButton;
 	
 	// Debugging option to track "current" object
 	protected int _currentObjectId;
@@ -155,7 +166,8 @@ public class BBGame {
 		tm.addTexture( "gui_font", text );
 		
 		// Load loading texture
-		tm.addTexture( "loading_splash", new Texture( BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.loading ) ), 1024, 1024 ), true ) );
+		tm.addTexture( "loading_splash", new Texture( BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.loading_characters ) ), 512, 1024 ), true ) );
+		tm.addTexture( "loading_backdrop", new Texture( BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.backdrop ) ), 1024, 1024 ), true ) );
 		
 		// Initialize resource loading runnable
 		loader = new Runnable() {
@@ -164,12 +176,18 @@ public class BBGame {
 			public void run() {
 				// Prepare tutorial (if applicable)
 				prepareTutorial();
+				loadingProgress = 0;
 				// Load resources
 				loadSprites();
+				loadingProgress = 5;
 				loadTextures();
+				loadingProgress = 10;
 				loadSounds();
+				loadingProgress = 15;
 				// Prepare environment
 				setupScene();
+				// Note: Opaque has transparency ~ 30
+				loadingProgress = 100;
 				// Done loading
 				loading = false;
 			}
@@ -203,12 +221,14 @@ public class BBGame {
 		// Is tutorial?
 		if ( level == Level.TUTORIAL ) {
 			isTutorial = true;
+			BB.isTimeLimitenabled = false;
 			wattsonText.clear();
 			wattsonText.add( wattsonPhrases[0][0] );
 			wattsonText.add( wattsonPhrases[0][1] );
 			wattsonText.add( wattsonPhrases[0][2] );
 			wattsonTextIterator = 0;
 		} else {
+			BB.isTimeLimitenabled = ( BB.isSponsorMode ) ? BB.isTimeLimitenabled : true;
 			isTutorial = false;
 		}
 	}
@@ -232,8 +252,13 @@ public class BBGame {
 				tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button_empty ) ), 128, 128 );
+				tm.addTexture( "EmptyButton", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.firebutton ) ), 128, 128 );
 				tm.addTexture( "FireButton", new Texture( bitmap, true ) );
+				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.firebuttonpressed ) ), 128, 128 );
 				tm.addTexture( "FireButtonPressed", new Texture( bitmap, true ) );
@@ -571,6 +596,8 @@ public class BBGame {
 		cam.setOrientation( new SimpleVector( 0, 0, 1 ), new SimpleVector( 0, -1, 0 ) );
 		//cam.lookAt( new SimpleVector( 0, -0.1, 1 ) );
 		
+		loadingProgress = 20;
+		
 		// Load objects in the scene
 		objects = world.getObjects();
 		_currentObjectId = objects.nextElement().getID();
@@ -602,6 +629,8 @@ public class BBGame {
 			physicsWorld.addRigidBody( world.getBody( i ) );
 		}
 		
+		loadingProgress = 25;
+		
 		// Set the level duration to be 100 seconds
 		endTime = System.currentTimeMillis() + 100000;
 		
@@ -627,8 +656,12 @@ public class BBGame {
     			"PauseButton", "PauseButtonPressed");
     	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
-    	
+    	scoreButton = new BBButton( BB.width / 2, BB.height / 6, BB.height / 3, BB.height / 3, "EmptyButton", "EmptyButton");
+    	scoreButton.canBePressed = false;
 
+    	score = 0;
+    	streak = 0;
+    	multiplier = 1;
 	}
 	
 	/**
@@ -663,11 +696,10 @@ public class BBGame {
 		}
 		
 		// Update time bar
-		if ( !isTutorial && BBMenuScreen.isTimeLimitenabled ) {
+		if ( BB.isTimeLimitenabled ) {
 			if ( !isPaused ) {
 				if ( endTime - System.currentTimeMillis() > 0 ) {
 					timeLeft = (endTime - System.currentTimeMillis() )/1000;
-					Log.d("BBGame", "timeLeft = " + timeLeft);
 				} else {
 					levelLose();
 				}
@@ -836,7 +868,7 @@ public class BBGame {
 			// Handle bubble-object collision
 			if ( target.type == BBWordObject.Classification.WORD_OBJECT ) {
 				// Only capture the object if the articles match
-				if ( bubble.getArticle() == target.getArticle() ) {
+				if ( bubble.article == target.article ) {
 					// Add to list of completed words
 					bubbleWords.add( target.getName( BBTranslator.Language.ENGLISH ) );
 					target.disableLazyTransformations();
@@ -871,7 +903,10 @@ public class BBGame {
 					
 					// Wrong color guessed :-(
 					deleteBubble( bubble );
+					endTime -= 5000;
 					timeLeft -= 5;
+					multiplier = 1;
+					streak = 0;
 					return 0;
 				}
 			// Handle bubble-bubble collision
@@ -880,8 +915,13 @@ public class BBGame {
 				Log.i( "BBRenderer", "Object is a bubble!" );
 				BBBubble bubbleCollisionObject = (BBBubble) target;
 				world.removeObject( bubbleCollisionObject.getHeldObjectId() );
-				deleteBubble( bubbleCollisionObject );
-				deleteBubble( bubble );
+				if ( bubble.getObjectId() > bubbleCollisionObject.getObjectId() ) {
+					deleteBubble( bubble );
+					deleteBubble( bubbleCollisionObject );
+				} else {
+					deleteBubble( bubbleCollisionObject );
+					deleteBubble( bubble );
+				}
 				return 0;
 			}
 		} catch ( IndexOutOfBoundsException e ) {
@@ -931,10 +971,10 @@ public class BBGame {
 	public void setPauseButtonState() {
 		if ( pauseButton.swapState() ) {
 			isPaused = true;
-			if ( !isTutorial && BBMenuScreen.isTimeLimitenabled )
+			if ( BB.isTimeLimitenabled )
 				timeLeft = (endTime - System.currentTimeMillis())/1000;
 		} else {
-			if ( !isTutorial && BBMenuScreen.isTimeLimitenabled )
+			if ( BB.isTimeLimitenabled )
 				endTime = System.currentTimeMillis() + (timeLeft*1000);
 			isPaused = false;
 		}
@@ -945,8 +985,14 @@ public class BBGame {
 	 */
 	// Checks if the player has won the level
 	public boolean hasWonLevel() {
-		int total = world.roomObjectWords.size();
 		
+		// Update score
+		score += 100 * multiplier;
+		
+		// Update multiplier
+		streak++;
+		multiplier = (streak > 2) ? (streak / 3 ) * 2 : 1;
+		int total = world.roomObjectWords.size();
 		int tempCaptured = 0;
 		
 		for(String word : world.roomObjectWords){
@@ -979,7 +1025,7 @@ public class BBGame {
 	public void levelWin() {
 		bubbleWords.clear();
 
-		SharedPreferences settings = BB.context.getSharedPreferences( BBMenuScreen.PREFERENCES, 0 );
+		SharedPreferences settings = BB.context.getSharedPreferences( BB.PREFERENCES, 0 );
 		bubbleTex = "bubbleBlue";
     	if ( isTutorial ) {
     		wattsonText.clear();
@@ -1010,12 +1056,21 @@ public class BBGame {
 	            public void run() {
 	            	Toast toast = Toast.makeText( BB.context, R.string.win_level_title, Toast.LENGTH_LONG );
 	                toast.show();
-	        		Intent intent = new Intent( BB.context, BBGameScreen.class );
-	        	    intent.setClass( BB.context, BBVideoScreen.class );
-	        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-	        	    intent.putExtra( BBMenuScreen.EXTRA_MESSAGE, "comic" + ( level.ordinal() - 1 ) + "b" );
-	        	    BB.context.startActivity( intent );
-	        	    loading = true;
+	                if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
+	                		BB.EMPTYSET).contains("comic" + (level.ordinal() - 1) + "b") ) {
+	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
+		        	    intent.setClass( BB.context, BBMapScreen.class );
+		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+		        	    BB.context.startActivity( intent );
+		        	    loading = true;
+	                } else {
+		        		Intent intent = new Intent( BB.context, BBGameScreen.class );
+		        	    intent.setClass( BB.context, BBVideoScreen.class );
+		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+		        	    intent.putExtra( BB.EXTRA_MESSAGE, "comic" + ( level.ordinal() - 1 ) + "b" );
+		        	    BB.context.startActivity( intent );
+		        	    loading = true;
+	                }
 	            }
 	        } );
     	}
@@ -1037,7 +1092,7 @@ public class BBGame {
         	    intent.setClass( BB.context, BBMapScreen.class );
         	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         	    BB.context.startActivity( intent );
-        	    BBMenuScreen.ANIMATION = "DOWN";
+        	    BB.ANIMATION = "DOWN";
         	    loading = true;
             }
         } );
