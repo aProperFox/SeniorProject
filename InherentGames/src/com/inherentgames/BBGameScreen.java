@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -18,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+
 import com.inherentgames.BBRoom.Level;
 
 
@@ -216,6 +216,7 @@ public class BBGameScreen extends Activity {
 	// Debugging purposes
     public boolean onOptionsItemSelected( MenuItem item ) {
 		try {
+			game.world.getObject( game._currentObjectId ).setAdditionalColor( 255, 255, 0);
 	        switch ( item.getItemId() ) {
 		        case R.id.inc_object_x:
 		        	game.world.getObject( game._currentObjectId ).translate( 1, 0, 0 );
@@ -236,7 +237,9 @@ public class BBGameScreen extends Activity {
 		        	game.world.getObject( game._currentObjectId ).translate( 0, -1, 0 );
 		        	return true;
 		        case R.id.inc_obj:
+		        	game.world.getObject( game._currentObjectId ).clearAdditionalColor();
 		        	game._currentObjectId = game.objects.nextElement().getID();
+		        	game.world.getObject( game._currentObjectId ).setAdditionalColor( 255, 255, 0);
 		        	Log.d( "GameScreen", "New Object is: " + game.world.getObject( game._currentObjectId ).getName() );
 		        	return true;
 		        case R.id.swap_time:

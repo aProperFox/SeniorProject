@@ -28,7 +28,7 @@ public class BB extends Application {
 	public static boolean isTimeLimitenabled;
 	// Empty set used as default for "playedComics"
 	public static Set<String> EMPTYSET;
-
+	
     @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public void onCreate(){
@@ -39,6 +39,15 @@ public class BB extends Application {
         
         // Create empty set
         EMPTYSET = new HashSet<String>();
+        
+     // Ensure not both menus can be inflated
+        if ( isDevMode ) {
+        	isSponsorMode = false;
+        	isTimeLimitenabled = false;
+        } else {
+            // Turn on time limit by default
+        	isTimeLimitenabled = true;
+        }
         
         // Determine and store device width & height
         Display display = ((WindowManager) BB.context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

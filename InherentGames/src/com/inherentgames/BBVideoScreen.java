@@ -86,13 +86,11 @@ public class BBVideoScreen extends Activity {
 	
 	@Override
 	public boolean onTouchEvent( MotionEvent me ) {
-		/*
-		 * Currently, video will not play if we have already played it
-		 * Leaving this code in case the sponsors want a 'skip' function
-		 *
+		
 		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
 			if ( shouldLoadMap ) {
         		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
+        		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
                 startActivity( intent );
                 finish();
         	}
@@ -104,7 +102,7 @@ public class BBVideoScreen extends Activity {
         	}
         	
 		}
-		*/
+		
 		
 		return true;
 	}

@@ -45,15 +45,6 @@ public class BBMenuScreen extends Activity {
 	@Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-   
-        // Ensure not both menus can be inflated
-        if ( BB.isDevMode ) {
-        	BB.isSponsorMode = false;
-        	BB.isTimeLimitenabled = false;
-        } else {
-            // Turn on time limit by default
-        	BB.isTimeLimitenabled = true;
-        }
 
         
         Log.d( "MenuScreen", "onCreate called" );

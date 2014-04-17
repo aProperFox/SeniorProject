@@ -115,6 +115,10 @@ public class BBGame {
 	protected boolean moveHand;
 	protected int handTransparency;
 	
+	// Track answer 
+	protected int answerTransparency;
+	protected String answer = "RightAnswer";
+	
 	// Tracks horizontal and vertical swipe movement
 	protected float horizontalSwipe = 0;
 	protected float verticalSwipe = 0;
@@ -228,7 +232,7 @@ public class BBGame {
 			wattsonText.add( wattsonPhrases[0][2] );
 			wattsonTextIterator = 0;
 		} else {
-			BB.isTimeLimitenabled = ( BB.isSponsorMode ) ? BB.isTimeLimitenabled : true;
+			BB.isTimeLimitenabled = ( BB.isSponsorMode || BB.isDevMode ) ? BB.isTimeLimitenabled : true;
 			isTutorial = false;
 		}
 	}
@@ -252,7 +256,7 @@ public class BBGame {
 				tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button_empty ) ), 128, 128 );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button ) ), 256, 128 );
 				tm.addTexture( "EmptyButton", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
@@ -310,6 +314,14 @@ public class BBGame {
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.defaulttexture ) ), 256, 256 );
 				tm.addTexture( "Default", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.right_answer ) ), 64, 64 );
+				tm.addTexture( "RightAnswer", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.wrong_answer ) ), 64, 64 );
+				tm.addTexture( "WrongAnswer", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				spritesLoaded = true;
@@ -576,6 +588,10 @@ public class BBGame {
         soundPoolMap.put( 27, soundPool.load( BB.context, R.raw.taxi, 1 ) );
         soundPoolMap.put( 28, soundPool.load( BB.context, R.raw.semaforo, 1 ) );
         soundPoolMap.put( 29, soundPool.load( BB.context, R.raw.basura, 1 ) );
+        soundPoolMap.put( 30, soundPool.load( BB.context, R.raw.positive, 1 ) );
+        soundPoolMap.put( 31, soundPool.load( BB.context, R.raw.negative, 1 ) );
+        soundPoolMap.put( 32, soundPool.load( BB.context, R.raw.bubble_pop, 1 ) );
+        soundPoolMap.put( 33, soundPool.load( BB.context, R.raw.level_win, 1 ) );
 	}
 	
 	// Sets up the game (OpenGL) scene
@@ -651,12 +667,15 @@ public class BBGame {
         moveHand = true;
         handTransparency = 50;
         
+        // Track answer filters
+        answerTransparency = 0;
+        
         // Setup pause and fire buttons
     	pauseButton = new BBButton( BB.width - BB.width / 30, BB.width / 35, BB.width / 15, BB.width / 15, 
     			"PauseButton", "PauseButtonPressed");
     	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
-    	scoreButton = new BBButton( BB.width / 2, BB.height / 6, BB.height / 3, BB.height / 3, "EmptyButton", "EmptyButton");
+    	scoreButton = new BBButton( BB.width / 8 + BB.height / 20, BB.height / 20 + BB.height / 12, BB.width / 4, BB.height / 6, "EmptyButton", "EmptyButton");
     	scoreButton.canBePressed = false;
 
     	score = 0;
@@ -691,7 +710,7 @@ public class BBGame {
 		// Step forward one "iteration" in the physics world
 		try {
 			physicsWorld.stepSimulation( ms / 1000000.0f );
-		} catch ( NullPointerException e ) {
+		} catch ( Exception e ) {
 			Log.e( "BBRenderer", "jBulletPhysics threw a NullPointerException." );
 		}
 		
@@ -704,6 +723,11 @@ public class BBGame {
 					levelLose();
 				}
 			}
+		}
+		
+		// Update answer filter transparency
+		if ( answerTransparency > 0 ) {
+			answerTransparency--;
 		}
 		
 		// Update arrow movement
@@ -767,8 +791,8 @@ public class BBGame {
 					}
 				}
 			}
-		} catch( ConcurrentModificationException e ) {
-			Log.e( "BBRenderer", "Concurrent Modification error occured" );
+		} catch( Exception e ) {
+			e.printStackTrace();
 		}
 		
 		checkCollisions();
@@ -869,6 +893,13 @@ public class BBGame {
 			if ( target.type == BBWordObject.Classification.WORD_OBJECT ) {
 				// Only capture the object if the articles match
 				if ( bubble.article == target.article ) {
+					// Play positive sound
+					soundPool.play(30, 3, 3, 1, 0, 1f);
+					
+					// Display Correct answer
+					answer = "RightAnswer";
+					answerTransparency = 15;
+					
 					// Add to list of completed words
 					bubbleWords.add( target.getName( BBTranslator.Language.ENGLISH ) );
 					target.disableLazyTransformations();
@@ -883,6 +914,7 @@ public class BBGame {
 					// Apply the appropriate text label on the bubble
 					bubble.setTexture( target.getName( BBTranslator.Language.SPANISH ) );
 					bubble.calcTextureWrap();
+					bubble.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 					bubble.build();
 					// Play the corresponding sound of the captured object
 					soundPool.play( BBTranslator.getIndexByWord( target.getName( BBTranslator.Language.SPANISH ) ) + 1, 3, 3, 1, 0, 1f );
@@ -902,6 +934,12 @@ public class BBGame {
 				else {
 					
 					// Wrong color guessed :-(
+					soundPool.play(31, 1, 1, 1, 0, 1f);
+					
+					// Display Incorrect answer
+					answer = "WrongAnswer";
+					answerTransparency = 15;
+					
 					deleteBubble( bubble );
 					endTime -= 5000;
 					timeLeft -= 5;
@@ -915,6 +953,7 @@ public class BBGame {
 				Log.i( "BBRenderer", "Object is a bubble!" );
 				BBBubble bubbleCollisionObject = (BBBubble) target;
 				world.removeObject( bubbleCollisionObject.getHeldObjectId() );
+				soundPool.play(32, 2, 2, 1, 0, 1f);
 				if ( bubble.getObjectId() > bubbleCollisionObject.getObjectId() ) {
 					deleteBubble( bubble );
 					deleteBubble( bubbleCollisionObject );
@@ -924,8 +963,8 @@ public class BBGame {
 				}
 				return 0;
 			}
-		} catch ( IndexOutOfBoundsException e ) {
-			Log.e( "BBRenderer", e.getMessage() );
+		} catch ( Exception e ) {
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -1045,6 +1084,8 @@ public class BBGame {
                 }
             } );
     	} else {
+    		
+    		soundPool.play(33, 2, 2, 1, 0, 1f);
     		
     		level = level.getNext();  
     		
