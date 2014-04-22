@@ -18,11 +18,11 @@
     <string name="tutorial_button">Tutorial</string>
     <string name="settings_button">Settings</string>
     <string name="store_button">Store</string>
-    <string name="easter_egg">Easter Egg unlocked!</string>
     <string name="c_title">Game Paused!</string>
     <string name="c_resume">Resume</string>
     <string name="c_settings">Settings</string>
     <string name="c_exit">Exit to Menu</string>
+    <string name="c_reset">Reset Level</string>
     <string name="unavailable">Level still in development!</string>
     <string name="load_level">Loading… (this may take a while)</string>
     <string name="inc_object_x">Inc Obj x</string>
@@ -39,4 +39,6 @@
 	<string name="word_volume">Word Voice Volume</string>
 	<string name="time_limit_enabled">Disable time limit</string>
 	<string name="time_limit_disabled">Enable time limit</string>
+	<string name="reset_level">Reset Level</string>
+	<string name="empty"></string>
 </resources>

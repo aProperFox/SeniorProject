@@ -60,7 +60,6 @@ public class BBRoom extends World {
 	protected Mode gameMode;
 	protected int numRequiredObjects;
 	
-	private GLSLShader shader;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
 	private int cameraBoxId = 0;
@@ -543,7 +542,7 @@ public class BBRoom extends World {
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/address.obj" ),
 						BB.context.getResources().getAssets().open( "raw/room3/address.mtl" ), 20.0f ) ), 
-						new SimpleVector( 0, 0, 0 ), "Address", Gender.FEMININE ) );
+						new SimpleVector( 0, - (float) Math.PI / 2, 0 ), "Address", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'address' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
 				// Bicycle = 1 ( la bicicleta )
@@ -561,7 +560,7 @@ public class BBRoom extends World {
 				// Car = 3 ( el coche )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/car.obj" ),
-						BB.context.getResources().getAssets().open( "raw/room3/car.mtl" ), 3.5f ) ), 
+						BB.context.getResources().getAssets().open( "raw/room3/car.mtl" ), 1f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Car", Gender.MASCULINE ) );
 				Log.d( "Room", "Loading object 'car' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
@@ -589,7 +588,7 @@ public class BBRoom extends World {
 				// Taxi = 7 ( la taxi )
 				roomObjects.add( new BBWordObject( Object3D.mergeAll(
 						Loader.loadOBJ( BB.context.getResources().getAssets().open( "raw/room3/taxi.obj" ),
-						BB.context.getResources().getAssets().open( "raw/room3/taxi.mtl" ), 2.5f ) ), 
+						BB.context.getResources().getAssets().open( "raw/room3/taxi.mtl" ), 1f ) ), 
 						new SimpleVector( (float )Math.PI, ( float )Math.PI/2, 0 ), "Taxi", Gender.FEMININE ) );
 				Log.d( "Room", "Loading object 'taxi' took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 				startTime = System.currentTimeMillis();
@@ -611,17 +610,17 @@ public class BBRoom extends World {
 			} 
 			
 			//Address 0
-			addWordObject( 20, 0f, 10, roomObjects.get( 0 ), "Address" );
+			addWordObject( 50, 0f, 0, roomObjects.get( 0 ), "Address" );
 			//Bus 2
 			addWordObject( -54, 8f, 13, roomObjects.get( 1 ), "Bus", new SimpleVector( 0, ( float )Math.PI, 0 ) );
 			//Car 3
-			addWordObject( -30, 8f, -23, roomObjects.get( 2 ), "Car", new SimpleVector( 0, ( float )Math.PI/2, 0 ) );
+			addWordObject( -30, 8f, -23, roomObjects.get( 2 ), "Car", new SimpleVector( 0, 0, 0 ) );
 			//Map 4
 			addWordObject( 4, -1f, -20, roomObjects.get( 3 ), "Map" );
 			//Street sign 6
 			addWordObject( -25, -1f, -19, roomObjects.get( 5 ), "Sign" );
 			//Taxi 7
-			addWordObject( 20, 7f, 10, roomObjects.get( 6 ), "Taxi", new SimpleVector( 0, ( float )Math.PI, 0 ) );
+			addWordObject( 20, 7f, 10, roomObjects.get( 6 ), "Taxi", new SimpleVector( 0, -( float ) Math.PI / 2, 0 ) );
 			//Traffic Light 8
 			addWordObject( -70, -3f, -20, roomObjects.get( 7 ), "Traffic_Light", new SimpleVector( 0, ( float )Math.PI, 0 ) );
 			addWordObject( -23, -3f, 22, roomObjects.get( 7 ), "Traffic_Light" );
@@ -669,6 +668,7 @@ public class BBRoom extends World {
 		object.setOrigin( new SimpleVector( x, y, z ) );
 		object.setName( name );
 		object.rotateBy( rotateBy );
+		object.addInitialRotation( rotateBy );
 		object.setTransparencyMode( Object3D.TRANSPARENCY_MODE_ADD );
 		object.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 		object.setCollisionOptimization( Object3D.COLLISION_DETECTION_OPTIMIZED );

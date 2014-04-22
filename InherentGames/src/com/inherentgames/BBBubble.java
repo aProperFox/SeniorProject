@@ -26,7 +26,7 @@ public class BBBubble extends BBWordObject {
 	private static final long serialVersionUID = -4649047534584957279L;
 	
 	// Tracks whether the bubble is holding an object
-	private boolean isHolding;
+	protected boolean isHolding;
 	// Tracks the object this bubble is holding
 	private int heldObjectId;
 	// Store various IDs of this object
@@ -115,13 +115,6 @@ public class BBBubble extends BBWordObject {
 			}
 			
 		});
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isHolding() {
-		return isHolding;
 	}
 	
 	/**

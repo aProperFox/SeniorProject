@@ -26,9 +26,12 @@ public class BB extends Application {
 	public static final boolean isDevMode = false;
 	public static boolean isSponsorMode = true;
 	public static boolean isTimeLimitenabled;
+	
+	public static int buttonWidth;
+	public static int buttonHeight;
 	// Empty set used as default for "playedComics"
 	public static Set<String> EMPTYSET;
-
+	
     @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public void onCreate(){
@@ -39,6 +42,15 @@ public class BB extends Application {
         
         // Create empty set
         EMPTYSET = new HashSet<String>();
+        
+     // Ensure not both menus can be inflated
+        if ( isDevMode ) {
+        	isSponsorMode = false;
+        	isTimeLimitenabled = false;
+        } else {
+            // Turn on time limit by default
+        	isTimeLimitenabled = true;
+        }
         
         // Determine and store device width & height
         Display display = ((WindowManager) BB.context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -52,6 +64,12 @@ public class BB extends Application {
 			width = size.x;
 			height = size.y;
 		}
+		
+		
+		// Set button width and height variables
+		buttonWidth = (int) (BB.width / 4.9f);
+		buttonHeight = (int) (BB.height / 8.7f);
+		
     }
     
     @TargetApi(Build.VERSION_CODES.KITKAT)

@@ -6,6 +6,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -14,8 +15,6 @@ import android.util.Log;
 import com.android.texample2.GLText;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.IPaintListener;
-import com.threed.jpct.Object3D;
-import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
@@ -73,7 +72,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * @param h
 	 * @param level
 	 */
-	public BBRenderer() {
+	public BBRenderer( ) {
 		
 		// Initialize variables
 		tm = BBTextureManager.getInstance();
@@ -95,9 +94,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	// Triggered when the view port is created
 	public void onSurfaceCreated( GL10 unused, EGLConfig config ) {
 		textSmall = new GLText( BB.context.getAssets() );
-		textSmall.load( "futura-normal.ttf", 64, 2, 2 );
+		textSmall.load( "futura-normal.ttf", BB.width / 35, 2, 2 );
 		textLarge = new GLText( BB.context.getAssets() );
-		textLarge.load( "futura-normal.ttf", 130, 2, 2 );
+		textLarge.load( "futura-normal.ttf", BB.width / 15, 2, 2 );
 	}
 	
 	// Triggered when the view port changes (e.g., by size)
@@ -175,19 +174,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			fb.display();
 			
 			/* The following code needs to come after switching to the frame buffer */
-			
-			// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
-			// turns it off)
-			GLES20.glEnable( GLES20.GL_BLEND );
-			GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-			
-			textSmall.begin( 0.0f, 0.0f, 0.0f, 1.0f, mVPMatrix );
-			textSmall.draw( "LOADING...", 590, -485 );
-			textSmall.end();
-			
-			// Disable it after done
-			GLES20.glDisable( GLES20.GL_BLEND );
-			
+			drawTextSmall( "LOADING...", (int) (BB.width / 1.239f), (int) (BB.height / 1.054), RGBColor.BLACK, false);
 			
 		} else {
 			
@@ -246,7 +233,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Bubble image
 				blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 				// Bubble text
-				//blitText( game.world.getBubbleArticle(), halfWidth-w/25, h-w/10, w/25, h/10, RGBColor.WHITE );
+				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				// Fire Button
 				blitImage( game.fireButton.currentImage, w/8, h-( w/8 ), 128, 128, w/8, w/8, 10 );
 				// Pause Button
@@ -281,11 +268,16 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Wattson help text
 				int iteration = 0;
 				for ( String string : game.wattsonText ) {
-					blitText( string, w/6, h/30 + ( letterWidth*2*iteration ), letterWidth, letterWidth*2, RGBColor.WHITE );
+					drawTextSmall( string, w/6, h/23 + ( letterWidth*2*iteration ), RGBColor.WHITE, false);
 					iteration++;
 				}
 			} catch ( ConcurrentModificationException e ) {
 				Log.e( "BBRenderer", "display2DGameInfo got ConcurrentModificationError: " + e );
+			}
+			
+			
+			if ( game.answerTransparency != 0 ) {
+				blitImage( game.answer, halfWidth, halfHeight, 64, 64, w, h, game.answerTransparency );
 			}
 			
 		}
@@ -297,48 +289,34 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			// Bubble image
 			blitImage( game.bubbleTex, w/2, h, 256, 256, w/3, w/3, 5 );
 			// Bubble text
-			//blitText( game.world.getBubbleArticle(), w/2-w/25, h-w/10, w/25, h/10, RGBColor.WHITE );
+			drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 			// Fire Button
 			blitButton( game.fireButton );
 			// Pause Button
 			blitButton( game.pauseButton );
 			// score button
-			//TODO: get prettier button to show score on
-			//blitButton( game.scoreButton );
+			blitButton( game.scoreButton );
 			// Info Bar
 			// Has extra 1px hang if using real size? Decremented to 255x255
-			blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
+			//blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
 			
-			// Dynamic fuel/time bars
-			// blitImageBottomUp( "FuelBar", (int) (w * 0.909), h/2, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
+			// Dynamic time bar
 			blitImageBottomUp( "TimeBar", (int) (w * 0.966), h/2, 16, 512, w/38, (int) timeHeight, (int) (h * 0.76), 100 );
 			// Score bars
 			blitImage( "ScoreBars", w-( w/16 ), h/2, 128, 512, w/8, ( int )( h*0.9 ), 100 );
+			//Score
+			String score = Integer.toString(game.score);
+			drawTextLarge( score, game.scoreButton.posX + BB.width / 10, game.scoreButton.posY - game.scoreButton.height / 3, RGBColor.WHITE, true );
 			
+			if ( game.answerTransparency != 0 ) {
+				blitImage( game.answer, halfWidth, halfHeight, 64, 64, w, h, game.answerTransparency );
+			}
 		
 		}
 		
 		fb.display();
+
 		
-		GLES20.glEnable( GLES20.GL_BLEND );
-		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textLarge.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );
-		switch ( game.world.currentGender ) {
-		case MASCULINE:
-			textLarge.draw( "El", -50, -460 );
-			break;
-		case FEMININE:
-			textLarge.draw( "La", -65, -460 );
-			break;
-		}
-		
-		// Draw score
-		// TODO: Make score prettier/add flag for certain texts to be drawn or not
-		//String score = Integer.toString(game.score);
-		//textLarge.drawC( score, score.length() * 35, 460);
-		
-		textLarge.end();
-		GLES20.glDisable( GLES20.GL_BLEND );
 	}
 	
 	/**
@@ -467,34 +445,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		}
 		
 	}
-	
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public Vector3f getDimensions( Object3D obj ) {
-		PolygonManager polyMan = obj.getPolygonManager();
-		int polygons = polyMan.getMaxPolygonID();
-		Vector3f minVerts = new Vector3f( 1000, 1000, 1000 );
-		Vector3f maxVerts = new Vector3f( -1000, -1000, -1000 );
-		for ( int i = 0; i < polygons; i++ ) {
-			for ( int j = 0; j < 3; j++ ) {
-				if ( minVerts.x > polyMan.getTransformedVertex( i, j ).x )
-					minVerts.x = polyMan.getTransformedVertex( i, j ).x;
-				if ( maxVerts.x < polyMan.getTransformedVertex( i, j ).x )
-					maxVerts.x = polyMan.getTransformedVertex( i, j ).x;
-				if ( minVerts.y > polyMan.getTransformedVertex( i, j ).y )
-					minVerts.y = polyMan.getTransformedVertex( i, j ).y;
-				if ( maxVerts.y < polyMan.getTransformedVertex( i, j ).y )
-					maxVerts.y = polyMan.getTransformedVertex( i, j ).y;
-				if ( minVerts.z > polyMan.getTransformedVertex( i, j ).z )
-					minVerts.z = polyMan.getTransformedVertex( i, j ).z;
-				if ( maxVerts.z < polyMan.getTransformedVertex( i, j ).z )
-					maxVerts.z = polyMan.getTransformedVertex( i, j ).z;
-			}
-		}
-		return new Vector3f( maxVerts.x - minVerts.x, maxVerts.y - minVerts.y, maxVerts.z - minVerts.z );
-	}
+
 	
 	/**
 	 * @param vector
@@ -519,74 +470,57 @@ class BBRenderer implements GLSurfaceView.Renderer {
 
 	/**
 	 * @param text
-	 * @param x
-	 * @param y
+	 * @param pixelX
+	 * @param pixelY
+	 * @param color
+	 * @param reverse
 	 */
-	public void blitText( String text, int x, int y ) {
-		Texture font = tm.getTexture( "gui_font" );
-		for ( int i = 0; i < text.length(); i++ ) {
-			char ch = text.charAt( i );
-			int yS = ch / charPerLine;
-			int xS = ( ch % charPerLine == 0 ) ? 0 : ch - yS * charPerLine;
-			fb.blit( font, xS * charWidth, yS * charHeight, x, y, charWidth, charHeight, FrameBuffer.TRANSPARENT_BLITTING );
-			x += charWidth;
+	public void drawTextLarge( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
+		// Switch frame buffers
+		fb.display();
+		
+		// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
+		// turns it off)
+		GLES20.glEnable( GLES20.GL_BLEND );
+		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
+		textLarge.begin( color.getRed() / 255f, color.getRed() / 255f, color.getRed() / 255f, 1.0f, mVPMatrix );
+		
+		if ( reverse ) {
+			textLarge.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+		} else {
+			textLarge.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
 		}
-	}
-
-	/**
-	 * @param text
-	 * @param x
-	 * @param y
-	 * @param addColor
-	 */
-	public void blitText( String text, int x, int y, RGBColor addColor ) {
-		Texture font = tm.getTexture( "gui_font" );
-		for ( int i = 0; i < text.length(); i++ ) {
-			char ch = text.charAt( i );
-			int yS = ch / charPerLine;
-			int xS = ( ch % charPerLine == 0 ) ? 0 : ch - yS * charPerLine;
-			fb.blit( font, xS * charWidth, yS * charHeight, x, y, charWidth, charHeight, charWidth, charHeight, 100,
-					FrameBuffer.TRANSPARENT_BLITTING, addColor );
-			x += charWidth;
-		}
-	}
-
-	/**
-	 * @param text
-	 * @param x
-	 * @param y
-	 * @param width
-	 * @param height
-	 * @param addColor
-	 */
-	public void blitText( String text, int x, int y, int width, int height, RGBColor addColor ) {
-		Texture font = tm.getTexture( "gui_font" );
-		for ( int i = 0; i < text.length(); i++ ) {
-			char ch = text.charAt( i );
-			int yS = ch / charPerLine;
-			int xS = ( ch % charPerLine == 0 ) ? 0 : ch - yS * charPerLine;
-			fb.blit( font, xS * charWidth, yS * charHeight, x, y, charWidth, charHeight, width, height, 100,
-					FrameBuffer.TRANSPARENT_BLITTING, addColor );
-			x += width;
-		}
+		
+		textLarge.end();
+		GLES20.glDisable( GLES20.GL_BLEND );
+		
 	}
 	
 	/**
 	 * @param text
-	 * @param x
-	 * @param y
-	 * @param transparency
+	 * @param pixelX
+	 * @param pixelY
+	 * @param color
+	 * @param reverse
 	 */
-	public void blitText( String text, int x, int y, int transparency ) {
-		Texture font = tm.getTexture( "gui_font" );
-		for ( int i = 0; i < text.length(); i++ ) {
-			char ch = text.charAt( i );
-			int yS = ch / charPerLine;
-			int xS = ( ch % charPerLine == 0 ) ? 0 : ch - yS * charPerLine;
-			fb.blit( font, xS * charWidth, yS * charHeight, x, y, charWidth, charHeight, charWidth, charHeight, transparency,
-					FrameBuffer.OPAQUE_BLITTING, RGBColor.WHITE );
-			x += charWidth;
+	public void drawTextSmall( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
+		// Switch frame buffers
+		fb.display();
+		
+		// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
+		// turns it off)
+		GLES20.glEnable( GLES20.GL_BLEND );
+		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
+		textSmall.begin( color.getRed() / 255f, color.getRed() / 255f, color.getRed() / 255f, 1.0f, mVPMatrix );
+		
+		if ( reverse ) { 
+			textSmall.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+		} else { 
+			textSmall.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
 		}
+		
+		textSmall.end();
+		GLES20.glDisable( GLES20.GL_BLEND );
 	}
 	
 	/**
@@ -664,5 +598,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		fb.blit( image, 0, 0, ( button.posX - button.width / 2 ), button.posY - ( button.height / 2 ), button.imageWidth, button.imageHeight, button.width, button.height, 20, false, null );
 
 	}
+	
 }
 

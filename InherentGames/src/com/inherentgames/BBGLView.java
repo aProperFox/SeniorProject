@@ -106,7 +106,8 @@ public class BBGLView extends GLSurfaceView {
 			    		    double y = Math.pow( dm.BB.heightPixels/dm.ydpi, 2 );
 			    		    double screenInches = Math.sqrt( x+y );
 			    			*/
-			    			Log.d( "GameScreen", "Action Pointer Up" );
+			    			Log.d( "BBGLView", "Action Pointer Up" );
+			    			
 							xpos = -1;
 							ypos = -1;
 							game.horizontalSwipe = 0;
@@ -114,7 +115,7 @@ public class BBGLView extends GLSurfaceView {
 							float xd = me.getX( 1 ) - firstX;
 							float yd = me.getY( 1 ) - firstY;
 							if ( isShootMode ){
-								if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+								if ( yd < ( -BB.height/5 ) && Math.abs( xd ) < BB.width/4 ) {
 									// If you can shoot, set the gender
 									if ( (game.wattsonPrivileges & 4) != 0 ) {
 										game.setGender( BBWordObject.Gender.MASCULINE );
@@ -125,7 +126,7 @@ public class BBGLView extends GLSurfaceView {
 									else
 										return false;
 								}
-								else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/6 ) {
+								else if ( yd > ( BB.height/5 ) && Math.abs( xd ) < BB.width/4 ) {
 									// If you can shoot, set the gender
 									if ( (game.wattsonPrivileges & 8) != 0 ) {
 										game.setGender( BBWordObject.Gender.FEMININE );
@@ -200,11 +201,11 @@ public class BBGLView extends GLSurfaceView {
 					case MotionEvent.ACTION_POINTER_DOWN:
 						firstX = me.getX( 1 );
 						firstY = me.getY( 1 );
-						isShootMode = true;
 						return true;
 					// First finger released
 		    		case MotionEvent.ACTION_UP:
 		    			Log.d( "GameScreen", "Action Up" );
+		    			
 						xpos = -1;
 						ypos = -1;
 						game.horizontalSwipe = 0;
@@ -216,26 +217,30 @@ public class BBGLView extends GLSurfaceView {
 					// Second or later finger released
 		    		case MotionEvent.ACTION_POINTER_UP:
 		    			Log.d( "GameScreen", "Action Pointer Up" );
+		    			Log.d( "BBGLView", "isShootMode: " + isShootMode );
 						xpos = -1;
 						ypos = -1;
 						game.horizontalSwipe = 0;
 						game.verticalSwipe = 0;
 						float xd = me.getX( 1 ) - firstX;
 						float yd = me.getY( 1 ) - firstY;
-						// Swipe up indicates masculine
-						if ( yd < ( -BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
-							game.setGender( Gender.MASCULINE );
+						if ( isShootMode ) {
+							// Swipe up indicates masculine
+							if ( yd < ( -BB.height/7 ) && Math.abs( xd ) < BB.width/4 ) {
+								game.setGender( Gender.MASCULINE );
+							}
+							// Swipe down indicates feminine
+							else if ( yd > ( BB.height/7 ) && Math.abs( xd ) < BB.width/4 ) {
+								game.setGender( Gender.FEMININE );
+							}
+							// Neither indicates nothing
+							else {
+								return true;
+							}
+							// Shoot bubble accordingly
+							game.shootBubble();
+							
 						}
-						// Swipe down indicates feminine
-						else if ( yd > ( BB.height/7 ) && Math.abs( xd ) < BB.width/6 ) {
-							game.setGender( Gender.FEMININE );
-						}
-						// Neither indicates nothing
-						else {
-							return true;
-						}
-						// Shoot bubble accordingly
-						game.shootBubble();
 						return true;
 					// Finger moved
 					// Note: Here, we're only using this event for panning around, not for swiping up/down to shoot bubbles

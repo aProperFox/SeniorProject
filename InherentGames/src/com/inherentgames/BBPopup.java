@@ -9,7 +9,7 @@ public class BBPopup extends Activity {
         public void onCreate( Bundle savedInstanceState ) {
                 
                 super.onCreate( savedInstanceState );
-                setContentView( R.layout.popup );
+                setContentView( R.layout.pause_popup );
         }
         /*
         public void onPopupBtClick( View view ) {

@@ -1,11 +1,12 @@
 package com.inherentgames;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 
 import javax.vecmath.Vector3f;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,7 +15,6 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseIntArray;
-import android.view.Menu;
 import android.widget.Toast;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
@@ -71,6 +71,10 @@ public class BBGame {
 	
 	/* Internal parameters */
 	
+	// Track level state
+	protected static enum State { PLAYING, WON, LOST };
+	protected State levelState;
+	
 	// Track the current room number
 	protected Level level = Level.CLASSROOM;
 	
@@ -115,6 +119,10 @@ public class BBGame {
 	protected boolean moveHand;
 	protected int handTransparency;
 	
+	// Track answer 
+	protected int answerTransparency;
+	protected String answer = "RightAnswer";
+	
 	// Tracks horizontal and vertical swipe movement
 	protected float horizontalSwipe = 0;
 	protected float verticalSwipe = 0;
@@ -136,6 +144,7 @@ public class BBGame {
 	
 	// Debugging option to track "current" object
 	protected int _currentObjectId;
+	
 	
 	// TODO: Move to BBTutorial for now, but ideally to a language file
 	// Tutorial text
@@ -193,7 +202,7 @@ public class BBGame {
 			}
 			
 		};
-		
+
 		// TODO: Find out what this is for
 		handler = new Handler();
 		
@@ -228,7 +237,7 @@ public class BBGame {
 			wattsonText.add( wattsonPhrases[0][2] );
 			wattsonTextIterator = 0;
 		} else {
-			BB.isTimeLimitenabled = ( BB.isSponsorMode ) ? BB.isTimeLimitenabled : true;
+			BB.isTimeLimitenabled = ( BB.isSponsorMode || BB.isDevMode ) ? BB.isTimeLimitenabled : true;
 			isTutorial = false;
 		}
 	}
@@ -252,7 +261,7 @@ public class BBGame {
 				tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button_empty ) ), 128, 128 );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button ) ), 256, 128 );
 				tm.addTexture( "EmptyButton", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
@@ -310,6 +319,14 @@ public class BBGame {
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.defaulttexture ) ), 256, 256 );
 				tm.addTexture( "Default", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.right_answer ) ), 64, 64 );
+				tm.addTexture( "RightAnswer", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.wrong_answer ) ), 64, 64 );
+				tm.addTexture( "WrongAnswer", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				spritesLoaded = true;
@@ -576,6 +593,10 @@ public class BBGame {
         soundPoolMap.put( 27, soundPool.load( BB.context, R.raw.taxi, 1 ) );
         soundPoolMap.put( 28, soundPool.load( BB.context, R.raw.semaforo, 1 ) );
         soundPoolMap.put( 29, soundPool.load( BB.context, R.raw.basura, 1 ) );
+        soundPoolMap.put( 30, soundPool.load( BB.context, R.raw.positive, 1 ) );
+        soundPoolMap.put( 31, soundPool.load( BB.context, R.raw.negative, 1 ) );
+        soundPoolMap.put( 32, soundPool.load( BB.context, R.raw.bubble_pop, 1 ) );
+        soundPoolMap.put( 33, soundPool.load( BB.context, R.raw.level_win, 1 ) );
 	}
 	
 	// Sets up the game (OpenGL) scene
@@ -651,17 +672,22 @@ public class BBGame {
         moveHand = true;
         handTransparency = 50;
         
+        // Track answer filters
+        answerTransparency = 0;
+        
         // Setup pause and fire buttons
     	pauseButton = new BBButton( BB.width - BB.width / 30, BB.width / 35, BB.width / 15, BB.width / 15, 
     			"PauseButton", "PauseButtonPressed");
     	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
-    	scoreButton = new BBButton( BB.width / 2, BB.height / 6, BB.height / 3, BB.height / 3, "EmptyButton", "EmptyButton");
+    	scoreButton = new BBButton( BB.width / 8 + BB.height / 20, BB.height / 20 + BB.height / 12, BB.width / 4, BB.height / 6, "EmptyButton", "EmptyButton");
     	scoreButton.canBePressed = false;
 
     	score = 0;
     	streak = 0;
     	multiplier = 1;
+    	
+    	levelState = State.PLAYING;
 	}
 	
 	/**
@@ -691,7 +717,7 @@ public class BBGame {
 		// Step forward one "iteration" in the physics world
 		try {
 			physicsWorld.stepSimulation( ms / 1000000.0f );
-		} catch ( NullPointerException e ) {
+		} catch ( Exception e ) {
 			Log.e( "BBRenderer", "jBulletPhysics threw a NullPointerException." );
 		}
 		
@@ -704,6 +730,11 @@ public class BBGame {
 					levelLose();
 				}
 			}
+		}
+		
+		// Update answer filter transparency
+		if ( answerTransparency > 0 ) {
+			answerTransparency--;
 		}
 		
 		// Update arrow movement
@@ -751,9 +782,9 @@ public class BBGame {
 				lastRotateTime = System.currentTimeMillis();
 				ArrayList<BBBubble> bubbleObjects = world.getBubbleObjects();
 				for ( BBBubble bubble : BBReversed.reversed( bubbleObjects ) ) {
-					if ( bubble.isHolding() ) {
+					if ( bubble.isHolding ) {
 						Object3D obj = world.getObject( bubble.getHeldObjectId() );
-						obj.setOrigin( bubble.getTranslation().calcSub( obj.getCenter() ) );
+						obj.translate( bubble.getTranslation().calcSub( obj.getTranslation() ).calcSub( obj.getOrigin() ).calcSub( obj.getCenter() ) );
 						obj.rotateY( 0.1f );
 						world.getObject( bubble.getObjectId() ).rotateY( 0.1f );
 						
@@ -767,8 +798,8 @@ public class BBGame {
 					}
 				}
 			}
-		} catch( ConcurrentModificationException e ) {
-			Log.e( "BBRenderer", "Concurrent Modification error occured" );
+		} catch( Exception e ) {
+			e.printStackTrace();
 		}
 		
 		checkCollisions();
@@ -869,11 +900,18 @@ public class BBGame {
 			if ( target.type == BBWordObject.Classification.WORD_OBJECT ) {
 				// Only capture the object if the articles match
 				if ( bubble.article == target.article ) {
+					// Play positive sound
+					soundPool.play(30, 3, 3, 1, 0, 1f);
+					
+					// Display Correct answer
+					answer = "RightAnswer";
+					answerTransparency = 15;
+					
 					// Add to list of completed words
 					bubbleWords.add( target.getName( BBTranslator.Language.ENGLISH ) );
 					target.disableLazyTransformations();
 					if ( target.getName( BBTranslator.Language.ENGLISH ) != "Plate" ) {
-						target.scale( 5.0f );
+						target.scale( 5.0f / 1.1f );
 					}
 					// Capture object
 					target.setStatic( false );
@@ -883,6 +921,7 @@ public class BBGame {
 					// Apply the appropriate text label on the bubble
 					bubble.setTexture( target.getName( BBTranslator.Language.SPANISH ) );
 					bubble.calcTextureWrap();
+					bubble.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 					bubble.build();
 					// Play the corresponding sound of the captured object
 					soundPool.play( BBTranslator.getIndexByWord( target.getName( BBTranslator.Language.SPANISH ) ) + 1, 3, 3, 1, 0, 1f );
@@ -902,6 +941,12 @@ public class BBGame {
 				else {
 					
 					// Wrong color guessed :-(
+					soundPool.play(31, 1, 1, 1, 0, 1f);
+					
+					// Display Incorrect answer
+					answer = "WrongAnswer";
+					answerTransparency = 15;
+					
 					deleteBubble( bubble );
 					endTime -= 5000;
 					timeLeft -= 5;
@@ -915,6 +960,7 @@ public class BBGame {
 				Log.i( "BBRenderer", "Object is a bubble!" );
 				BBBubble bubbleCollisionObject = (BBBubble) target;
 				world.removeObject( bubbleCollisionObject.getHeldObjectId() );
+				soundPool.play(32, 2, 2, 1, 0, 1f);
 				if ( bubble.getObjectId() > bubbleCollisionObject.getObjectId() ) {
 					deleteBubble( bubble );
 					deleteBubble( bubbleCollisionObject );
@@ -924,8 +970,8 @@ public class BBGame {
 				}
 				return 0;
 			}
-		} catch ( IndexOutOfBoundsException e ) {
-			Log.e( "BBRenderer", e.getMessage() );
+		} catch ( Exception e ) {
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -940,7 +986,7 @@ public class BBGame {
 			for ( i = 0; i < numBubbles; i++ ) {
 				BBBubble bubble = world.getBubble( i );
 				// Make sure the bubble doesn't already contain an object
-				if ( bubble != null && !bubble.isHolding() && bubble.getBodyIndex() != -1 ) {
+				if ( bubble != null && !bubble.isHolding && bubble.getBodyIndex() != -1 ) {
 					RigidBody tempBody = (RigidBody) physicsWorld.getCollisionObjectArray().get( bubble.getBodyIndex() );
 					
 					// To get the position the bubble will be in the next "step"/tick, just use its current linear velocity
@@ -1024,6 +1070,9 @@ public class BBGame {
 	// Handles the player winning the level
 	public void levelWin() {
 		bubbleWords.clear();
+		
+		levelState = State.WON;
+		// TODO: show game screen dialog
 
 		SharedPreferences settings = BB.context.getSharedPreferences( BB.PREFERENCES, 0 );
 		bubbleTex = "bubbleBlue";
@@ -1046,18 +1095,18 @@ public class BBGame {
             } );
     	} else {
     		
+    		soundPool.play(33, 2, 2, 1, 0, 1f);
+    		
     		level = level.getNext();  
     		
-    		if ( settings.getInt( "nextLevel", 0 ) < level.ordinal() )
+    		if ( settings.getInt( "nextLevel", 0 ) < level.ordinal() ) {
     			settings.edit().putInt( "nextLevel", level.ordinal() ).commit();
-    		
-            world.dispose();
+    		}
     		handler.post( new Runnable() {
-	            public void run() {
-	            	Toast toast = Toast.makeText( BB.context, R.string.win_level_title, Toast.LENGTH_LONG );
-	                toast.show();
-	                if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
-	                		BB.EMPTYSET).contains("comic" + (level.ordinal() - 1) + "b") ) {
+    			@SuppressLint("NewApi")
+				public void run() {
+		        	if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
+	                		BB.EMPTYSET).contains("comic" + ( level.ordinal() - 1) + "b") ) {
 	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
 		        	    intent.setClass( BB.context, BBMapScreen.class );
 		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
@@ -1071,8 +1120,9 @@ public class BBGame {
 		        	    BB.context.startActivity( intent );
 		        	    loading = true;
 	                }
-	            }
-	        } );
+    			}
+    		});
+           
     	}
 
 	}
@@ -1083,6 +1133,10 @@ public class BBGame {
 	// TODO: Make sure activity changes are handled correctly
 	// Handles the player losing the level
 	public void levelLose() {
+		
+		levelState = State.LOST;
+		// TODO: show game screen dialog
+		
         world.dispose();
 		handler.post( new Runnable() {
             public void run() {
@@ -1103,6 +1157,45 @@ public class BBGame {
 	 */
 	public void setLevel( Level num ) {
 		level = num;
+	}
+	
+	public void resetLevel() {
+		timeLeft = 100;
+		endTime = System.currentTimeMillis() + 100000;
+		bubbleTex = "bubbleBlue";
+		bubbleWords.clear();
+		score = 0;
+		multiplier = 1;
+		
+		BBBubble bubble;
+		
+		for ( BBBubble object : world.getBubbleObjects()) {
+			bubble = (BBBubble) world.getObject( object.getObjectId() );
+			bubble.isHolding = false;
+			//world.removeObject( bubble.getID() );
+			//physicsWorld.removeRigidBody( (RigidBody) physicsWorld.getCollisionObjectArray().get( bubble.getBodyIndex() ) );
+		}
+		
+		BBWordObject wordObject;
+		
+		for ( BBWordObject object : world.getWordObjects()) {
+			wordObject = (BBWordObject) world.getObject( object.getObjectId() );
+			wordObject.clearTranslation();
+			wordObject.setStatic( true );
+			wordObject.scaleFrom( 5.0f / 1.1f );
+			wordObject.clearRotation();
+		}
+		
+		levelState = State.PLAYING;
+		
+		// TODO: delete bubbles in room
+		/*
+		for ( BBBubble object : world.getBubbleObjects()) {
+			bubble = (BBBubble) world.getObject( object.getObjectId() );
+			world.removeObject( bubble.getID() );
+			physicsWorld.removeRigidBody( (RigidBody) physicsWorld.getCollisionObjectArray().get( bubble.getBodyIndex() ) );
+		}
+		*/
 	}
 	
 	
