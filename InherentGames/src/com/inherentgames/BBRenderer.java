@@ -6,7 +6,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
-import android.graphics.Point;
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -15,8 +15,6 @@ import android.util.Log;
 import com.android.texample2.GLText;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.IPaintListener;
-import com.threed.jpct.Object3D;
-import com.threed.jpct.PolygonManager;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
@@ -74,7 +72,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	 * @param h
 	 * @param level
 	 */
-	public BBRenderer() {
+	public BBRenderer( ) {
 		
 		// Initialize variables
 		tm = BBTextureManager.getInstance();

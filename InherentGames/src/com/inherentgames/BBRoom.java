@@ -60,7 +60,6 @@ public class BBRoom extends World {
 	protected Mode gameMode;
 	protected int numRequiredObjects;
 	
-	private GLSLShader shader;
 	/*
 	 * TODO: add color to WordObjects when camera is aimed at them
 	private int cameraBoxId = 0;
@@ -669,6 +668,7 @@ public class BBRoom extends World {
 		object.setOrigin( new SimpleVector( x, y, z ) );
 		object.setName( name );
 		object.rotateBy( rotateBy );
+		object.addInitialRotation( rotateBy );
 		object.setTransparencyMode( Object3D.TRANSPARENCY_MODE_ADD );
 		object.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 		object.setCollisionOptimization( Object3D.COLLISION_DETECTION_OPTIMIZED );

@@ -3,21 +3,29 @@ package com.inherentgames;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 
+import com.inherentgames.BBGame.State;
 import com.inherentgames.BBRoom.Level;
 
 
@@ -27,9 +35,14 @@ public class BBGameScreen extends Activity {
 	protected GLSurfaceView glView;
 	protected BBRenderer renderer;
 	protected BBGame game;
-	protected AlertDialog.Builder builder;
-	protected AlertDialog alert;
+	protected Dialog pauseDialog;
+	protected Dialog endDialog;
+	protected Dialog loseDialog;
 	private Drawable icon;
+	
+	private Button pauseResumeButton, pauseSettingsButton, pauseExitButton, pauseResetButton;
+	private Button endContinueButton, endSettingsButton, endExitButton, endResetButton;
+	private View endView;
 	
 	// Internal parameters
 	private boolean isTutorial = false;
@@ -89,63 +102,147 @@ public class BBGameScreen extends Activity {
 		icon = new BitmapDrawable( resultBitmap );
 		
 		// Define the pause menu
-		final CharSequence[] items = {BB.context.getString( R.string.c_resume ), BB.context.getString( R.string.c_settings ), BB.context.getString( R.string.c_exit )};
-
-		builder = new AlertDialog.Builder( BBGameScreen.this );
-		builder.setIcon( icon );
-		builder.setTitle( BB.context.getString( R.string.c_title ) );
-		builder.setItems( items, new DialogInterface.OnClickListener() {
-		    public void onClick( DialogInterface dialog, int item ) {
-				if ( items[item] == BB.context.getString( R.string.c_resume ) ) {
-					game.setPauseButtonState();
-					dialog.cancel();
-				}
-				else if ( items[item] == BB.context.getString( R.string.c_settings ) ) {
-					game.setPauseButtonState();
-					/*
-					Intent intent = new Intent( context, Settings.class );
-					startActivity( intent );
-					*/
-				}
-				else if ( items[item] == BB.context.getString( R.string.c_exit ) ) {
-					finish();
-				}
-		    }
+		LayoutInflater inflater = LayoutInflater.from(BBGameScreen.this);
+        View pauseView = inflater.inflate(R.layout.pause_popup, null);
+		pauseView.setMinimumWidth( 2 * BB.width / 3 );
+		pauseView.setMinimumHeight( 2 * BB.height / 3 );
+        
+		pauseDialog = new Dialog( BBGameScreen.this, android.R.style.Theme_Translucent );
+		pauseDialog.getWindow().setLayout( 2 * BB.width / 3, 2 * BB.height / 3 );
+		pauseDialog.requestWindowFeature( Window.FEATURE_NO_TITLE );
+		pauseDialog.getWindow().addFlags( WindowManager.LayoutParams.FLAG_DIM_BEHIND );
+		pauseDialog.setContentView( pauseView );
+		pauseDialog.getWindow().getAttributes().dimAmount = 0.5f;  
+		
+		// Resume button
+		pauseResumeButton = ( Button ) pauseDialog.findViewById( R.id.resume_button );
+		pauseResumeButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		        	game.setPauseButtonState();
+					pauseDialog.cancel();
+		        }
 		} );
 		
-		alert = builder.create();
+		// Settings button
+		pauseSettingsButton = ( Button ) pauseDialog.findViewById( R.id.settings_button );
+		pauseSettingsButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            Intent i = new Intent( BBGameScreen.this, BBSettings.class );
+		            pauseDialog.cancel();
+		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
+		        }
+		} );
+		
+		// Reset button
+		pauseResetButton = ( Button ) pauseDialog.findViewById( R.id.reset_button );
+		pauseResetButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            game.resetLevel();
+		            game.setPauseButtonState();
+					pauseDialog.cancel();
+		        }
+		} );
+		
+		// Exit button
+		pauseExitButton = ( Button ) pauseDialog.findViewById( R.id.exit_button );
+		pauseExitButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		        	pauseDialog.cancel();
+		            finish();
+		        }
+		} );
+
+		// Define the pause menu
+        endView = inflater.inflate(R.layout.end_popup, null);
+        endView.setMinimumWidth( BB.width / 2 );
+        endView.setMinimumHeight( 7 * BB.height / 8 );
+        
+		endDialog = new Dialog( BBGameScreen.this, android.R.style.Theme_Translucent );
+		endDialog.getWindow().setLayout( BB.width / 2, 7 * BB.height / 8 );
+		endDialog.requestWindowFeature( Window.FEATURE_NO_TITLE );
+		endDialog.getWindow().addFlags( WindowManager.LayoutParams.FLAG_DIM_BEHIND );
+		endDialog.setContentView( endView );
+		endDialog.getWindow().getAttributes().dimAmount = 0.5f;  
+
+		// Resume button
+		endContinueButton = ( Button ) endDialog.findViewById( R.id.resume_button );
+		endContinueButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		        	if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
+	                		BB.EMPTYSET).contains("comic" + ( game.level.ordinal() - 1) + "b") ) {
+	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
+		        	    intent.setClass( BB.context, BBMapScreen.class );
+		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+		        	    game.world.dispose();
+		        	    endDialog.cancel();
+		        	    BB.context.startActivity( intent );
+		        	    game.loading = true;
+	                } else {
+		        		Intent intent = new Intent( BB.context, BBGameScreen.class );
+		        	    intent.setClass( BB.context, BBVideoScreen.class );
+		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+		        	    intent.putExtra( BB.EXTRA_MESSAGE, "comic" + ( game.level.ordinal() - 1 ) + "b" );
+		        	    game.world.dispose();
+		        	    endDialog.cancel();
+		        	    BB.context.startActivity( intent );
+		        	    game.loading = true;
+	                }
+		        }
+		} );
+		
+		// Settings button
+		endSettingsButton = ( Button ) endDialog.findViewById( R.id.settings_button );
+		endSettingsButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            Intent i = new Intent( BBGameScreen.this, BBSettings.class );
+		            endDialog.cancel();
+		            startActivity( i );
+		            overridePendingTransition( R.anim.slide_in_down, R.anim.slide_out_down );
+		        }
+		} );
+		
+		// Reset button
+		endResetButton = ( Button ) endDialog.findViewById( R.id.reset_button );
+		endResetButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		            game.resetLevel();
+		            game.setPauseButtonState();
+					endDialog.cancel();
+		        }
+		} );
+		
+		// Exit button
+		endExitButton = ( Button ) endDialog.findViewById( R.id.exit_button );
+		endExitButton.setOnClickListener( new View.OnClickListener() {
+		        
+		        @Override
+		        public void onClick( View v ) {
+		        	endDialog.cancel();
+		        	finish();
+		        }
+		} );
+		
 		
 		// Set the activity's content view to the OpenGL view
 		setContentView( glView );
-	}
-	
-	//Keeping this in case we find a better way to get the context menu instead of using alert Dialog
-	/*
-	@Override
-	public void onCreateContextMenu( ContextMenu menu, View v, ContextMenuInfo menuInfo ) {
-		super.onCreateContextMenu( menu, v, menuInfo );
-		menu.setHeaderTitle( getString( R.string.c_title ) );
-		menu.add( 0, v.getId(), 0, getString( R.string.c_resume ) );
-		menu.add( 0, v.getId(), 0, getString( R.string.c_restart ) );
-		menu.add( 0, v.getId(), 0, getString( R.string.c_exit ) );	
-	}
-	
-	@Override
-	public boolean onContextItemSelected( MenuItem item ) {
-		if ( item.getTitle()==getString( R.string.c_resume ) ) {
-			renderer.setPauseButtonState();
-		}
-		else if ( item.getTitle()==getString( R.string.c_restart ) ) {
-    	    renderer.levelLose();
-		}
-		else if ( item.getTitle()==getString( R.string.c_exit ) ) {
-			 Intent intent = new Intent( context, MenuScreen.class );
-			 startActivity( intent );
-		}
 		
-		return true;
 	}
-	*/
+
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
@@ -239,7 +336,7 @@ public class BBGameScreen extends Activity {
 		        case R.id.inc_obj:
 		        	game.world.getObject( game._currentObjectId ).clearAdditionalColor();
 		        	game._currentObjectId = game.objects.nextElement().getID();
-		        	game.world.getObject( game._currentObjectId ).setAdditionalColor( 255, 255, 0);
+		        	game.world.getObject( game._currentObjectId ).setAdditionalColor( 255, 255, 0 );
 		        	Log.d( "GameScreen", "New Object is: " + game.world.getObject( game._currentObjectId ).getName() );
 		        	return true;
 		        case R.id.swap_time:
@@ -251,6 +348,10 @@ public class BBGameScreen extends Activity {
 		        	} else {
 		        		item.setTitle( R.string.time_limit_disabled );
 		        	}
+		        	return true;
+		        case R.id.reset:
+		        	game.resetLevel();
+		        	return true;
 	        }
 	        Log.d( "GameScreen", "New object location: " + game.world.getObject( game._currentObjectId ).getTranslation() );
 		}catch ( Exception e ) {
@@ -282,7 +383,18 @@ public class BBGameScreen extends Activity {
 	}
 	
 	protected void showPauseMenu() {
-		alert.show();
+		pauseDialog.show();
 	}
+	
+	protected void showEndMenu( boolean won ) {
+		if ( won ) {
+			endView.setBackgroundResource( R.drawable.win_game );
+		} else {
+			endView.setBackgroundResource( R.drawable.lose_game );
+		}
+		endDialog.show();
+	}
+
+
 	
 }

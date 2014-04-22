@@ -68,22 +68,19 @@ public class BBMenuScreen extends Activity {
 		buttonTextColor = Color.rgb( 156, 192, 207 );
 		
 		typeface = Typeface.createFromAsset( getAssets(), "futura-normal.ttf" );
-		
-		// Set button width and height variables
-		int buttonWidth = (int) (BB.width / 4.9f);
-		int buttonHeight = (int) (BB.height / 8.7f);
-		float buttonX = (BB.width / 1.2f) - buttonWidth / 2;
+
+		float buttonX = (BB.width / 1.2f) - BB.buttonWidth / 2;
 		
 		// Click handler for buttons
 		playButton = ( Button ) findViewById( R.id.playbutton );
 		setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
 		
 		// Set location based on screen dimensions
-		playButton.setWidth( buttonWidth );
-		playButton.setHeight( buttonHeight );
+		playButton.setWidth( BB.buttonWidth );
+		playButton.setHeight( BB.buttonHeight );
 		playButton.setX( buttonX );
 		Log.d("BBMenuScreen", "button x is: " + playButton.getX());
-		playButton.setY( (BB.height / 2.204f) - buttonHeight / 2 );
+		playButton.setY( (BB.height / 2.204f) - BB.buttonHeight / 2 );
 		Log.d("BBMenuScreen", "button y is: " + playButton.getY());
 		
 		SharedPreferences settings = getSharedPreferences( BB.PREFERENCES, 0 );
@@ -123,9 +120,9 @@ public class BBMenuScreen extends Activity {
 		
 		// Set location based on screen dimensions
 		settingsButton.setX( buttonX );
-		settingsButton.setY( (BB.height / 1.349f) - buttonHeight / 2 );
-		settingsButton.setWidth( buttonWidth );
-		settingsButton.setHeight( buttonHeight );
+		settingsButton.setY( (BB.height / 1.349f) - BB.buttonHeight / 2 );
+		settingsButton.setWidth( BB.buttonWidth );
+		settingsButton.setHeight( BB.buttonHeight );
 		
 		settingsButton.setOnClickListener( new View.OnClickListener() {
 		        
@@ -143,9 +140,9 @@ public class BBMenuScreen extends Activity {
 		
 		// Set location based on screen dimensions
 		tutorialButton.setX( buttonX );
-		tutorialButton.setY( (BB.height / 1.674f) - buttonHeight / 2 );
-		tutorialButton.setWidth( buttonWidth );
-		tutorialButton.setHeight( buttonHeight );
+		tutorialButton.setY( (BB.height / 1.674f) - BB.buttonHeight / 2 );
+		tutorialButton.setWidth( BB.buttonWidth );
+		tutorialButton.setHeight( BB.buttonHeight );
 		
 		tutorialButton.setOnClickListener( new View.OnClickListener() {
 		        
@@ -167,10 +164,10 @@ public class BBMenuScreen extends Activity {
 		
 		// Set location based on screen dimensions
 		storeButton.setX( buttonX );
-		storeButton.setY( (BB.height / 1.13f) - buttonHeight / 2 );
+		storeButton.setY( (BB.height / 1.13f) - BB.buttonHeight / 2 );
 		Log.d("BBMenuScreen", "button y is: " + storeButton.getY());
-		storeButton.setWidth( buttonWidth );
-		storeButton.setHeight( buttonHeight );
+		storeButton.setWidth( BB.buttonWidth );
+		storeButton.setHeight( BB.buttonHeight );
 		
 		storeButton.setOnClickListener( new View.OnClickListener() {
 		        

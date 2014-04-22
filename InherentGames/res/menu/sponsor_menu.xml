@@ -4,4 +4,6 @@
           android:title="@string/delete_data" />
 	<item android:id="@+id/swap_time"
 		  android:title="@string/time_limit_enabled" />
+	<item android:id="@+id/reset"
+	    android:title="@string/reset_level" />
 </menu>

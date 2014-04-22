@@ -18,8 +18,11 @@ public class BBWordObject extends Object3D {
 	
 	// Tracks whether this object is moving around (i.e., inside a bubble or not)
 	private boolean isStatic;
-	private float maxDimension;
+	protected float maxDimension;
+	protected float startScale;
 	private int objectId = -1;
+	
+	private SimpleVector initialRotation = new SimpleVector( 0, 0, 0 );
 	// Tracks the gender of this object
 	protected Gender article;
 	// Stores the name of the object in all relevant languages
@@ -39,10 +42,14 @@ public class BBWordObject extends Object3D {
 		this.maxDimension = obj.getMaxDimension();
 		names[BBTranslator.Language.ENGLISH] = obj.getName( BBTranslator.Language.ENGLISH );
 		this.article = obj.article;
+		initialRotation = obj.initialRotation;
 		// Saves calculating transformation matrix until lazy transformations are disabled again, improving performance
 		enableLazyTransformations();
 		// Indicates that other objects can collide into this object
 		setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
+		
+		// Used to rescale when objects are reset
+		startScale = this.getScale();
 	}
 	
 	/**
@@ -138,6 +145,10 @@ public class BBWordObject extends Object3D {
 		super.scale( scaleTo/maxDimension );
 	}
 	
+	public void scaleFrom( float scaleFrom ) {
+		super.scale( maxDimension/scaleFrom );
+	}
+	
 	/**
 	 * @param room
 	 */
@@ -149,9 +160,23 @@ public class BBWordObject extends Object3D {
 	 * @param axes
 	 */
 	public void rotateBy( SimpleVector axes ) {
+		if ( initialRotation.equals( new SimpleVector( 0, 0, 0 )))
+			initialRotation = axes;
 		this.rotateX( axes.x );
 		this.rotateY( axes.y );
 		this.rotateZ( axes.z );
+	}
+	
+	public void addInitialRotation( SimpleVector vector ) {
+		initialRotation.add( vector );
+	}
+	
+	@Override
+	public void clearRotation() {
+		super.clearRotation();
+		if ( !initialRotation.equals( new SimpleVector( 0, 0, 0 )))
+			rotateBy ( initialRotation );
+		Log.d("BBWordObject", "Object: " + names[0] +"initialRotation = " + initialRotation);
 	}
 	
 	/**
