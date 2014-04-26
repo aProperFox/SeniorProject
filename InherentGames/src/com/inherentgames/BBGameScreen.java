@@ -2,8 +2,8 @@ package com.inherentgames;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -11,11 +11,10 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +24,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import com.inherentgames.BBGame.State;
 import com.inherentgames.BBRoom.Level;
 
 
@@ -114,6 +112,20 @@ public class BBGameScreen extends Activity {
 		pauseDialog.setContentView( pauseView );
 		pauseDialog.getWindow().getAttributes().dimAmount = 0.5f;  
 		
+		pauseDialog.setOnKeyListener(new Dialog.OnKeyListener() {
+
+            @Override
+            public boolean onKey(DialogInterface arg0, int keyCode,
+                    KeyEvent event) {
+                // TODO Auto-generated method stub
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    game.setPauseButtonState();
+                    pauseDialog.cancel();
+                }
+                return true;
+            }
+        });
+		
 		// Resume button
 		pauseResumeButton = ( Button ) pauseDialog.findViewById( R.id.resume_button );
 		pauseResumeButton.setOnClickListener( new View.OnClickListener() {
@@ -172,6 +184,19 @@ public class BBGameScreen extends Activity {
 		endDialog.getWindow().addFlags( WindowManager.LayoutParams.FLAG_DIM_BEHIND );
 		endDialog.setContentView( endView );
 		endDialog.getWindow().getAttributes().dimAmount = 0.5f;  
+		
+		endDialog.setOnKeyListener(new Dialog.OnKeyListener() {
+
+            @Override
+            public boolean onKey(DialogInterface arg0, int keyCode,
+                    KeyEvent event) {
+                // TODO Auto-generated method stub
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                }
+                return true;
+            }
+        });
 
 		// Resume button
 		endContinueButton = ( Button ) endDialog.findViewById( R.id.resume_button );
@@ -362,19 +387,25 @@ public class BBGameScreen extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		Log.d( "BBGameScreen", "onBackPressed Called" );
-		BB.ANIMATION = "DOWN";
-		if ( isTutorial ) {
-			finish();
+		
+		if ( game.loading ) {
+			
 		} else {
-			/*
-			Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
-			setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
-			startActivity( setIntent );
-			// Dispose tutorial world, provided it has been loaded
-			game.loading = true;*/
-			finish();
+			Log.d( "BBGameScreen", "onBackPressed Called" );
+			BB.ANIMATION = "DOWN";
+			if ( isTutorial ) {
+				finish();
+			} else {
+				/*
+				Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
+				setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
+				startActivity( setIntent );
+				// Dispose tutorial world, provided it has been loaded
+				game.loading = true;*/
+				finish();
+			}
 		}
+
 	}
 	
 	// Used to indicate to Android system to perform an optimization

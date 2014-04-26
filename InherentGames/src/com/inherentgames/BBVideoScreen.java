@@ -12,9 +12,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 public class BBVideoScreen extends Activity {
@@ -22,11 +23,39 @@ public class BBVideoScreen extends Activity {
 	
 	private boolean shouldLoadMap = false;
 	
-	@SuppressLint( "InlinedApi" )
+	@SuppressLint( { "InlinedApi", "NewApi" } )
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.video_screen );
+        
+        // Handle skip button
+        Button skipButton = (Button) findViewById( R.id.video_skip_button );
+        skipButton.setLayoutParams(new RelativeLayout.LayoutParams( BB.width / 10, BB.width / 10 ));
+        skipButton.setX( BB.width  - BB.width / 8 );
+        skipButton.setY( BB.height - BB.width / 8 );
+        
+        skipButton.setOnClickListener( new View.OnClickListener() {
+	        
+	        @Override
+	        public void onClick( View v ) {
+				if ( shouldLoadMap ) {
+	        		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
+	        		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+	        		videoView.stopPlayback();
+	                startActivity( intent );
+	                finish();
+	        	}
+	        	else {
+	        		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
+	                intent.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	                videoView.stopPlayback();
+	                startActivity( intent );
+	                finish();
+	        	}
+	        }
+	        
+        });
         
         Intent intent = getIntent();
         final String message = intent.getStringExtra( BB.EXTRA_MESSAGE );
@@ -55,7 +84,8 @@ public class BBVideoScreen extends Activity {
         
         videoView.setOnCompletionListener( new MediaPlayer.OnCompletionListener() 
         {
-            @Override
+            @SuppressLint("NewApi")
+			@Override
             public void onCompletion( MediaPlayer mp ) 
             {
             	// Update comics played
@@ -81,31 +111,10 @@ public class BBVideoScreen extends Activity {
             	
             }
         } );
+        
+
 
     }
-	
-	@Override
-	public boolean onTouchEvent( MotionEvent me ) {
-		
-		if ( me.getAction() == MotionEvent.ACTION_DOWN ) {
-			if ( shouldLoadMap ) {
-        		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
-        		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
-                startActivity( intent );
-                finish();
-        	}
-        	else {
-        		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
-                intent.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
-                startActivity( intent );
-                finish();
-        	}
-        	
-		}
-		
-		
-		return true;
-	}
 	
 	@Override
 	protected void onResume() {

@@ -76,6 +76,8 @@ public class BBMenuScreen extends Activity {
 		setButtonConfig( playButton, getString( R.string.play_button ).toUpperCase(Locale.US) );
 		
 		// Set location based on screen dimensions
+		playButton.setMinimumHeight( 0 );
+		playButton.setMinimumWidth( 0 );
 		playButton.setWidth( BB.buttonWidth );
 		playButton.setHeight( BB.buttonHeight );
 		playButton.setX( buttonX );
@@ -119,6 +121,8 @@ public class BBMenuScreen extends Activity {
 		setButtonConfig( settingsButton, getString( R.string.settings_button ).toUpperCase(Locale.US) );
 		
 		// Set location based on screen dimensions
+		settingsButton.setMinimumHeight( 0 );
+		settingsButton.setMinimumWidth( 0 );
 		settingsButton.setX( buttonX );
 		settingsButton.setY( (BB.height / 1.349f) - BB.buttonHeight / 2 );
 		settingsButton.setWidth( BB.buttonWidth );
@@ -139,6 +143,8 @@ public class BBMenuScreen extends Activity {
 		setButtonConfig( tutorialButton, getString( R.string.tutorial_button ).toUpperCase(Locale.US) );
 		
 		// Set location based on screen dimensions
+		tutorialButton.setMinimumHeight( 0 );
+		tutorialButton.setMinimumWidth( 0 );
 		tutorialButton.setX( buttonX );
 		tutorialButton.setY( (BB.height / 1.674f) - BB.buttonHeight / 2 );
 		tutorialButton.setWidth( BB.buttonWidth );
@@ -163,6 +169,8 @@ public class BBMenuScreen extends Activity {
 		setButtonConfig( storeButton, getString( R.string.store_button ).toUpperCase(Locale.US) );
 		
 		// Set location based on screen dimensions
+		storeButton.setMinimumHeight( 0 );
+		storeButton.setMinimumWidth( 0 );
 		storeButton.setX( buttonX );
 		storeButton.setY( (BB.height / 1.13f) - BB.buttonHeight / 2 );
 		Log.d("BBMenuScreen", "button y is: " + storeButton.getY());
