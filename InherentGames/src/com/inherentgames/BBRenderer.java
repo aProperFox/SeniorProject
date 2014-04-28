@@ -41,7 +41,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	
 	int soundID = 1;
 	
-	private float fuelHeight;
 	private float timeHeight;
 	
 	private int arrowX;
@@ -84,8 +83,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		maxLoadingTexHeight = Math.min( 1024,  BB.height );
 		
 		letterWidth = BB.width / 85;
-		
-		fuelHeight = 0;
 		
 		arrowX = BB.width / 12;
 		arrowY = BB.height / 10 + BB.width / 6;
@@ -189,7 +186,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			game.world.renderScene( fb );
 			game.world.draw( fb );
 			
-			fuelHeight = (int) (((float) game.captured / game.world.roomObjectWords.size()) * (BB.height * 0.75));
 			timeHeight = (int) (((game.timeLeft/100.0f) * (BB.height * 0.76)));
 			
 			// Render the HUD/sprite elements
@@ -235,11 +231,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Bubble text
 				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				// Fire Button
-				blitImage( game.fireButton.currentImage, w/8, h-( w/8 ), 128, 128, w/8, w/8, 10 );
+				blitButton( game.fireButton );
 				// Pause Button
 				blitButton( game.pauseButton );
 				// Dynamic fuel/time bars
-				//blitImageBottomUp( "FuelBar", (int) (w * 0.909), halfHeight, 16, 512, w/38, (int) fuelHeight, (int) (h * 0.76), 100 );
 				blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int)timeHeight, (int) ( BB.height*0.76 ), 100 );
 				// Score bars 
 				blitImage( "ScoreBars", w-( w/16 ), halfHeight, 128, 512, w/8, ( int )( h*0.9 ), 100 );
@@ -251,15 +246,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 
 				displayScreenItem( fb, game.wattsonPrivileges );
 			}
-			if( ( game.wattsonPrivileges & 2) == 0 ) {
-				if ( arrowState == "ArrowRight" ) {
-					blitImage( arrowState, arrowX + game.arrowMod, arrowY, 128, 128, BB.width / 8, BB.width / 8, 100 );
-				} else if (arrowState == "NoArrow" ){
-					
-				} else {
-					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
-				}
-			}
+
 			//Info Bar
 			//Has extra 1 px hang if using real size? Decremented to 127x127
 			blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
@@ -276,10 +263,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			}
 			
 			
-			if ( game.answerTransparency != 0 ) {
-				blitImage( game.answer, halfWidth, halfHeight, 64, 64, w, h, game.answerTransparency );
-			}
-			
 		}
 		
 		// Not tutorial displays
@@ -294,8 +277,13 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			blitButton( game.fireButton );
 			// Pause Button
 			blitButton( game.pauseButton );
-			// score button
+			// score buttons
 			blitButton( game.scoreButton );
+			blitButton( game.multiplierButton );
+			if ( game.multiplier > 1 ) {
+				String multiplier = "x" + game.multiplier;
+				drawTextLarge(multiplier, BB.width / 4 + BB.height / 15, BB.height / 20 + BB.height / 8, RGBColor.WHITE, false);
+			}
 			// Info Bar
 			// Has extra 1px hang if using real size? Decremented to 255x255
 			//blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
@@ -308,10 +296,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			String score = Integer.toString(game.score);
 			drawTextLarge( score, game.scoreButton.posX + BB.width / 10, game.scoreButton.posY - game.scoreButton.height / 3, RGBColor.WHITE, true );
 			
-			if ( game.answerTransparency != 0 ) {
-				blitImage( game.answer, halfWidth, halfHeight, 64, 64, w, h, game.answerTransparency );
-			}
-		
+			// Draw word when correct answer guessed
+			drawTextLarge( game.answer.data, game.answer.location.x, game.answer.location.y, game.answer.color, false );
+			
 		}
 		
 		fb.display();
@@ -341,6 +328,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				arrowX = BB.width / 12;
 				arrowY = BB.height / 10 + BB.width / 6;
 				arrowState = "ArrowUp";
+				blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				break;
 			case 2:
 				//Fire Button
@@ -348,14 +336,15 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				//Bubble image
 				blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 				//Bubble text
-				//blitText( game.world.getBubbleArticle(), halfWidth-w/25, h-w/10, w/25, h/10, RGBColor.WHITE );
-				
+				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
+				/*
 				if ( isLastItem ) {
 					arrowX = ( int )( w/3.5f );
 					arrowY = h - ( w/8 );
 					arrowState = "ArrowLeft";
+					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				}
-				
+				*/
 				 //Dynamic fuel bar
 				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
@@ -371,8 +360,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				 //Bubble image
 				 blitImage( game.bubbleTex, halfWidth, BB.height, 256, 256, BB.width/3, BB.width/3, 5 );
 				 //Bubble text
-				 //blitText( game.world.getBubbleArticle(), halfWidth-BB.width/25, BB.height-BB.width/10, BB.width/25, BB.height/10, RGBColor.WHITE );
-				 
+				 drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				 //Dynamic fuel bar
 				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
@@ -381,9 +369,10 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				 
 				 if ( !game.fireButton.isActive() ) {
 					 arrowX = game.fireButton.posX;
-					  arrowY = game.fireButton.posY - game.fireButton.height;
+					 arrowY = game.fireButton.posY - game.fireButton.height;
 					 arrowState = "ArrowDown";
 					 blitImage( "Filter", halfWidth, halfHeight, 64, 64, w, h, 10 );
+					 blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 					 }
 				 else {
 					 arrowState = "NoArrow";
@@ -404,8 +393,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
  				 //Bubble image
  				 blitImage( game.bubbleTex, halfWidth, BB.height, 256, 256, BB.width / 3, BB.width / 3, 5 );
  				 //Bubble text
- 				 //blitText( game.world.getBubbleArticle(), halfWidth - BB.width/25, BB.height - BB.width / 10, BB.width / 25, BB.height / 10, RGBColor.WHITE );
-
+ 				 drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				 //Dynamic fuel bar
 				 blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int) ( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp( "FuelBar", (int) ( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int) ( BB.height*0.76 ), 100 );
@@ -417,6 +405,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 					  arrowY = game.fireButton.posY - game.fireButton.height;
 					  arrowState = "ArrowDown";
 					  blitImage( "Filter", halfWidth, halfHeight, 64, 64, w, h, 10 );
+					  blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				  }
 	  			 else {
 					 arrowState = "NoArrow";
@@ -439,6 +428,12 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				arrowX = BB.width / 12;
 				arrowY = BB.height / 10 + BB.width / 6;
 				arrowState = "ArrowUp";
+				if ( game.timeIcon.hasFinished ) {
+					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
+				}
+				else {
+					blitImage(game.timeIcon.data, game.timeIcon.location.x, game.timeIcon.location.y, 512, 512, game.timeIcon.width, game.timeIcon.height, 100 );
+				}
 				break;
 			default:
 				break;
@@ -483,7 +478,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		// turns it off)
 		GLES20.glEnable( GLES20.GL_BLEND );
 		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textLarge.begin( color.getRed() / 255f, color.getRed() / 255f, color.getRed() / 255f, 1.0f, mVPMatrix );
+		textLarge.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
 		
 		if ( reverse ) {
 			textLarge.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
@@ -511,7 +506,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		// turns it off)
 		GLES20.glEnable( GLES20.GL_BLEND );
 		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textSmall.begin( color.getRed() / 255f, color.getRed() / 255f, color.getRed() / 255f, 1.0f, mVPMatrix );
+		textSmall.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
 		
 		if ( reverse ) { 
 			textSmall.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );

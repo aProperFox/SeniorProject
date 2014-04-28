@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib backpackGreen.mtl
+mtllib backpack.mtl
 g default
 v -0.119213 2.384084 1.099153
 v -0.073677 2.523834 1.088672

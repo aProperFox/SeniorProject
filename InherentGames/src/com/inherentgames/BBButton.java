@@ -39,7 +39,7 @@ public class BBButton {
 		currentImage = this.passiveImage;
 		
 		// Set loaded image width and height (they must have the same dimensions)
-		Texture tempTex = TextureManager.getInstance().getTexture(passiveImage);
+		Texture tempTex = TextureManager.getInstance().getTexture(activeImage);
 		imageWidth = tempTex.getWidth();
 		imageHeight = tempTex.getHeight();
 		

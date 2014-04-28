@@ -50,8 +50,14 @@ public class BBGLView extends GLSurfaceView {
 					xpos = me.getX();
 					ypos = me.getY();
 					if ( xpos < BB.width/5 && xpos > 0 && ypos > 0 && ypos < BB.width/5 ) {
-		
-						game.iterateWattson();
+						if ( game.wattsonPrivileges == 17 ) {
+							if ( game.timeIcon.hasFinished ) {
+								game.iterateWattson();
+							}
+						} else {
+							game.iterateWattson();
+						}
+
 						isShootMode = false;
 						return true;
 					}

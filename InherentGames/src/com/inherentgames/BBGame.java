@@ -6,10 +6,10 @@ import java.util.Enumeration;
 import javax.vecmath.Vector3f;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -25,6 +25,7 @@ import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.Clock;
 import com.inherentgames.BBRoom.Level;
+import com.inherentgames.BBTranslator.Language;
 import com.inherentgames.BBWordObject.Gender;
 import com.threed.jpct.Camera;
 import com.threed.jpct.Interact2D;
@@ -119,9 +120,9 @@ public class BBGame {
 	protected boolean moveHand;
 	protected int handTransparency;
 	
-	// Track answer 
-	protected int answerTransparency;
-	protected String answer = "RightAnswer";
+	// Track dynamic screen objects
+	BBDynamicScreenObject timeIcon;
+	BBDynamicScreenObject answer;
 	
 	// Tracks horizontal and vertical swipe movement
 	protected float horizontalSwipe = 0;
@@ -141,6 +142,7 @@ public class BBGame {
 	protected BBButton fireButton;
 	protected BBButton pauseButton;
 	protected BBButton scoreButton;
+	protected BBButton multiplierButton;
 	
 	// Debugging option to track "current" object
 	protected int _currentObjectId;
@@ -236,6 +238,11 @@ public class BBGame {
 			wattsonText.add( wattsonPhrases[0][1] );
 			wattsonText.add( wattsonPhrases[0][2] );
 			wattsonTextIterator = 0;
+			
+			timeIcon = new BBDynamicScreenObject(BB.width / 2, BB.height / 2, (int) ( BB.width*0.966 ),
+					( int )( BB.height*0.91 ), "TimeIcon", 3000, BB.buttonHeight / 2, BB.buttonHeight / 2,
+					BB.height / 19 , BB.height / 19 );
+			
 		} else {
 			BB.isTimeLimitenabled = ( BB.isSponsorMode || BB.isDevMode ) ? BB.isTimeLimitenabled : true;
 			isTutorial = false;
@@ -260,8 +267,16 @@ public class BBGame {
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.bubbleblue ) ), 256, 256 );
 				tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
 				bitmap.recycle();
+				// Empty png for drawing nothing
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.nothing ) ), 16, 16 );
+				tm.addTexture( "Nothing", new Texture( bitmap, true ) );
+				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button ) ), 256, 128 );
+				tm.addTexture( "Button", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button_empty ) ), 128, 128 );
 				tm.addTexture( "EmptyButton", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
@@ -287,6 +302,10 @@ public class BBGame {
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.time_bar ) ), 16, 512 );
 				tm.addTexture( "TimeBar", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.time_icon ) ), 512, 512 );
+				tm.addTexture( "TimeIcon", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.score_bars ) ), 128, 512 );
@@ -331,7 +350,7 @@ public class BBGame {
 				
 				spritesLoaded = true;
 			} catch( Exception e ) {
-				
+				e.printStackTrace();
 			}
 		}
 	}
@@ -672,16 +691,19 @@ public class BBGame {
         moveHand = true;
         handTransparency = 50;
         
-        // Track answer filters
-        answerTransparency = 0;
+        // Track answers on screen
+        answer = new BBDynamicScreenObject((BB.width / 2) - (0 * (BB.width / 15 + 4)),
+        		BB.height / 10, BB.width / 2, - BB.height / 5, "", 1500, Gender.MASCULINE );
         
         // Setup pause and fire buttons
     	pauseButton = new BBButton( BB.width - BB.width / 30, BB.width / 35, BB.width / 15, BB.width / 15, 
     			"PauseButton", "PauseButtonPressed");
     	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
-    	scoreButton = new BBButton( BB.width / 8 + BB.height / 20, BB.height / 20 + BB.height / 12, BB.width / 4, BB.height / 6, "EmptyButton", "EmptyButton");
+    	scoreButton = new BBButton( BB.width / 8 + BB.height / 20, BB.height / 20 + BB.height / 12, BB.width / 4, BB.height / 6, "Button", "Button");
     	scoreButton.canBePressed = false;
+    	multiplierButton = new BBButton( BB.width / 4 + BB.height / 8, BB.height / 20 + BB.height / 12, BB.height / 4, BB.height / 4, "Nothing", "EmptyButton");
+    	multiplierButton.canBePressed = false;
 
     	score = 0;
     	streak = 0;
@@ -718,7 +740,7 @@ public class BBGame {
 		try {
 			physicsWorld.stepSimulation( ms / 1000000.0f );
 		} catch ( Exception e ) {
-			Log.e( "BBRenderer", "jBulletPhysics threw a NullPointerException." );
+			e.printStackTrace();
 		}
 		
 		// Update time bar
@@ -732,10 +754,13 @@ public class BBGame {
 			}
 		}
 		
-		// Update answer filter transparency
-		if ( answerTransparency > 0 ) {
-			answerTransparency--;
+		// Update answer location
+		answer.move();
+		
+		if ( isTutorial ) {
+			timeIcon.move();
 		}
+
 		
 		// Update arrow movement
 		if ( arrowDir > 0 ) {
@@ -877,6 +902,9 @@ public class BBGame {
 			}
 			else if(wattsonTextIterator == 4){
 				wattsonPrivileges = 17;
+				timeIcon = new BBDynamicScreenObject(BB.width / 2, BB.height / 2, (int) ( BB.width*0.966 ),
+						( int )( BB.height*0.91 ), "TimeIcon", 2000, BB.height / 2, BB.height / 2,
+						BB.height / 35 , BB.height / 35 );
 			}
 			else{
 				wattsonPrivileges = 14;
@@ -904,9 +932,17 @@ public class BBGame {
 					soundPool.play(30, 3, 3, 1, 0, 1f);
 					
 					// Display Correct answer
-					answer = "RightAnswer";
-					answerTransparency = 15;
-					
+					String word;
+					if ( target.article == Gender.FEMININE ) {
+						word = "La ";
+					} else {
+						word = "El ";
+					}
+					word += target.getName( Language.SPANISH );
+					answer = new BBDynamicScreenObject((BB.width / 2) - (word.length() * (BB.width / 65)),
+							BB.height / 20 + BB.height / 10, (BB.width / 2) - (word.length() * (BB.width / 65)),
+							0, word, 1000, target.article );
+
 					// Add to list of completed words
 					bubbleWords.add( target.getName( BBTranslator.Language.ENGLISH ) );
 					target.disableLazyTransformations();
@@ -941,16 +977,18 @@ public class BBGame {
 				else {
 					
 					// Wrong color guessed :-(
-					soundPool.play(31, 1, 1, 1, 0, 1f);
+					soundPool.play(31, 0.5f, 0.5f, 1, 0, 1f);
 					
-					// Display Incorrect answer
-					answer = "WrongAnswer";
-					answerTransparency = 15;
+					// Don't display anything for Incorrect answer
+					answer.location = answer.end;
 					
 					deleteBubble( bubble );
 					endTime -= 5000;
 					timeLeft -= 5;
 					multiplier = 1;
+					if ( multiplierButton.isActive()) {
+						multiplierButton.swapState();
+					}
 					streak = 0;
 					return 0;
 				}
@@ -1038,6 +1076,10 @@ public class BBGame {
 		// Update multiplier
 		streak++;
 		multiplier = (streak > 2) ? (streak / 3 ) * 2 : 1;
+		if ( multiplier > 1 && !multiplierButton.isActive()) {
+			multiplierButton.swapState();
+		}
+		
 		int total = world.roomObjectWords.size();
 		int tempCaptured = 0;
 		
