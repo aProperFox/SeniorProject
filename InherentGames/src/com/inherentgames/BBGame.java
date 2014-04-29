@@ -6,15 +6,24 @@ import java.util.Enumeration;
 import javax.vecmath.Vector3f;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
@@ -142,7 +151,6 @@ public class BBGame {
 	protected BBButton fireButton;
 	protected BBButton pauseButton;
 	protected BBButton scoreButton;
-	protected BBButton multiplierButton;
 	
 	// Debugging option to track "current" object
 	protected int _currentObjectId;
@@ -166,6 +174,7 @@ public class BBGame {
 	protected int wattsonTextIterator;
 	protected boolean hasCompletedSteps = false;
 	protected int wattsonPrivileges = 1;
+	
 	
 	public BBGame() {
 		// Initialize texture manager
@@ -204,6 +213,8 @@ public class BBGame {
 			}
 			
 		};
+		
+		
 
 		// TODO: Find out what this is for
 		handler = new Handler();
@@ -213,7 +224,6 @@ public class BBGame {
 		
 		// Initialize the clock
 		clock = new Clock();
-		
 		
 	}
 	
@@ -226,12 +236,15 @@ public class BBGame {
 		}
 		return instance;
 	}
+
 	
 	// Sets up the tutorial
 	private void prepareTutorial() {
 		// Is tutorial?
 		if ( level == Level.TUTORIAL ) {
 			isTutorial = true;
+			wattsonPrivileges = 1;
+			hasCompletedSteps = false;
 			BB.isTimeLimitenabled = false;
 			wattsonText.clear();
 			wattsonText.add( wattsonPhrases[0][0] );
@@ -244,7 +257,7 @@ public class BBGame {
 					BB.height / 19 , BB.height / 19 );
 			
 		} else {
-			BB.isTimeLimitenabled = ( BB.isSponsorMode || BB.isDevMode ) ? BB.isTimeLimitenabled : true;
+			BB.isTimeLimitenabled = ( BB.isDevMode ) ? false : true;
 			isTutorial = false;
 		}
 	}
@@ -267,17 +280,9 @@ public class BBGame {
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.bubbleblue ) ), 256, 256 );
 				tm.addTexture( "bubbleBlue", new Texture( bitmap, true ) );
 				bitmap.recycle();
-				// Empty png for drawing nothing
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.nothing ) ), 16, 16 );
-				tm.addTexture( "Nothing", new Texture( bitmap, true ) );
-				bitmap.recycle();
 				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button ) ), 256, 128 );
-				tm.addTexture( "Button", new Texture( bitmap, true ) );
-				bitmap.recycle();
-				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.button_empty ) ), 128, 128 );
-				tm.addTexture( "EmptyButton", new Texture( bitmap, true ) );
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.score_empty ) ), 512, 512 );
+				tm.addTexture( "EmptyScore", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.firebutton ) ), 128, 128 );
@@ -288,16 +293,16 @@ public class BBGame {
 				tm.addTexture( "FireButtonPressed", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.crosshair ) ), 2048, 1024 );
+				tm.addTexture( "Crosshair", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pause_button ) ), 128, 128 );
 				tm.addTexture( "PauseButton", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pause_button_pressed ) ), 128, 128 );
 				tm.addTexture( "PauseButtonPressed", new Texture( bitmap, true ) );
-				bitmap.recycle();
-				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.word_bar ) ), 16, 512 );
-				tm.addTexture( "FuelBar", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.time_bar ) ), 16, 512 );
@@ -338,14 +343,6 @@ public class BBGame {
 				
 				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.defaulttexture ) ), 256, 256 );
 				tm.addTexture( "Default", new Texture( bitmap, true ) );
-				bitmap.recycle();
-				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.right_answer ) ), 64, 64 );
-				tm.addTexture( "RightAnswer", new Texture( bitmap, true ) );
-				bitmap.recycle();
-				
-				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.wrong_answer ) ), 64, 64 );
-				tm.addTexture( "WrongAnswer", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
 				spritesLoaded = true;
@@ -613,9 +610,8 @@ public class BBGame {
         soundPoolMap.put( 28, soundPool.load( BB.context, R.raw.semaforo, 1 ) );
         soundPoolMap.put( 29, soundPool.load( BB.context, R.raw.basura, 1 ) );
         soundPoolMap.put( 30, soundPool.load( BB.context, R.raw.positive, 1 ) );
-        soundPoolMap.put( 31, soundPool.load( BB.context, R.raw.negative, 1 ) );
-        soundPoolMap.put( 32, soundPool.load( BB.context, R.raw.bubble_pop, 1 ) );
-        soundPoolMap.put( 33, soundPool.load( BB.context, R.raw.level_win, 1 ) );
+        soundPoolMap.put( 31, soundPool.load( BB.context, R.raw.bubble_pop, 1 ) );
+        soundPoolMap.put( 32, soundPool.load( BB.context, R.raw.level_win, 1 ) );
 	}
 	
 	// Sets up the game (OpenGL) scene
@@ -632,7 +628,7 @@ public class BBGame {
 		// Set up the camera for the scene
 		cam = world.getCamera();
 		cam.setPosition( new SimpleVector( 0, 0, 0 ) );
-		cam.lookAt( new SimpleVector( 0, 0.1, 0 ) );
+		cam.lookAt( new SimpleVector( 0, 0.15, 0 ) );
 		cam.setOrientation( new SimpleVector( 0, 0, 1 ), new SimpleVector( 0, -1, 0 ) );
 		//cam.lookAt( new SimpleVector( 0, -0.1, 1 ) );
 		
@@ -698,12 +694,10 @@ public class BBGame {
         // Setup pause and fire buttons
     	pauseButton = new BBButton( BB.width - BB.width / 30, BB.width / 35, BB.width / 15, BB.width / 15, 
     			"PauseButton", "PauseButtonPressed");
-    	fireButton = new BBButton( BB.width / 6, BB.height - (BB.width / 6), BB.width / 6, BB.width / 6, 
+    	fireButton = new BBButton( BB.width / 10, BB.height - (BB.width / 10), BB.width / 6, BB.width / 6, 
     			"FireButton", "FireButtonPressed");
-    	scoreButton = new BBButton( BB.width / 8 + BB.height / 20, BB.height / 20 + BB.height / 12, BB.width / 4, BB.height / 6, "Button", "Button");
+    	scoreButton = new BBButton( BB.height / 6, BB.height / 6, BB.height / 3, BB.height / 3, "EmptyScore", "EmptyScore");
     	scoreButton.canBePressed = false;
-    	multiplierButton = new BBButton( BB.width / 4 + BB.height / 8, BB.height / 20 + BB.height / 12, BB.height / 4, BB.height / 4, "Nothing", "EmptyButton");
-    	multiplierButton.canBePressed = false;
 
     	score = 0;
     	streak = 0;
@@ -940,7 +934,7 @@ public class BBGame {
 					}
 					word += target.getName( Language.SPANISH );
 					answer = new BBDynamicScreenObject((BB.width / 2) - (word.length() * (BB.width / 65)),
-							BB.height / 20 + BB.height / 10, (BB.width / 2) - (word.length() * (BB.width / 65)),
+							BB.height / 20 + BB.height / 8, (BB.width / 2) - (word.length() * (BB.width / 65)),
 							0, word, 1000, target.article );
 
 					// Add to list of completed words
@@ -986,9 +980,6 @@ public class BBGame {
 					endTime -= 5000;
 					timeLeft -= 5;
 					multiplier = 1;
-					if ( multiplierButton.isActive()) {
-						multiplierButton.swapState();
-					}
 					streak = 0;
 					return 0;
 				}
@@ -998,7 +989,7 @@ public class BBGame {
 				Log.i( "BBRenderer", "Object is a bubble!" );
 				BBBubble bubbleCollisionObject = (BBBubble) target;
 				world.removeObject( bubbleCollisionObject.getHeldObjectId() );
-				soundPool.play(32, 2, 2, 1, 0, 1f);
+				soundPool.play(31, 0.5f, 0.5f, 1, 0, 1f);
 				if ( bubble.getObjectId() > bubbleCollisionObject.getObjectId() ) {
 					deleteBubble( bubble );
 					deleteBubble( bubbleCollisionObject );
@@ -1076,9 +1067,6 @@ public class BBGame {
 		// Update multiplier
 		streak++;
 		multiplier = (streak > 2) ? (streak / 3 ) * 2 : 1;
-		if ( multiplier > 1 && !multiplierButton.isActive()) {
-			multiplierButton.swapState();
-		}
 		
 		int total = world.roomObjectWords.size();
 		int tempCaptured = 0;
@@ -1095,7 +1083,7 @@ public class BBGame {
 			if(wattsonPrivileges == 8){
 				cam.lookAt(new SimpleVector(0,0.1,1));
 			}
-			else if(wattsonPrivileges == 14){
+			else if(wattsonPrivileges == 17){
 				cam.lookAt(new SimpleVector(0,0,1));
 			}
 		}
@@ -1137,7 +1125,7 @@ public class BBGame {
             } );
     	} else {
     		
-    		soundPool.play(33, 2, 2, 1, 0, 1f);
+    		soundPool.play(32, 2, 2, 1, 0, 1f);
     		
     		level = level.getNext();  
     		

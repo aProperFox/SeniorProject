@@ -396,6 +396,9 @@ public class BBGameScreen extends Activity {
 			if ( isTutorial ) {
 				finish();
 			} else {
+				game.world.dispose();
+				renderer = new BBRenderer();
+				game.loading = true;
 				/*
 				Intent setIntent = new Intent( BBGameScreen.this, BBMapScreen.class );
 				setIntent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP );
