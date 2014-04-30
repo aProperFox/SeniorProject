@@ -70,14 +70,18 @@ public class BBGLView extends GLSurfaceView {
 							ypos = me.getY( 0 );
 							// Press fire button
 							if ( game.fireButton.includes((int) xpos, (int) ypos) ) {
-								isShootMode = true;
-								game.fireButton.swapState();
+								if ( game.wattsonPrivileges > 2 ) {
+									isShootMode = true;
+									game.fireButton.swapState();
+								}
 							}
 							// Press pause button
 							else if ( game.pauseButton.includes((int) xpos, (int) ypos)) {
-								isShootMode = false;
-								game.setPauseButtonState();
-								gameScreen.showPauseMenu();
+								if ( game.wattsonPrivileges == 14 ) {
+									isShootMode = false;
+									game.setPauseButtonState();
+									gameScreen.showPauseMenu();
+								}
 			
 							}
 			
@@ -88,8 +92,10 @@ public class BBGLView extends GLSurfaceView {
 							return true;
 			
 			    		case MotionEvent.ACTION_POINTER_DOWN:
-							firstX = me.getX( 1 );
-							firstY = me.getY( 1 );
+			    			if ( isShootMode ) {
+								firstX = me.getX( 1 );
+								firstY = me.getY( 1 );
+			    			}
 							return true;
 			
 			    		case MotionEvent.ACTION_UP:
@@ -205,8 +211,10 @@ public class BBGLView extends GLSurfaceView {
 						return true;
 					// Second or later finger pressed down
 					case MotionEvent.ACTION_POINTER_DOWN:
-						firstX = me.getX( 1 );
-						firstY = me.getY( 1 );
+						if ( isShootMode ) {
+							firstX = me.getX( 1 );
+							firstY = me.getY( 1 );
+						}
 						return true;
 					// First finger released
 		    		case MotionEvent.ACTION_UP:
@@ -231,6 +239,9 @@ public class BBGLView extends GLSurfaceView {
 						float xd = me.getX( 1 ) - firstX;
 						float yd = me.getY( 1 ) - firstY;
 						if ( isShootMode ) {
+							Log.d("BBGLView", "x difference is: " + xd);
+							Log.d("BBGLView", "y difference is: " + yd);
+
 							// Swipe up indicates masculine
 							if ( yd < ( -BB.height/7 ) && Math.abs( xd ) < BB.width/4 ) {
 								game.setGender( Gender.MASCULINE );

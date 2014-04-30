@@ -81,9 +81,7 @@ public class BBMenuScreen extends Activity {
 		playButton.setWidth( BB.buttonWidth );
 		playButton.setHeight( BB.buttonHeight );
 		playButton.setX( buttonX );
-		Log.d("BBMenuScreen", "button x is: " + playButton.getX());
 		playButton.setY( (BB.height / 2.204f) - BB.buttonHeight / 2 );
-		Log.d("BBMenuScreen", "button y is: " + playButton.getY());
 		
 		SharedPreferences settings = getSharedPreferences( BB.PREFERENCES, 0 );
 		

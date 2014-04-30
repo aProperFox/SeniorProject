@@ -23,39 +23,14 @@ public class BBVideoScreen extends Activity {
 	
 	private boolean shouldLoadMap = false;
 	
+	private Button skipButton;
+	
 	@SuppressLint( { "InlinedApi", "NewApi" } )
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.video_screen );
-        
-        // Handle skip button
-        Button skipButton = (Button) findViewById( R.id.video_skip_button );
-        skipButton.setLayoutParams(new RelativeLayout.LayoutParams( BB.width / 10, BB.width / 10 ));
-        skipButton.setX( BB.width  - BB.width / 8 );
-        skipButton.setY( BB.height - BB.width / 8 );
-        
-        skipButton.setOnClickListener( new View.OnClickListener() {
-	        
-	        @Override
-	        public void onClick( View v ) {
-				if ( shouldLoadMap ) {
-	        		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
-	        		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
-	        		videoView.stopPlayback();
-	                startActivity( intent );
-	                finish();
-	        	}
-	        	else {
-	        		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
-	                intent.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
-	                videoView.stopPlayback();
-	                startActivity( intent );
-	                finish();
-	        	}
-	        }
-	        
-        });
+
         
         Intent intent = getIntent();
         final String message = intent.getStringExtra( BB.EXTRA_MESSAGE );
@@ -77,14 +52,17 @@ public class BBVideoScreen extends Activity {
         
         root.setBackgroundColor( Color.BLACK );
         		
+        
         Uri uri = Uri.parse( "android.resource://com.inherentgames/raw/" + message );   
 
         videoView.setVideoURI( uri );
         videoView.start();  
         
+        
+        
         videoView.setOnCompletionListener( new MediaPlayer.OnCompletionListener() 
         {
-            @SuppressLint("NewApi")
+
 			@Override
             public void onCompletion( MediaPlayer mp ) 
             {
@@ -98,6 +76,8 @@ public class BBVideoScreen extends Activity {
             	if ( shouldLoadMap ) {
             		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
             		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+            		videoView.stopPlayback();
+            		videoView.suspend();
                     startActivity( intent );
                     finish();
             	}
@@ -105,6 +85,8 @@ public class BBVideoScreen extends Activity {
             		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
                     intent.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
                     intent.putExtra( "tutorial", false );
+                    videoView.stopPlayback();
+                    videoView.suspend();
                     startActivity( intent );
                     finish();
             	}
@@ -112,9 +94,42 @@ public class BBVideoScreen extends Activity {
             }
         } );
         
-
+        // Handle skip button
+        skipButton = (Button) findViewById( R.id.video_skip_button );
+        skipButton.setLayoutParams(new RelativeLayout.LayoutParams( BB.width / 10, BB.width / 10 ));
+        skipButton.setX( BB.height * 1.47f - BB.width / 6 );
+        skipButton.setY( BB.height - BB.width / 6 );
+        
+        skipButton.setOnClickListener( new View.OnClickListener() {
+	        
+	        @Override
+	        public void onClick( View v ) {
+				if ( shouldLoadMap ) {
+	        		Intent intent = new Intent( BBVideoScreen.this, BBMapScreen.class );
+	        		intent.setFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+	        		videoView.stopPlayback();
+	        		
+	                startActivity( intent );
+	                finish();
+	        	}
+	        	else {
+	        		Intent intent = new Intent( BBVideoScreen.this, BBGameScreen.class );
+	                intent.setFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
+	                videoView.stopPlayback();
+	                videoView.suspend();
+	                startActivity( intent );
+	                finish();
+	        	}
+	        }
+	        
+        });
 
     }
+	
+	@Override
+	public void onBackPressed() {
+		
+	}
 	
 	@Override
 	protected void onResume() {

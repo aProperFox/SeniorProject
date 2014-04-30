@@ -32,6 +32,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	/* Internal parameters */
 	
 	private GLText textSmall;
+	private GLText textMedium;
 	private GLText textLarge;
 	
 	// Represents the "cleared" background color of the frame buffer 
@@ -92,6 +93,8 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	public void onSurfaceCreated( GL10 unused, EGLConfig config ) {
 		textSmall = new GLText( BB.context.getAssets() );
 		textSmall.load( "futura-normal.ttf", BB.width / 35, 2, 2 );
+		textMedium = new GLText( BB.context.getAssets() );
+		textMedium.load( "futura-normal.ttf", BB.width / 25, 2, 2 );
 		textLarge = new GLText( BB.context.getAssets() );
 		textLarge.load( "futura-normal.ttf", BB.width / 15, 2, 2 );
 	}
@@ -178,6 +181,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			// Update game elements
 			game.update();
 			
+			
 			// Render sky box (if applicable)
 			if ( game.world.skybox != null )
 				game.world.skybox.render( game.world, fb );
@@ -241,9 +245,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				
 				
 			} else {
-				// Pause Button
-				blitButton( game.pauseButton );
-
+				
 				displayScreenItem( fb, game.wattsonPrivileges );
 			}
 
@@ -268,9 +270,13 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		// Not tutorial displays
 		else {
 			
-			blitCrosshair( w, h );
+			if (game.fireButton.isActive() ) {
+				blitImage( "Crosshair", halfWidth, halfHeight, 2048, 1024, (int) (h * 16f / 9f), h, 30);
+			} else {
+				blitCrosshair( w, h );
+			}
 			// Bubble image
-			blitImage( game.bubbleTex, w/2, h, 256, 256, w/3, w/3, 5 );
+			blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 			// Bubble text
 			drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 			// Fire Button
@@ -279,25 +285,17 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			blitButton( game.pauseButton );
 			// score buttons
 			blitButton( game.scoreButton );
-			blitButton( game.multiplierButton );
-			if ( game.multiplier > 1 ) {
-				String multiplier = "x" + game.multiplier;
-				drawTextLarge(multiplier, BB.width / 4 + BB.height / 15, BB.height / 20 + BB.height / 8, RGBColor.WHITE, false);
-			}
-			// Info Bar
-			// Has extra 1px hang if using real size? Decremented to 255x255
-			//blitImage( "InfoBar", w/10, w/10, 127, 127, w/5, w/5, 100 );
-			
+			//Score
+			drawTextMedium( Integer.toString(game.score), game.scoreButton.posX + game.scoreButton.width / 8, game.scoreButton.posY - game.scoreButton.height / 10, RGBColor.WHITE, true );
+			//Multiplier
+			String multiplier = game.multiplier + "X";
+			drawTextSmall(multiplier, game.scoreButton.posX + game.scoreButton.width / 6, game.scoreButton.posY - game.scoreButton.height / 5, RGBColor.WHITE, false);
 			// Dynamic time bar
 			blitImageBottomUp( "TimeBar", (int) (w * 0.966), h/2, 16, 512, w/38, (int) timeHeight, (int) (h * 0.76), 100 );
 			// Score bars
 			blitImage( "ScoreBars", w-( w/16 ), h/2, 128, 512, w/8, ( int )( h*0.9 ), 100 );
-			//Score
-			String score = Integer.toString(game.score);
-			drawTextLarge( score, game.scoreButton.posX + BB.width / 10, game.scoreButton.posY - game.scoreButton.height / 3, RGBColor.WHITE, true );
-			
 			// Draw word when correct answer guessed
-			drawTextLarge( game.answer.data, game.answer.location.x, game.answer.location.y, game.answer.color, false );
+			drawTextLarge( game.answer.data, (int) game.answer.location.x, (int) game.answer.location.y, game.answer.color, false );
 			
 		}
 		
@@ -331,25 +329,21 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				break;
 			case 2:
+				/*
+				 * probably not necessary to display for second stage of tutorial
+				 * 
 				//Fire Button
 				blitButton( game.fireButton );
 				//Bubble image
 				blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 				//Bubble text
 				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
-				/*
-				if ( isLastItem ) {
-					arrowX = ( int )( w/3.5f );
-					arrowY = h - ( w/8 );
-					arrowState = "ArrowLeft";
-					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
-				}
-				*/
+
 				 //Dynamic fuel bar
 				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
 				 blitImage("ScoreBars", BB.width-( BB.width/16 ), halfHeight, 128, 512, BB.width/8, (int)( BB.height*0.9 ), 100 );
-				
+				*/
 				break;
 			case 4:
 				 if ( game.wattsonPrivileges == itemNum )
@@ -432,7 +426,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 					blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				}
 				else {
-					blitImage(game.timeIcon.data, game.timeIcon.location.x, game.timeIcon.location.y, 512, 512, game.timeIcon.width, game.timeIcon.height, 100 );
+					blitImage(game.timeIcon.data, (int) game.timeIcon.location.x, (int) game.timeIcon.location.y, 512, 512, (int) game.timeIcon.width, (int) game.timeIcon.height, 100 );
 				}
 				break;
 			default:
@@ -487,6 +481,34 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		}
 		
 		textLarge.end();
+		GLES20.glDisable( GLES20.GL_BLEND );
+		
+	}
+	
+	/**
+	 * @param text
+	 * @param pixelX
+	 * @param pixelY
+	 * @param color
+	 * @param reverse
+	 */
+	public void drawTextMedium( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
+		// Switch frame buffers
+		fb.display();
+		
+		// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
+		// turns it off)
+		GLES20.glEnable( GLES20.GL_BLEND );
+		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
+		textMedium.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
+		
+		if ( reverse ) {
+			textMedium.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+		} else {
+			textMedium.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+		}
+		
+		textMedium.end();
 		GLES20.glDisable( GLES20.GL_BLEND );
 		
 	}
