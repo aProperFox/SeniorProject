@@ -360,16 +360,7 @@ public class BBGame {
 			long startTime = System.currentTimeMillis();
 			switch( level ) {
 				case TUTORIAL:
-					
-					// Can probably delete if, since tutorial now mandatory
-					if ( !tm.containsTexture( "Escritorio" ) ) {
-						bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.escritorio ) ), 256, 256 );
-						tm.addTexture( "Escritorio", new Texture( bitmap, true ) );
-						bitmap.recycle();
-						bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.silla ) ), 256, 256 );
-						tm.addTexture( "Silla", new Texture( bitmap, true ) );
-						bitmap.recycle();
-					}
+
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.tutorialwall ) ), 512, 256 );
 					tm.addTexture( "TutorialWall", new Texture( bitmap, true ) );
 					bitmap.recycle();
@@ -399,40 +390,6 @@ public class BBGame {
 					//tm.addTexture( "Backpack", objects );
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.paper ) ), 256, 128 );
 					tm.addTexture( "Paper", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					
-					//Can probably delete if, since tutorial now mandatory
-					if ( !tm.containsTexture( "Escritorio" ) ) {
-						bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.escritorio ) ), 128, 128 );
-						tm.addTexture( "Escritorio", new Texture( bitmap, true ) );
-						bitmap.recycle();
-						bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.silla ) ), 128, 128 );
-						tm.addTexture( "Silla", new Texture( bitmap, true ) );
-						bitmap.recycle();
-					}
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pizarra ) ), 128, 128 );
-					tm.addTexture( "Pizarra", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.mochila ) ), 128, 128 );
-					tm.addTexture( "Mochila", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.reloj ) ), 128, 128 );
-					tm.addTexture( "Reloj", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.calendario ) ), 128, 128 );
-					tm.addTexture( "Calendario", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.puerta ) ), 128, 128 );
-					tm.addTexture( "Puerta", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.libro ) ), 128, 128 );
-					tm.addTexture( "Libro", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.papel ) ), 128, 128 );
-					tm.addTexture( "Papel", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.ventana ) ), 128, 128 );
-					tm.addTexture( "Ventana", new Texture( bitmap, true ) );
 					bitmap.recycle();
 					
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.room0wall0 ) ), 1024, 512 );
@@ -492,34 +449,6 @@ public class BBGame {
 					tm.addTexture( "Room1Ceiling", new Texture( bitmap, true ) );
 					bitmap.recycle();
 					
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.cuenta ) ), 128, 128 );
-					tm.addTexture( "Cuenta", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pan ) ), 128, 128 );
-					tm.addTexture( "Pan", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.pastel ) ), 128, 128 );
-					tm.addTexture( "Pastel", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.taza ) ), 128, 128 );
-					tm.addTexture( "Taza", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.cuchillo ) ), 128, 128 );
-					tm.addTexture( "Cuchillo", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.efectivo ) ), 128, 128 );
-					tm.addTexture( "Efectivo", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.plato ) ), 128, 128 );
-					tm.addTexture( "Plato", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.cuchara ) ), 128, 128 );
-					tm.addTexture( "Cuchara", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.mesa ) ), 128, 128 );
-					tm.addTexture( "Mesa", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					
 					Log.d( "BBRenderer", "Loading textures took " + ( System.currentTimeMillis() - startTime ) + " milliseconds" );
 					break;
 					
@@ -533,38 +462,7 @@ public class BBGame {
 					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.streetsign_back ) ), 256, 512 );
 					tm.addTexture( "StreetSign_Back", new Texture( bitmap, true ) );
 					bitmap.recycle();
-					
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.direccion ) ), 256, 256 );
-					tm.addTexture( "Direccion", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.bicicleta ) ), 256, 256 );
-					tm.addTexture( "Bicicleta", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.autobus ) ), 256, 256 );
-					tm.addTexture( "Autobus", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.coche ) ), 256, 256 );
-					tm.addTexture( "Coche", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.mapa ) ), 256, 256 );
-					tm.addTexture( "Mapa", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.policia ) ), 256, 256 );
-					tm.addTexture( "Policia", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.senal ) ), 256, 256 );
-					tm.addTexture( "Senal", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.taxi ) ), 256, 256 );
-					tm.addTexture( "Taxi", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.semaforo ) ), 256, 256 );
-					tm.addTexture( "Semaforo", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.basura ) ), 256, 256 );
-					tm.addTexture( "Basura", new Texture( bitmap, true ) );
-					bitmap.recycle();
-					
+
 					break;
 				case BEACH:
 					break;
@@ -947,10 +845,6 @@ public class BBGame {
 					target.setStatic( false );
 					// Track which object the bubble captured
 					bubble.setHeldObjectId( target.getID() );
-					//Object3D worldBubbleObject = world.getObject( bubble.getObjectId() );
-					// Apply the appropriate text label on the bubble
-					bubble.setTexture( target.getName( BBTranslator.Language.SPANISH ) );
-					bubble.calcTextureWrap();
 					bubble.setCollisionMode( Object3D.COLLISION_CHECK_OTHERS );
 					bubble.build();
 					// Play the corresponding sound of the captured object
@@ -1135,6 +1029,37 @@ public class BBGame {
     		handler.post( new Runnable() {
     			@SuppressLint("NewApi")
 				public void run() {
+    				BBGameScreen.endContinueButton.setText( R.string.c_resume );
+    				BBGameScreen.endContinueButton.setOnClickListener( new View.OnClickListener() {
+        		        
+        		        @Override
+        		        public void onClick( View v ) {
+				        	if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
+			                		BB.EMPTYSET).contains("comic" + ( level.ordinal() - 1) + "b") ) {
+			                	Intent intent = new Intent( BB.context, BBGameScreen.class );
+				        	    intent.setClass( BB.context, BBMapScreen.class );
+				        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+				        	    world.dispose();
+				        	    BBGameScreen.endDialog.cancel();
+				        	    BB.context.startActivity( intent );
+				        	    loading = true;
+			                } else {
+				        		Intent intent = new Intent( BB.context, BBGameScreen.class );
+				        	    intent.setClass( BB.context, BBVideoScreen.class );
+				        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+				        	    intent.putExtra( BB.EXTRA_MESSAGE, "comic" + ( level.ordinal() - 1 ) + "b" );
+				        	    world.dispose();
+				        	    BBGameScreen.endDialog.cancel();
+				        	    BB.context.startActivity( intent );
+				        	    loading = true;
+			                }
+        		        }
+    				} );
+    				
+    				BBGameScreen.endView.setBackgroundResource( R.drawable.win_game );
+    				BBGameScreen.endDialog.show();
+    				setPauseButtonState();
+    				/*
 		        	if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
 	                		BB.EMPTYSET).contains("comic" + ( level.ordinal() - 1) + "b") ) {
 	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
@@ -1150,6 +1075,7 @@ public class BBGame {
 		        	    BB.context.startActivity( intent );
 		        	    loading = true;
 	                }
+	                */
     			}
     		});
            
@@ -1166,10 +1092,27 @@ public class BBGame {
 		
 		levelState = State.LOST;
 		// TODO: show game screen dialog
-		
-        world.dispose();
 		handler.post( new Runnable() {
             public void run() {
+	        	BBGameScreen.endContinueButton.setText( R.string.c_back_to_map );
+            	BBGameScreen.endContinueButton.setOnClickListener( new View.OnClickListener() {
+    		        
+    		        @Override
+    		        public void onClick( View v ) {
+	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
+		        	    intent.setClass( BB.context, BBMapScreen.class );
+		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+		        	    world.dispose();
+		        	    BBGameScreen.endDialog.cancel();
+		        	    BB.context.startActivity( intent );
+		        	    loading = true;
+    		        	
+    		        }
+            	} );
+            	BBGameScreen.endView.setBackgroundResource( R.drawable.lose_game );
+				BBGameScreen.endDialog.show();
+				setPauseButtonState();
+            	/*
             	Toast toast = Toast.makeText( BB.context, R.string.lose_level_title, Toast.LENGTH_LONG );
                 toast.show();
                 Intent intent = new Intent( BB.context, BBGameScreen.class );
@@ -1178,6 +1121,7 @@ public class BBGame {
         	    BB.context.startActivity( intent );
         	    BB.ANIMATION = "DOWN";
         	    loading = true;
+        	    */
             }
         } );
 	}

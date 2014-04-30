@@ -24,6 +24,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import com.inherentgames.BBGame.State;
 import com.inherentgames.BBRoom.Level;
 
 
@@ -34,13 +35,13 @@ public class BBGameScreen extends Activity {
 	protected BBRenderer renderer;
 	protected BBGame game;
 	protected Dialog pauseDialog;
-	protected Dialog endDialog;
-	protected Dialog loseDialog;
+	public static Dialog endDialog;
 	private Drawable icon;
 	
 	private Button pauseResumeButton, pauseSettingsButton, pauseExitButton, pauseResetButton;
-	private Button endContinueButton, endSettingsButton, endExitButton, endResetButton;
-	private View endView;
+	public static Button endContinueButton;
+	protected Button endSettingsButton, endExitButton, endResetButton;
+	public static View endView;
 	
 	// Internal parameters
 	private boolean isTutorial = false;
@@ -200,31 +201,7 @@ public class BBGameScreen extends Activity {
 
 		// Resume button
 		endContinueButton = ( Button ) endDialog.findViewById( R.id.resume_button );
-		endContinueButton.setOnClickListener( new View.OnClickListener() {
-		        
-		        @Override
-		        public void onClick( View v ) {
-		        	if ( BB.context.getSharedPreferences( BB.PREFERENCES, 0).getStringSet( "playedComics", 
-	                		BB.EMPTYSET).contains("comic" + ( game.level.ordinal() - 1) + "b") ) {
-	                	Intent intent = new Intent( BB.context, BBGameScreen.class );
-		        	    intent.setClass( BB.context, BBMapScreen.class );
-		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-		        	    game.world.dispose();
-		        	    endDialog.cancel();
-		        	    BB.context.startActivity( intent );
-		        	    game.loading = true;
-	                } else {
-		        		Intent intent = new Intent( BB.context, BBGameScreen.class );
-		        	    intent.setClass( BB.context, BBVideoScreen.class );
-		        	    intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-		        	    intent.putExtra( BB.EXTRA_MESSAGE, "comic" + ( game.level.ordinal() - 1 ) + "b" );
-		        	    game.world.dispose();
-		        	    endDialog.cancel();
-		        	    BB.context.startActivity( intent );
-		        	    game.loading = true;
-	                }
-		        }
-		} );
+
 		
 		// Settings button
 		endSettingsButton = ( Button ) endDialog.findViewById( R.id.settings_button );
@@ -257,6 +234,7 @@ public class BBGameScreen extends Activity {
 		        
 		        @Override
 		        public void onClick( View v ) {
+		        	game.loading = true;
 		        	endDialog.cancel();
 		        	finish();
 		        }
@@ -408,6 +386,7 @@ public class BBGameScreen extends Activity {
 				finish();
 			}
 		}
+		
 
 	}
 	

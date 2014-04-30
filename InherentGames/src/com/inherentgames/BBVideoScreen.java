@@ -97,8 +97,8 @@ public class BBVideoScreen extends Activity {
         // Handle skip button
         skipButton = (Button) findViewById( R.id.video_skip_button );
         skipButton.setLayoutParams(new RelativeLayout.LayoutParams( BB.width / 10, BB.width / 10 ));
-        skipButton.setX( BB.height * 1.47f - BB.width / 10 );
-        skipButton.setY( BB.height - BB.width / 10 );
+        skipButton.setX( BB.height * 1.47f - BB.width / 6 );
+        skipButton.setY( BB.height - BB.width / 6 );
         
         skipButton.setOnClickListener( new View.OnClickListener() {
 	        

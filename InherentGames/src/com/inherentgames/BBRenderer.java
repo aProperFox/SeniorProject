@@ -181,6 +181,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			// Update game elements
 			game.update();
 			
+			
 			// Render sky box (if applicable)
 			if ( game.world.skybox != null )
 				game.world.skybox.render( game.world, fb );
