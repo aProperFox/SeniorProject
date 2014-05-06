@@ -8,6 +8,11 @@ import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
 
+/**
+ * @author Tyler
+ * A helper class for JPCT-AE to work with jBullet, shouldn't need to be modified.
+ * See http://www.jpct.net/wiki/index.php/Physics for more details.
+ */
 public class JPCTBulletMotionState extends MotionState {
 	public final Transform centerOfMassOffset = new Transform();
   private Object3D obj3d;

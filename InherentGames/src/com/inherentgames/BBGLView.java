@@ -9,6 +9,10 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
 
+/**
+ * @author Tyler
+ * The GLSurfaceView class that handles MotionEvents for the GameScreen.
+ */
 public class BBGLView extends GLSurfaceView {
 	
 	// Library objects
@@ -24,6 +28,11 @@ public class BBGLView extends GLSurfaceView {
 	private boolean isShootMode = false;
 	private long lastPressedWattson = 0;
 	
+	/**
+	 * Constructor for BBGLView.
+	 * 
+	 * @param context - the context of the GameScreen
+	 */
 	BBGLView( Context context ) {
 		super( context );
 		// Set OpenGL context to version 2
@@ -191,6 +200,7 @@ public class BBGLView extends GLSurfaceView {
 			    	
 					// First finger pressed down
 		    		case MotionEvent.ACTION_DOWN:
+		    			Log.d("BBGLView", "Action Down");
 						xpos = me.getX( 0 );
 						ypos = me.getY( 0 );
 						// Pressed fire button
@@ -211,6 +221,7 @@ public class BBGLView extends GLSurfaceView {
 						return true;
 					// Second or later finger pressed down
 					case MotionEvent.ACTION_POINTER_DOWN:
+						Log.d("BBGLView", "Action Ponter Down");
 						if ( isShootMode ) {
 							firstX = me.getX( 1 );
 							firstY = me.getY( 1 );
@@ -219,9 +230,6 @@ public class BBGLView extends GLSurfaceView {
 					// First finger released
 		    		case MotionEvent.ACTION_UP:
 		    			Log.d( "GameScreen", "Action Up" );
-		    			
-						xpos = -1;
-						ypos = -1;
 						game.horizontalSwipe = 0;
 						game.verticalSwipe = 0;
 						isShootMode = false;
@@ -232,8 +240,6 @@ public class BBGLView extends GLSurfaceView {
 		    		case MotionEvent.ACTION_POINTER_UP:
 		    			Log.d( "GameScreen", "Action Pointer Up" );
 		    			Log.d( "BBGLView", "isShootMode: " + isShootMode );
-						xpos = -1;
-						ypos = -1;
 						game.horizontalSwipe = 0;
 						game.verticalSwipe = 0;
 						float xd = me.getX( 1 ) - firstX;
@@ -262,7 +268,8 @@ public class BBGLView extends GLSurfaceView {
 					// Finger moved
 					// Note: Here, we're only using this event for panning around, not for swiping up/down to shoot bubbles
 		    		case MotionEvent.ACTION_MOVE:
-		    			if ( !isShootMode ) {
+		    			Log.d("BBGLView", "Action Move, pointers: " + me.getPointerCount());
+		    			if ( !isShootMode && me.getPointerCount() < 2 ) {
 		    				xd = me.getX() - xpos;
 		    				yd = me.getY() - ypos;
 		

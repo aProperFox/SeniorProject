@@ -28,6 +28,10 @@ import com.inherentgames.BBGame.State;
 import com.inherentgames.BBRoom.Level;
 
 
+/**
+ * @author Tyler
+ * The main activity while playing the game. Creates an associated BBRoom and BBRenderer.
+ */
 public class BBGameScreen extends Activity {
     
 	// Library objects
@@ -390,24 +394,20 @@ public class BBGameScreen extends Activity {
 
 	}
 	
-	// Used to indicate to Android system to perform an optimization
+	/**
+	 * Used to indicate to Android system to perform an optimization
+	 * 
+	 * @return true
+	 */
 	protected boolean isFullscreenOpaque() {
 		return true;
 	}
 	
+	/**
+	 * Shows the pause menu. Called by BBGLView whenever the pause button is pressed
+	 */
 	protected void showPauseMenu() {
 		pauseDialog.show();
 	}
-	
-	protected void showEndMenu( boolean won ) {
-		if ( won ) {
-			endView.setBackgroundResource( R.drawable.win_game );
-		} else {
-			endView.setBackgroundResource( R.drawable.lose_game );
-		}
-		endDialog.show();
-	}
-
-
 	
 }

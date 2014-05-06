@@ -6,14 +6,17 @@ import com.threed.jpct.Mesh;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
+/**
+ * @author Tyler
+ * An Extension of the JPCT-AE class Object3D. This handles all of the objects in a room. The
+ * key addition here is that BBWordObjects have words and articles associated with them.
+ */
 public class BBWordObject extends Object3D {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -4088731260124106298L;
 	
 	// Define valid genders and classifications
-	public static enum Gender { MASCULINE, FEMININE };
+	public static enum Gender { MASCULINE, FEMININE, NONE };
 	public static enum Classification { WORD_OBJECT, BUBBLE };
 	
 	// Tracks whether this object is moving around (i.e., inside a bubble or not)
@@ -34,7 +37,10 @@ public class BBWordObject extends Object3D {
 	
 	
 	/**
-	 * @param obj
+	 * The constructor for BBWordObject. Sets the initial rotation of the object (so it can be
+	 * rotate back if the game is reset), the article, names, and collisionMode.
+	 * 
+	 * @param obj - the BBWordObject to base this BBWordObject off of
 	 */
 	public BBWordObject( BBWordObject obj ) {
 		super( obj.toObject3D() );
@@ -53,10 +59,13 @@ public class BBWordObject extends Object3D {
 	}
 	
 	/**
-	 * @param obj
-	 * @param rotationAxis
-	 * @param name
-	 * @param article
+	 * The constructor for BBWordObject. Sets the initial rotation of the object (so it can be
+	 * rotate back if the game is reset), the article, names, and collisionMode.
+	 * 
+	 * @param obj - the Object3D to base this BBWordObject off of
+	 * @param rotationAxis - the vector to rotate the object by (in radians)
+	 * @param name - the english name of the object
+	 * @param article - the spanish gender of the object
 	 */
 	public BBWordObject( Object3D obj, SimpleVector rotationAxis, String name, Gender article ) {
 		super( obj );
@@ -72,21 +81,24 @@ public class BBWordObject extends Object3D {
 	}
 	
 	/**
-	 * @return
+	 * @return - true if the object is not moving, false if it is
 	 */
 	public boolean getStaticState() {
 		return isStatic;
 	}
 	
 	/**
-	 * @param state
+	 * Sets isStatic to the given boolean
+	 * 
+	 * @param state - the boolean to set isStatic to
 	 */
 	public void setStatic( boolean state ) {
 		isStatic = state;
 	}
 	
 	/**
-	 * 
+	 * Sets the maxDimension variable to the max distance from the center to the mesh end. Important
+	 * for scaling down to bubble size.
 	 */
 	public void setMaxDimension() {
 		long startTime = System.currentTimeMillis();
@@ -96,21 +108,23 @@ public class BBWordObject extends Object3D {
 	}
 	
 	/**
-	 * @return
+	 * @return - maxDimension of the object. Important for scaling down to bubble size
 	 */
 	public float getMaxDimension() {
 		return maxDimension;
 	}
 	
 	/**
-	 * @param id
+	 * Lets the object be aware of its world id
+	 * 
+	 * @param id - the id to set the objectId to
 	 */
 	public void setObjectId( int id ) {
 		this.objectId = id;
 	}
 	
 	/**
-	 * @return
+	 * @return - the world id of the object
 	 */
 	public int getObjectId() {
 		return objectId;
@@ -130,8 +144,10 @@ public class BBWordObject extends Object3D {
 	}
 	
 	/**
-	 * @param language
-	 * @return
+	 * Gets the name of the object in the requested language
+	 * 
+	 * @param language - the language requested
+	 * @return - the name of the object in the requested language
 	 */
 	public String getName( int language ) {
 		return names[language];
@@ -145,19 +161,28 @@ public class BBWordObject extends Object3D {
 		super.scale( scaleTo/maxDimension );
 	}
 	
+	/**
+	 * Opposite of scale(). Scales the object back from the given size
+	 * 
+	 * @param scaleFrom - the float to scale the object from
+	 */
 	public void scaleFrom( float scaleFrom ) {
 		super.scale( maxDimension/scaleFrom );
 	}
 	
 	/**
-	 * @param room
+	 * Removes an object from the room
+	 * 
+	 * @param room - the room (world) to remove the object from
 	 */
 	public void removeObject( BBRoom room ) {
 		room.removeObject( objectId );
 	}
 	
 	/**
-	 * @param axes
+	 * Rotates the object by the given vector (in radians)
+	 * 
+	 * @param axes - the vector to rotate by
 	 */
 	public void rotateBy( SimpleVector axes ) {
 		if ( initialRotation.equals( new SimpleVector( 0, 0, 0 )))
@@ -167,10 +192,18 @@ public class BBWordObject extends Object3D {
 		this.rotateZ( axes.z );
 	}
 	
+	/**
+	 * Adds to the initalRotation vector (if object has been rotated beyond the base object's rotation set in BBRoom)
+	 * 
+	 * @param vector - the vector to add to the initalRotation vector
+	 */
 	public void addInitialRotation( SimpleVector vector ) {
 		initialRotation.add( vector );
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.threed.jpct.Object3D#clearRotation()
+	 */
 	@Override
 	public void clearRotation() {
 		super.clearRotation();
@@ -180,12 +213,18 @@ public class BBWordObject extends Object3D {
 	}
 	
 	/**
-	 * @return
+	 * @return - a casted Object3D of this
 	 */
 	public Object3D toObject3D() {
-		return ( Object3D )this;
+		return (Object3D) this;
 	}
 
+	/**
+	 * A simple max function for getting the highest value of the given vertices
+	 * 
+	 * @param vertices - the vertices of the object
+	 * @return - the max vertex
+	 */
 	public float getMax( float[] vertices ) {
 		float max = 0;
 		for ( float vertex: vertices ) {

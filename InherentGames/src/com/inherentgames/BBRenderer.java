@@ -20,7 +20,11 @@ import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
 import com.threed.jpct.World;
 
-// Renders the state of the game
+/**
+ * @author Tyler
+ * Renders the state of the game. This is the second main class for the entire game. It handles rendering everything
+ * in the level and on screen. It also calls BBGame.update() since it has to be updated often.
+ */
 class BBRenderer implements GLSurfaceView.Renderer {
 	
 	// Library objects
@@ -67,10 +71,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	private float[] mVPMatrix = new float[16];
 	
 	/**
-	 * @param c
-	 * @param w
-	 * @param h
-	 * @param level
+	 * The Constructor for BBRenderer. Instantiates some local parameters.
 	 */
 	public BBRenderer( ) {
 		
@@ -89,7 +90,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		arrowY = BB.height / 10 + BB.width / 6;
 	}
 	
-	// Triggered when the view port is created
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceCreated(javax.microedition.khronos.opengles.GL10, javax.microedition.khronos.egl.EGLConfig)
+	 */
 	public void onSurfaceCreated( GL10 unused, EGLConfig config ) {
 		textSmall = new GLText( BB.context.getAssets() );
 		textSmall.load( "futura-normal.ttf", BB.width / 35, 2, 2 );
@@ -99,7 +102,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		textLarge.load( "futura-normal.ttf", BB.width / 15, 2, 2 );
 	}
 	
-	// Triggered when the view port changes (e.g., by size)
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onSurfaceChanged(javax.microedition.khronos.opengles.GL10, int, int)
+	 */
 	public void onSurfaceChanged( GL10 unused, int w, int h ) {
 		// Clear the frame buffer if it's not clean
 		if ( fb != null ) {
@@ -157,7 +162,9 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		
 	}
 	
-	// Triggers every clock cycle / time the system wants to draw a frame
+	/* (non-Javadoc)
+	 * @see android.opengl.GLSurfaceView.Renderer#onDrawFrame(javax.microedition.khronos.opengles.GL10)
+	 */
 	public void onDrawFrame( GL10 unused ) {
 		
 		// Clear the frame buffer
@@ -174,7 +181,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			fb.display();
 			
 			/* The following code needs to come after switching to the frame buffer */
-			drawTextSmall( "LOADING...", (int) (BB.width / 1.239f), (int) (BB.height / 1.054), RGBColor.BLACK, false);
+			drawText ( textSmall, "LOADING...", (int) (BB.width / 1.239f), (int) (BB.height / 1.054), RGBColor.BLACK, false);
 			
 		} else {
 			
@@ -211,14 +218,14 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	/**
-	 * @return
+	 * @return - the current FrameBuffer being used by the renderer
 	 */
 	public static FrameBuffer getFrameBuffer() {
 		return fb;
 	}
 	
 	/**
-	 * @param fb
+	 * Displays the on screen 2D sprites to be rendered. Has different steps for displaying tutorial sprites.
 	 */
 	public void display2DGameInfo() {
 		int w = BB.width;
@@ -233,7 +240,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Bubble image
 				blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 				// Bubble text
-				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
+				drawText ( textLarge, game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				// Fire Button
 				blitButton( game.fireButton );
 				// Pause Button
@@ -257,7 +264,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				// Wattson help text
 				int iteration = 0;
 				for ( String string : game.wattsonText ) {
-					drawTextSmall( string, w/6, h/23 + ( letterWidth*2*iteration ), RGBColor.WHITE, false);
+					drawText ( textSmall, string, w/6, h/23 + ( letterWidth*2*iteration ), RGBColor.WHITE, false);
 					iteration++;
 				}
 			} catch ( ConcurrentModificationException e ) {
@@ -278,7 +285,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			// Bubble image
 			blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
 			// Bubble text
-			drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
+			drawText ( textLarge, game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 			// Fire Button
 			blitButton( game.fireButton );
 			// Pause Button
@@ -286,16 +293,16 @@ class BBRenderer implements GLSurfaceView.Renderer {
 			// score buttons
 			blitButton( game.scoreButton );
 			//Score
-			drawTextMedium( Integer.toString(game.score), game.scoreButton.posX + game.scoreButton.width / 8, game.scoreButton.posY - game.scoreButton.height / 10, RGBColor.WHITE, true );
+			drawText ( textMedium, Integer.toString(game.score), game.scoreButton.posX + game.scoreButton.width / 8, game.scoreButton.posY - game.scoreButton.height / 10, RGBColor.WHITE, true );
 			//Multiplier
 			String multiplier = game.multiplier + "X";
-			drawTextSmall(multiplier, game.scoreButton.posX + game.scoreButton.width / 6, game.scoreButton.posY - game.scoreButton.height / 5, RGBColor.WHITE, false);
+			drawText ( textSmall,multiplier, game.scoreButton.posX + game.scoreButton.width / 6, game.scoreButton.posY - game.scoreButton.height / 5, RGBColor.WHITE, false);
 			// Dynamic time bar
 			blitImageBottomUp( "TimeBar", (int) (w * 0.966), h/2, 16, 512, w/38, (int) timeHeight, (int) (h * 0.76), 100 );
 			// Score bars
 			blitImage( "ScoreBars", w-( w/16 ), h/2, 128, 512, w/8, ( int )( h*0.9 ), 100 );
 			// Draw word when correct answer guessed
-			drawTextLarge( game.answer.data, (int) game.answer.location.x, (int) game.answer.location.y, game.answer.color, false );
+			drawText( textLarge, game.answer.data, (int) game.answer.location.x, (int) game.answer.location.y, game.answer.color, false );
 			
 		}
 		
@@ -305,10 +312,11 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	/**
-	 * @param fb
-	 * @param itemNum
+	 * Displays screen items based on wattsonPrivileges as each state of the tutorial needs different displays.
+	 * 
+	 * @param fb - the current FrameBuffer to display to
+	 * @param itemNum - the state of the tutorial that defines what is to be displayed
 	 */
-	// TODO: Figure out what this function actually does, and separate the tasks between BBRenderer & BBGame
 	private void displayScreenItem( FrameBuffer fb, int itemNum ) {
 		int w = BB.width;
 		int h = BB.height;
@@ -329,21 +337,6 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				blitImage( arrowState, arrowX, arrowY + game.arrowMod, 128, 128, BB.width / 8, BB.width / 8, 100 );
 				break;
 			case 2:
-				/*
-				 * probably not necessary to display for second stage of tutorial
-				 * 
-				//Fire Button
-				blitButton( game.fireButton );
-				//Bubble image
-				blitImage( game.bubbleTex, halfWidth, h, 256, 256, w/3, w/3, 5 );
-				//Bubble text
-				drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
-
-				 //Dynamic fuel bar
-				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
-				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
-				 blitImage("ScoreBars", BB.width-( BB.width/16 ), halfHeight, 128, 512, BB.width/8, (int)( BB.height*0.9 ), 100 );
-				*/
 				break;
 			case 4:
 				 if ( game.wattsonPrivileges == itemNum )
@@ -354,7 +347,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
 				 //Bubble image
 				 blitImage( game.bubbleTex, halfWidth, BB.height, 256, 256, BB.width/3, BB.width/3, 5 );
 				 //Bubble text
-				 drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
+				 drawText ( textLarge, game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				 //Dynamic fuel bar
 				 blitImageBottomUp("TimeBar", (int)( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int)( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp("FuelBar", (int)( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int)( BB.height*0.76 ), 100 );
@@ -387,7 +380,7 @@ class BBRenderer implements GLSurfaceView.Renderer {
  				 //Bubble image
  				 blitImage( game.bubbleTex, halfWidth, BB.height, 256, 256, BB.width / 3, BB.width / 3, 5 );
  				 //Bubble text
- 				 drawTextLarge ( game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
+ 				 drawText ( textLarge, game.world.getBubbleArticle(), (int) (BB.width / 2.11f), (int) (BB.height / 1.08f), RGBColor.WHITE, false);
 				 //Dynamic fuel bar
 				 blitImageBottomUp( "TimeBar", (int) ( BB.width*0.966 ), halfHeight, 16, 512, BB.width/38, (int) timeHeight, (int) ( BB.height*0.76 ), 100 );
 				 //blitImageBottomUp( "FuelBar", (int) ( BB.width*0.909 ), BB.height/2, 16, 512, BB.width/38, (int) fuelHeight, (int) ( BB.height*0.76 ), 100 );
@@ -437,34 +430,51 @@ class BBRenderer implements GLSurfaceView.Renderer {
 
 	
 	/**
-	 * @param vector
-	 * @return
+	 * Converts the JPCT-AE SimpleVector to the jBullet Vector3f as the graphics and physics engine use different
+	 * vector types.
+	 * 
+	 * @param vector - JPCT-AE SimpleVector to be converted
+	 * @return - jBullet Vector3f created by given vector
 	 */
 	public Vector3f toVector3f( SimpleVector vector ) {
 		return new Vector3f( vector.x, vector.y, vector.z );
 	}
 	
 	/**
-	 * @param vector
-	 * @return
+	 * Converts the jBullet Vector3f to the JPCT-AE SimpleVector as the graphics and physics engine use different
+	 * vector types.
+	 * 
+	 * @param vector - jBullet Vector3f to be converted
+	 * @return - JPCT-AE SimpleVector created by given vector
 	 */
 	public SimpleVector toSimpleVector( Vector3f vector ) {
 		return new SimpleVector( vector.x, vector.y, vector.z );
 	}
 
-	public static int getTextWidth( String text ) {
-		int length = text.length() * charWidth;
-		return length;
-	}
 
 	/**
-	 * @param text
-	 * @param pixelX
-	 * @param pixelY
-	 * @param color
-	 * @param reverse
+	 * Displays text on the screen. it will switch the FrameBuffer so it has priority. It converts the GLText
+	 * coordinates to screen coordinates since GLText coords look like:
+	 * *******************
+	 * *(-,+)       (+,+)*
+	 * *      (0,0)      *
+	 * *(-,-)       (+,-)*
+	 * *******************
+	 * and screen coords look like:
+	 * (0,0)**************
+	 * *                 *
+	 * *                 *
+	 * *                 *
+	 * **********(MAX,MAX)
+	 * 
+	 * @param size - the GLText to be used, called size because GLText doesn't have dynamic size and we have three sizes
+	 * @param text - the text to be displayed
+	 * @param pixelX - the leftmost x coordinate of the text in pixels (unless reverse == true).
+	 * @param pixelY - the topmost y coordinate of the text in pixels.
+	 * @param color - the color of the text
+	 * @param reverse - if true, will make pixelX the right most coordinate of text in pixels
 	 */
-	public void drawTextLarge( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
+	public void drawText( GLText size, String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
 		// Switch frame buffers
 		fb.display();
 		
@@ -472,83 +482,30 @@ class BBRenderer implements GLSurfaceView.Renderer {
 		// turns it off)
 		GLES20.glEnable( GLES20.GL_BLEND );
 		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textLarge.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
+		size.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
 		
 		if ( reverse ) {
-			textLarge.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+			size.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
 		} else {
-			textLarge.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
+			size.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
 		}
 		
-		textLarge.end();
+		size.end();
 		GLES20.glDisable( GLES20.GL_BLEND );
 		
 	}
 	
 	/**
-	 * @param text
-	 * @param pixelX
-	 * @param pixelY
-	 * @param color
-	 * @param reverse
-	 */
-	public void drawTextMedium( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
-		// Switch frame buffers
-		fb.display();
-		
-		// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
-		// turns it off)
-		GLES20.glEnable( GLES20.GL_BLEND );
-		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textMedium.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
-		
-		if ( reverse ) {
-			textMedium.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
-		} else {
-			textMedium.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
-		}
-		
-		textMedium.end();
-		GLES20.glDisable( GLES20.GL_BLEND );
-		
-	}
-	
-	/**
-	 * @param text
-	 * @param pixelX
-	 * @param pixelY
-	 * @param color
-	 * @param reverse
-	 */
-	public void drawTextSmall( String text, int pixelX, int pixelY, RGBColor color, boolean reverse ) {
-		// Switch frame buffers
-		fb.display();
-		
-		// Enable texture + alpha blending (need to do this every time because JPCT-AE presumably
-		// turns it off)
-		GLES20.glEnable( GLES20.GL_BLEND );
-		GLES20.glBlendFunc( GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA );
-		textSmall.begin( color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0f, mVPMatrix );
-		
-		if ( reverse ) { 
-			textSmall.drawC( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
-		} else { 
-			textSmall.draw( text, pixelX - ( BB.width / 2 ), ( BB.height / 2 ) - pixelY );
-		}
-		
-		textSmall.end();
-		GLES20.glDisable( GLES20.GL_BLEND );
-	}
-	
-	/**
-	 * @param textureName
-	 * @param x
-	 * @param y
-	 * @param imageWidth
-	 * @param imageHeight
-	 * @param width
-	 * @param height
-	 * @param transparency
+	 * Displays an image on screen using the frame buffer
+	 * 
+	 * @param textureName - the texture name, grabbed from JPCT-AE's TextureManager
+	 * @param x - center x coordinate of the image on screen (in pixels)
+	 * @param y - center y coordinate of the image on screen (in pixels)
+	 * @param imageWidth - loaded width of the given image (always a power of 2)
+	 * @param imageHeight - loaded height of the given image (always a power of 2)
+	 * @param width - the on screen width of the image (in pixels)
+	 * @param height - the on screen height of the image (in pixels)
+	 * @param transparency - the transparency of the image (max is ~20, -1 means no transparency)
 	 */
 	public void blitImage( String textureName, int x, int y, int imageWidth, int imageHeight, int width, int height, int transparency ) {
 		Texture image = tm.getTexture( textureName );
@@ -556,15 +513,18 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	/**
-	 * @param textureName
-	 * @param x
-	 * @param y
-	 * @param imageWidth
-	 * @param imageHeight
-	 * @param width
-	 * @param height
-	 * @param totalHeight
-	 * @param transparency
+	 * A special image display that is used for the time bar. It displays an image from the bottom up rather than from the
+	 * center out so that the image can go down like a time bar.
+	 * 
+	 * @param textureName - the texture name, grabbed from JPCT-AE's TextureManager
+	 * @param x - center x coordinate of the image on screen (in pixels)
+	 * @param y - center y coordinate of the image on screen (in pixels)
+	 * @param imageWidth - loaded width of the given image (always a power of 2)
+	 * @param imageHeight - loaded height of the given image (always a power of 2)
+	 * @param width - the on screen width of the image (in pixels)
+	 * @param height - the on screen height of the image (in pixels)
+	 * @param totalHeight - the max height it can be
+	 * @param transparency - the transparency of the image (max is ~20, -1 means no transparency)
 	 */
 	public void blitImageBottomUp( String textureName, int x, int y, int imageWidth, int imageHeight, int width, int height, int totalHeight, int transparency ) {
 		Texture image = tm.getTexture( textureName );
@@ -572,43 +532,21 @@ class BBRenderer implements GLSurfaceView.Renderer {
 	}
 
 	/**
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param h
-	 * @param transparency
-	 * @param color
-	 */
-	public void blitFilledBox( int x, int y, int w, int h, int transparency, RGBColor color ) {
-		fb.blit( REFERENCE_POINT, 0, 0, x, y, 8, 8, w, h, transparency, false, color );
-	}
-	
-	/**
-	 * @param fb
-	 * @param w
-	 * @param h
+	 * Displays a simple crosshair in the center of the screen
+	 * 
+	 * @param w - the width of the crosshair
+	 * @param h -  the height of the crosshair
 	 */
 	public void blitCrosshair( int w, int h ) {
 		fb.blit( REFERENCE_POINT, 0, 0, w/2-w/100, h/2-h/150, 8, 8, w/50, h/75, 10, false, RGBColor.BLACK );
 		fb.blit( REFERENCE_POINT, 0, 0, w/2-h/150, h/2-w/100, 8, 8, h/75, w/50, 10, false, RGBColor.BLACK );
 	}
+
 	
 	/**
-	 * @param x
-	 * @param y
-	 * @param radius
-	 * @param transparency
-	 * @param color
-	 */
-	public void blitFilledCircle( int x, int y, int radius, int transparency, RGBColor color ) {
-		for ( float i = 180.0f; i > 90.0f; i-=1 ) {
-			fb.blit( REFERENCE_POINT, 0, 0, ( int )( x+Math.cos( i*Math.PI/180 )*radius ), ( int )( y-Math.sin( i*Math.PI/180 )*radius ),
-					8, 8, ( int )( Math.abs( Math.cos( i*Math.PI/180 )*radius )*2 ), ( int )( Math.floor( (Math.sin( i*Math.PI/180 )*radius )-( Math.sin( (i-1 )*Math.PI/180 )*radius ) ) ), transparency, false, color );
-		}
-	}
-	
-	/**
-	 * @param button
+	 * Displays a BBButton easily, since it already has x, y, width, and height parameters
+	 * 
+	 * @param button - the BBButton to be displayed
 	 */
 	public void blitButton( BBButton button ) {
 		Texture image = tm.getTexture( button.currentImage );

@@ -13,6 +13,10 @@ import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
+/**
+ * @author Tyler
+ * A class that keeps track of Floor and Ceiling objects, setting their texture, size, location, and physics.
+ */
 public class BBFloor {
 	SimpleVector[] coordinates = new SimpleVector[4];
 	String type = "";
@@ -22,8 +26,11 @@ public class BBFloor {
 	private RigidBody body;
 	
 	/**
-	 * @param size
-	 * @param textureId
+	 * The Constructor for BBFloor. Determines whether the object is a floor or ceiling by looking at its y-value,
+	 * then creates two triangles and puts physics on them.
+	 * 
+	 * @param size - a JPCT-AE SimpleVector where x and z are the width and length, and y is the height
+	 * @param textureId - a texture id to set the texture of the triangles when created (may not be needed as setTexture is called later.)
 	 */
 	public BBFloor( SimpleVector size, int textureId ) {
 		coordinates[0] = new SimpleVector( -size.x/2, size.y, +size.z/2 );
@@ -59,20 +66,26 @@ public class BBFloor {
 	}
 	
 	/**
-	 * @param tex
+	 * Function that calls the setTexture function on the JPCT-AE Object3D 'floor' contained by this class
+	 * 
+	 * @param tex - texture to be set, which has been added to the JPCT-AE TextureManager
 	 */
 	public void setTexture( String tex ) {
 		floor.setTexture( tex );
 	}
 	
 	/**
-	 * @return
+	 * Gets the JPCT-AE Object3D 'floor' contained by this class
+	 * 
+	 * @return - the JPCT-AE Object3D 'floor' contained by this class
 	 */
 	public Object3D getFloor() {
 		return floor;
 	}
 	
 	/**
+	 * Gets the jBullet RigidBody (physics body) of the floor/ceiling
+	 * 
 	 * @return
 	 */
 	public RigidBody getBody() {

@@ -18,6 +18,10 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
+/**
+ * @author Tyler
+ * The activity that handles playing videos and changing activities once completed.
+ */
 public class BBVideoScreen extends Activity {
 	VideoView videoView;
 	

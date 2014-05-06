@@ -10,6 +10,10 @@ import com.bulletphysics.linearmath.Transform;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
+/**
+ * @author Tyler
+ * An extension of BBSurface that is based around walls
+ */
 public class BBWall extends BBSurface {
 	
 	
@@ -23,10 +27,12 @@ public class BBWall extends BBSurface {
 	private CollisionShape groundShape;
 
 	/**
-	 * @param origin
-	 * @param width
-	 * @param height
-	 * @param textureName
+	 * The constructor for BBWall. Creates basic plane objects and sets the texture based on given parameters
+	 * 
+	 * @param origin - a vector giving the location of the surface
+	 * @param width - the width of the surface
+	 * @param height - the height of the surface
+	 * @param textureId - the texture id to be applied to the surface
 	 */
 	public BBWall( SimpleVector origin, float width, float height, String textureName ) {
 		super( origin, width, height, 0 );
@@ -57,14 +63,15 @@ public class BBWall extends BBSurface {
 	}
 	
 	/**
-	 * @return
+	 * @return - the Object3D associated with this class
 	 */
 	public Object3D getWall() {
 		return wall;
 	}
 	
 	/**
-	 * 
+	 * Sets the coordinates of the surface, ensuring the orientation of the wall is correct and the texture is facing
+	 * the correct direction.
 	 */
 	private void setCoordinates() {
 		if ( origin.x == 0 && origin.z > 0 ) {
@@ -98,7 +105,7 @@ public class BBWall extends BBSurface {
 	}
 
 	/**
-	 * @return
+	 * @return - the RigidBody associated with the wall
 	 */
 	public RigidBody getBody() {
 		return body;

@@ -15,6 +15,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+/**
+ * @author Tyler
+ * The Activity that displays the map select screen and handles what to do when the a level is pressed (either call
+ * BBVideoScreen or BBGameScreen).
+ */
 @SuppressLint("NewApi")
 public class BBMapScreen extends Activity {
 
@@ -27,6 +32,9 @@ public class BBMapScreen extends Activity {
 	
 	int levelNum;
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
 	@SuppressLint( "NewApi" )
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
@@ -58,6 +66,9 @@ public class BBMapScreen extends Activity {
 		getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
 	@SuppressLint("InlinedApi")
 	public void onResume() {
 		super.onResume();
@@ -79,6 +90,9 @@ public class BBMapScreen extends Activity {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onTouchEvent(android.view.MotionEvent)
+	 */
 	public boolean onTouchEvent( MotionEvent me ) {
 		float xpos = me.getX();
 		float ypos = me.getY();
@@ -135,6 +149,9 @@ public class BBMapScreen extends Activity {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onBackPressed()
+	 */
 	@Override
 	public void onBackPressed() {
 	   Log.d( "MapScreen", "onBackPressed Called" );

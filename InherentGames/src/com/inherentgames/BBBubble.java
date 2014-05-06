@@ -7,6 +7,11 @@ import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 
+/**
+ * @author Tyler
+ * BBBubble is a class that extends BBWordObject. Every bubble shot during gameplay is a new BBBubble, and is added to the
+ * graphics engine and physics engine.
+ */
 public class BBBubble extends BBWordObject {
 
 	// Define valid bubble colors
@@ -37,9 +42,13 @@ public class BBBubble extends BBWordObject {
 	private long timeCreated;
 	
 	/**
-	 * @param translation
-	 * @param article
-	 * @param timeInMillis
+	 * The Constructor for BBBubble. Takes in a translation vector, an enum Gender, and a time created. The constructor will
+	 * add the appropriate color to the bubble, depending con what the Gender given to it. Base JPCT-AE handling is done
+	 * in the constructor, but physics is added during declaration.
+	 * 
+	 * @param translation - a JPCT-AE SimpleVector that gives it a starting point (if bubble not shot from (0,0,0) 
+	 * @param article - BBWordObject enum Gender can have either a feminine or masculine state
+	 * @param timeInMillis - the time of creation, in milliseconds
 	 */
 	public BBBubble( SimpleVector translation, Gender article, long timeInMillis ) {
 		super( Primitives.getSphere( 5.0f ), new SimpleVector( 0, 0, 0 ), "Bubble", article );
@@ -118,7 +127,10 @@ public class BBBubble extends BBWordObject {
 	}
 	
 	/**
-	 * @param id
+	 * Called when a bubble captures an object in the room. It will set its variable heldObjectId to
+	 * the world id of the object captured, as received by the JPCT-AE function Object3D.getID() 
+	 * 
+	 * @param id - an int passed in of the captured object's world id
 	 */
 	public void setHeldObjectId( int id ) {
 		heldObjectId = id;
@@ -126,35 +138,47 @@ public class BBBubble extends BBWordObject {
 	}
 	
 	/**
-	 * @return
+	 * Called when needing the world object id of the captured object. It is used for rotating the object
+	 * and updating its location relative to the bubble.
+	 * 
+	 * @return heldObjectId - the world object id of the held object (if any) 
 	 */
 	public int getHeldObjectId() {
 		return heldObjectId;
 	}
 	
 	/**
-	 * @param index
+	 * Used for the 'bubbles' ArrayList in BBRoom to keep track of all bubble id's, since it is not native
+	 * to JPCT-AE's 'World' class. Stored in local variable 'localBodyIndex'
+	 * 
+	 * @param index - the int index of this bubble in the BBRoom.bubbles ArrayList
 	 */
 	public void setLocalBodyIndex( int index ) {
 		localBodyIndex = index;
 	}
 	
 	/**
-	 * @return
+	 * Gets the localBodyIndex of this bubble in the BBRoom.bubbles ArrayList
+	 * 
+	 * @return localBodyIndex - an int representing the location of this bubble in BBRoom.bubbles
 	 */
 	public int getLocalBodyIndex() {
 		return localBodyIndex;
 	}
 	
 	/**
-	 * @return
+	 * Gets the index of the bubble's jBullet object RigidBody to find the object in the physics engine.
+	 * 
+	 * @return bodyIndex - an int that refers to the bubble's RigidBody id in the physics engine
 	 */
 	public int getBodyIndex() {
 		return bodyIndex;
 	}
 	
 	/**
-	 * @param index
+	 * Sets the index of the bubble's jBullet object RigidBody to find the object in the physics engine. 
+	 * 
+	 * @param index - an int that refers to the bubble's RigidBody id in the physics engine
 	 */
 	public void setBodyIndex( int index ) {
 		bodyIndex = index;
@@ -175,12 +199,20 @@ public class BBBubble extends BBWordObject {
 	}
 	
 	/**
-	 * @return
+	 * Gets the time the bubble was created 
+	 * 
+	 * @return timeCreated - the time the bubble was created in milliseconds
 	 */
 	public long getTimeCreated() {
 		return timeCreated;
 	}
 	
+	/**
+	 * Converts the enum BBBubble.Color to the JPCT-AE RGBColor
+	 * 
+	 * @param c - the BBBubble.Color 
+	 * @return - a new RGBColor based on the BBBubble.Color c
+	 */
 	private RGBColor color( Color c ) {
 		return new RGBColor( c.r, c.g, c.b );
 	}

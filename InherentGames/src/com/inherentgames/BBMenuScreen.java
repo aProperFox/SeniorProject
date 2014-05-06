@@ -26,6 +26,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 
+/**
+ * @author Tyler
+ * The Activity that handles the initial menu screen. It plays the title screen song and handles button
+ * clicks to go to the correct activity when a button is clicked.
+ */
 @SuppressLint( "NewApi" )
 public class BBMenuScreen extends Activity {
 	
@@ -323,6 +328,16 @@ public class BBMenuScreen extends Activity {
     }
 	
 	
+	/**
+	 * Sets button properties for each button passed in since all buttons have the same configuration. It sets:
+	 * -text color
+	 * -text size
+	 * -text
+	 * -typeface
+	 * 
+	 * @param button - the button to be configured
+	 * @param text - the text to set for the button
+	 */
 	private void setButtonConfig( Button button, String text ) {
 		button.setTextColor( buttonTextColor );
         button.setTextSize( 24 );

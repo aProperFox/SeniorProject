@@ -5,6 +5,10 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+/**
+ * @author Tyler
+ * The unimplemented settings Activity for changing game settings. We are missing the required xml files for this
+ */
 public class BBSettings extends Activity implements OnSeekBarChangeListener{
 	LinearLayout myscreen;
 	SeekBar bgm, master, voice;

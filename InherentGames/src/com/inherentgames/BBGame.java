@@ -46,6 +46,17 @@ import com.threed.jpct.util.BitmapHelper;
 import com.threed.jpct.util.MemoryHelper;
 
 // Handles game dynamics, and represents the overall state of the game
+/**
+ * @author Tyler
+ * The core Class of the entire game. Handles the physics engine, and updating all movement. It loads:
+ * -Textures
+ * -Sprites (on screen textures)
+ * -Sounds
+ * It instantiates the scene and creates the BBRoom object which is needed to have any sort of room
+ * It also keeps track of dynamics in the Tutorial like Wattson's text and privileges. It keeps track of
+ * time left and the score, and will end the game appropriately when beaten/lost.
+ * This ain't your grandmother's Class.
+ */
 public class BBGame {
 	// Singleton self reference
 	private static BBGame instance = null;
@@ -138,7 +149,7 @@ public class BBGame {
 	protected float verticalSwipe = 0;
 	
 	// Track the states of the fire button, pause button, and bubbles
-	protected String bubbleTex = "bubbleBlue";
+	protected String bubbleTex = "Nothing";
 
 	// Track the score
 	protected int score = 0;
@@ -176,6 +187,10 @@ public class BBGame {
 	protected int wattsonPrivileges = 1;
 	
 	
+	/**
+	 * The constructor for the class. Determines whether or not to display the loading screen or not. If so, it will run a
+	 * thread to load all of the objects/textures/sounds and set up the room.
+	 */
 	public BBGame() {
 		// Initialize texture manager
 		tm = BBTextureManager.getInstance();
@@ -227,9 +242,11 @@ public class BBGame {
 		
 	}
 	
-	// Allows for the singleton design pattern
-	// I.e., we only want one instance of BBGame 
-	//       to exist at any one time.
+	/**
+	 * Allows for the singleton design pattern
+	 * I.e., we only want one instance of BBGame to exist at any one time.
+	 * @return - instance of BBGame
+	 */
 	public static BBGame getInstance() {
 		if ( instance == null ) {
 			instance = new BBGame();
@@ -238,7 +255,9 @@ public class BBGame {
 	}
 
 	
-	// Sets up the tutorial
+	/**
+	 * Sets up the tutorial, if the current level is Tutorial, also determines whether to enable the time limit.
+	 */
 	private void prepareTutorial() {
 		// Is tutorial?
 		if ( level == Level.TUTORIAL ) {
@@ -265,7 +284,9 @@ public class BBGame {
 	/* Asset Loading */
 	
 	// TODO: All the actual texture loading needs to be offloaded to the texture manager
-	// Loads all the sprite textures (AKA the textures for all the HUD elements)
+	/**
+	 * Loads all of the sprites (on screen images) into the JPCT-AE TextureManager.
+	 */
 	private void loadSprites() {
 		// Reusable bitmap holder
 		Bitmap bitmap;
@@ -345,6 +366,10 @@ public class BBGame {
 				tm.addTexture( "Default", new Texture( bitmap, true ) );
 				bitmap.recycle();
 				
+				bitmap = BitmapHelper.rescale( BitmapHelper.convert( BB.context.getResources().getDrawable( R.drawable.nothing ) ), 16, 16 );
+				tm.addTexture( "Nothing", new Texture( bitmap, true ) );
+				bitmap.recycle();
+				
 				spritesLoaded = true;
 			} catch( Exception e ) {
 				e.printStackTrace();
@@ -353,7 +378,9 @@ public class BBGame {
 	}
 	
 	// TODO: All the actual texture loading needs to be offloaded to the texture manager
-	// Loads all the level-related textures
+	/**
+	 * Loads all of the textures (surface, object wrapped textures) into the JPCT-AE TextureManager.
+	 */
 	private void loadTextures() {
 		Bitmap bitmap;
 		try {
@@ -475,6 +502,9 @@ public class BBGame {
 	
 	// TODO: All the actual sound loading needs to be offset to ideally a sound manager object (BBSoundManager)
 	// Loads all the game sounds
+	/**
+	 * Loads all of the in-game sounds into a soundPoolMap.
+	 */
 	private void loadSounds() {
 		soundPool = new SoundPool( 4, AudioManager.STREAM_MUSIC, 100 );
         soundPoolMap = new SparseIntArray();
@@ -512,7 +542,10 @@ public class BBGame {
         soundPoolMap.put( 32, soundPool.load( BB.context, R.raw.level_win, 1 ) );
 	}
 	
-	// Sets up the game (OpenGL) scene
+	/**
+	 * Sets up the game (OpenGL) scene by creating a BBRoom and instantiates it. This is kind of an onCreate or
+	 * onSurfaceChanged method as it is called every time a new room is loaded and initializes a lot of variables.
+	 */
 	private void setupScene() {
 		// Initialize the level scene
 		world = new BBRoom( level );
@@ -585,6 +618,8 @@ public class BBGame {
         moveHand = true;
         handTransparency = 50;
         
+        bubbleTex = "Nothing";
+        
         // Track answers on screen
         answer = new BBDynamicScreenObject((BB.width / 2) - (0 * (BB.width / 15 + 4)),
         		BB.height / 10, BB.width / 2, - BB.height / 5, "", 1500, Gender.MASCULINE );
@@ -605,13 +640,18 @@ public class BBGame {
 	}
 	
 	/**
-	 * @return
+	 * Gets the camera used in the game
+	 * 
+	 * @return - the JPCT-AE Camera used in the room
 	 */
 	public Camera getCam() {
 		return cam;
 	}
-	
-	// Steps one frame/iteration in the game rendering
+
+	/**
+	 * Updates the physics engine, time limit, rotation of objects held in bubbles, and anything else that needs to
+	 * be updated during game rendering.
+	 */
 	protected void update() {
 		// Get wall clock time
 		long ms = clock.getTimeMicroseconds();
@@ -723,10 +763,11 @@ public class BBGame {
 	}
 	
 	/**
-	 * @param position
-	 * @return
+	 * Creates a new BBBubble, adds it to the physics engine and Room, and gives it a velocity based on the
+	 * direction the camera is facing. Won't create a bubble if shot within 50 milliseconds of the last bubble,
+	 * or if the pause menu is active. Is called by BBGLView which handles in game MotionEvents (touch events).
+	 * 
 	 */
-	// Shoots a bubble in the aimed direction
 	public void shootBubble() {
 		// Make sure the game is running
 		if ( !isPaused ) {
@@ -757,18 +798,22 @@ public class BBGame {
 	}
 	
 	/**
-	 * @param bubble
+	 * Removes a bubble from the room, physics engine. 
+	 * NOTE: This needs to be handled better as it occasionally breaks the physics engine.
+	 * 
+	 * @param bubble - the BBBubbles object to be deleted from the room/physics engine
 	 */
-	// Removes bubble from the game/world
 	public void deleteBubble( BBBubble bubble ) {
 		physicsWorld.removeRigidBody( (RigidBody) physicsWorld.getCollisionObjectArray().get( bubble.getBodyIndex() ) );
 		world.removeBubble( bubble );
 	}
 	
 	/**
-	 * @param state
+	 * Sets the local variable bubbleTex to be equal to the color associated with the most recently shot article.
+	 * 
+	 * @param state - The Gender of the on screen bubble that has just been selected or 'loaded' by the gun (which way
+	 * swiped)
 	 */
-	// Sets the bubble/gender state
 	public void setGender( Gender state ) {
 		//Put 2D bubble image on screen with 2D renderer
 		world.setGender( state );
@@ -779,7 +824,10 @@ public class BBGame {
 	}
 	
 	/**
-	 * @return
+	 * Iterates through Wattson's text and privileges for the tutorial. WattsonPrivileges pertains to which actions are
+	 * allowed during the tutorial (e.g. shooting blue/red bubbles, looking around). It is based on the bits of an int.
+	 * 
+	 * @return - wattsonPrivileges (defined above)
 	 */
 	public int iterateWattson() {
 		wattsonText.clear();
@@ -808,11 +856,23 @@ public class BBGame {
 	}
 	
 	/**
-	 * @return
+	 * Handles a collision after it has been detected by JPCT-AE collision detection. If the article is correct, it will:
+	 * -play the positive sound
+	 * -say the word in Spanish
+	 * -shrink the object and update the bubble associated with capturing it
+	 * -display the word on screen as a BBDynamicScreenObject
+	 * -call the hasWonLevel() function
+	 * If the article is incorrect it will:
+	 * -play the negative sound
+	 * -decrement the time limit
+	 * -moves the BBDynamicScreenObject word to its end point
+	 * -reset the multiplier
+	 * 
+	 * TODO: Make sure there are no gross inefficiencies here
+	 * @param bubble - the bubble that instantiated the collision
+	 * @param target - the target object in the room that is being collided with
+	 * @return - an int, always 0 for now
 	 */
-	// TODO: Make sure there are no gross inefficiencies here
-	// Checks for bubble-object match; if there is, it shrinks the object down
-	// and sets it to stay inside the bubble object
 	public int handleCollision( BBBubble bubble, BBWordObject target ) {
 		
 		try {
@@ -900,6 +960,13 @@ public class BBGame {
 	}
 	
 	// Check for bubble collisions, and captures objects inside bubbles (if applicable)
+	/**
+	 * Run by the update function. Will detect collisions between BBBubbles and BBWordObjects if the bubble is not already
+	 * holding an object. It calls the JPCT-AE Object3D function checkForCollisionSpherical() which is handled by the
+	 * handleCollision() function.
+	 * 
+	 * @return - an int, always 0 for now
+	 */
 	public int checkCollisions() {
 		int i = 0, numBubbles = world.getNumBubbles();
 		
@@ -934,9 +1001,8 @@ public class BBGame {
 	}
 	
 	/**
-	 * 
+	 * Swaps the pause button state and sets the time limit accordingly.
 	 */
-	// Sets the pause button state
 	public void setPauseButtonState() {
 		if ( pauseButton.swapState() ) {
 			isPaused = true;
@@ -950,9 +1016,11 @@ public class BBGame {
 	}
 	
 	/**
-	 * @return
+	 * Checks if the player has won the level. It also updates the score, multiplier, and local variable 'captured' to
+	 * detect the number of unique objects captured by bubbles so far.
+	 * 
+	 * @return - true if necessary objects have been captured, false if not
 	 */
-	// Checks if the player has won the level
 	public boolean hasWonLevel() {
 		
 		// Update score
@@ -973,6 +1041,8 @@ public class BBGame {
 		
 		captured = tempCaptured;
 		  		
+		// Changes where the camera looks in the tutorial so you are looking at the correct object during the time you
+		// cannot look around.
 		if(isTutorial){
 			if(wattsonPrivileges == 8){
 				cam.lookAt(new SimpleVector(0,0.1,1));
@@ -988,10 +1058,10 @@ public class BBGame {
 	}
 	
 	/**
+	 * Handles winning the level. Will update the levels beaten in the shared preferences, and show the win menu.
 	 * 
+	 * TODO: Check to make sure there are no gross inefficiencies, also handle activity changes correctly
 	 */
-	// TODO: Check to make sure there are no gross inefficiencies, also handle activity changes correctly
-	// Handles the player winning the level
 	public void levelWin() {
 		bubbleWords.clear();
 		
@@ -1084,10 +1154,11 @@ public class BBGame {
 	}
 
 	/**
+	 * Handles the player losing the level. Will show the lose menu and update the continue button to not play
+	 * a video since the player hasn't won.
 	 * 
+	 * TODO: Make sure activity changes are handled correctly
 	 */
-	// TODO: Make sure activity changes are handled correctly
-	// Handles the player losing the level
 	public void levelLose() {
 		
 		levelState = State.LOST;
@@ -1127,19 +1198,34 @@ public class BBGame {
 	}
 	
 	/**
-	 * @param num
+	 * Sets the local variable 'level' to the given parameter
+	 * 
+	 * @param level - the level to be set for the room
 	 */
-	public void setLevel( Level num ) {
-		level = num;
+	public void setLevel( Level level ) {
+		this.level = level;
 	}
 	
+	/**
+	 * Resets the level by reverting:
+	 * -score
+	 * -time limit
+	 * -multiplier
+	 * -bubbles captured
+	 * -bubbleTex
+	 * -location/rotation/scale of objects
+	 * -bubble.isHolding
+	 * 
+	 * TODO: delete current bubble in room
+	 */
 	public void resetLevel() {
 		timeLeft = 100;
 		endTime = System.currentTimeMillis() + 100000;
-		bubbleTex = "bubbleBlue";
+		bubbleTex = "Nothing";
 		bubbleWords.clear();
 		score = 0;
 		multiplier = 1;
+		captured = 0;
 		
 		BBBubble bubble;
 		

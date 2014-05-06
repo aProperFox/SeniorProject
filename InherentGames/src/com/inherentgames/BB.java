@@ -14,6 +14,11 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 
+/**
+ * @author Tyler
+ * The BB class extends the native Android Application class which is a basis for static variables that can be used throughout the entire application.
+ * It also contains an instance of the application context, which makes easy access to the context from any other class. 
+ */
 public class BB extends Application {
 
     protected static Context context;
@@ -24,7 +29,7 @@ public class BB extends Application {
 	public static String ANIMATION = "DOWN";
 	public static final String PREFERENCES = "BABBLE_PREF";
 	public static final boolean isDevMode = false;
-	public static boolean isSponsorMode = true;
+	public static boolean isSponsorMode = false;
 	public static boolean isTimeLimitenabled;
 	
 	public static int buttonWidth;
@@ -32,6 +37,9 @@ public class BB extends Application {
 	// Empty set used as default for "playedComics"
 	public static Set<String> EMPTYSET;
 	
+    /* (non-Javadoc)
+     * @see android.app.Application#onCreate()
+     */
     @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public void onCreate(){
@@ -72,6 +80,14 @@ public class BB extends Application {
 		
     }
     
+    /**
+     * setImmersiveMode is a function that sets the newly created 'Immersive Mode' for android devices with an OS version of KitKat or higher.
+     * It is helpful for devices that don't have dedicated 'back' and 'home' button locations, and prevents the popup buttons from remaining
+     * on screen during game play.
+     * 
+     * @param activityView - the current activity
+     * @param decorView
+     */
     @TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void setImmersiveMode( final View activityView, final View decorView ) {
 		if ( android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT ) {

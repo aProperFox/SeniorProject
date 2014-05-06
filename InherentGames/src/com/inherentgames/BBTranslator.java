@@ -2,9 +2,17 @@ package com.inherentgames;
 
 import android.util.Log;
 
+/**
+ * @author Tyler
+ * A class that 'translates' a word to another language. Should be expandable to other languages
+ */
 public class BBTranslator {
 	
 	// Define valid language values
+	/**
+	 * @author Tyler
+	 * A class with values associated with languages. Could be changed to an enum?
+	 */
 	public class Language { 
 		public static final int ENGLISH = 0;
 		public static final int SPANISH = 1;
@@ -47,9 +55,12 @@ public class BBTranslator {
 	};
 
 	/**
-	 * @param word
-	 * @param language
-	 * @return
+	 * "Translates" a word from one language to another by looking up the translation in the wordList
+	 * array.
+	 * 
+	 * @param word - the word to look up
+	 * @param language - the language to translate to
+	 * @return - the translated word, if found
 	 */
 	public static String translateToLanguage( String word, int language ) {
 		Log.i( "THE LENGTH OF THE ARRAY IS:", " " + wordList.length );
@@ -62,8 +73,10 @@ public class BBTranslator {
 	}
 	
 	/**
-	 * @param word
-	 * @return
+	 * Gets the first index of the word in the wordList array.
+	 * 
+	 * @param word - the word to look up
+	 * @return - the first index of the word in the multi-dimensional array.
 	 */
 	public static int getIndexByWord( String word ) {
 		for ( int i = 0; i < wordList.length; i++ ) {

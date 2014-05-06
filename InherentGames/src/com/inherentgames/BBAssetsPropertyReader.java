@@ -8,17 +8,30 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+/**
+ * @author Tyler
+ * BBAssetsPropertyReader is a class that helps read .properties files
+ */
 public class BBAssetsPropertyReader {
        private Properties properties;
 
-       public BBAssetsPropertyReader() {
+       /**
+     * Constructor for BBAssetsPropertyReader, takes no arguments.
+     */
+    public BBAssetsPropertyReader() {
               /**
                * Constructs a new Properties object.
                */
               properties = new Properties();
        }
 
-       public Properties getProperties( String FileName ) {
+    /**
+     * getProperties takes in an argument of a String for the .properties file name, and returns the content from that file in the Java Object; Properties
+     * 
+     * @param FileName - the filename of the .properties file
+     * @return the content of the .properties file, now in Properties form for easy access
+     */
+    public Properties getProperties( String FileName ) {
 
               try {
                      /**

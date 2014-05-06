@@ -3,6 +3,10 @@ package com.inherentgames;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
 
+/**
+ * @author Tyler
+ * An abstract class for walls
+ */
 public class BBSurface {
 	
 	
@@ -13,10 +17,12 @@ public class BBSurface {
 	private Object3D surface = new Object3D( 2 );
 
 	/**
-	 * @param origin
-	 * @param width
-	 * @param height
-	 * @param textureId
+	 * The constructor for BBSurface. Creates basic plane objects and sets the texture based on given parameters
+	 * 
+	 * @param origin - a vector giving the location of the surface
+	 * @param width - the width of the surface
+	 * @param height - the height of the surface
+	 * @param textureId - the texture id to be applied to the surface
 	 */
 	public BBSurface( SimpleVector origin, float width, float height, int textureId ) {
 		
@@ -37,14 +43,15 @@ public class BBSurface {
 	}
 	
 	/**
-	 * @return
+	 * @return - the JPCT-AE Object3D associated with the surface
 	 */
 	public Object3D getSurface() {
 		return surface;
 	}
 	
 	/**
-	 * 
+	 * Sets the coordinates of the surface, ensuring the orientation of the wall is correct and the texture is facing
+	 * the correct direction.
 	 */
 	private void setCoordinates() {
 		if ( origin.x == 0 && origin.z > 0 ) {
