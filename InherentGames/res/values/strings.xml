@@ -1,0 +1,46 @@
+<resources>
+
+    <string name="app_name">Babble Bubbles</string>
+    <string name="btn_newgame">New Game</string>
+    <string name="btn_exit">Exit</string>
+    <string name="btn_tutorial">Tutorial</string>
+    <string name="btn_settings">Settings</string>
+    <string name="change_lighting">Cycle Lighting</string>
+    <string name="change_physics">Cycle Physics</string>
+    <string name="bt_txt">Menu</string>
+    <string name="win_level_title">You won the level!</string>
+    <string name="win_level_text">Now let us make it a bit harder!</string>
+    <string name="lose_level_title">You lost the level!</string>
+    <string name="ok">OK</string>
+    <string name="change_level">Change Level (dev)</string>
+    <string name="delete_data">Delete data (dev)</string>
+    <string name="play_button">Play</string>
+    <string name="tutorial_button">Tutorial</string>
+    <string name="settings_button">Settings</string>
+    <string name="store_button">Store</string>
+    <string name="c_title">Game Paused!</string>
+    <string name="c_resume">Resume</string>
+    <string name="c_settings">Settings</string>
+    <string name="c_exit">Exit to Menu</string>
+    <string name="c_reset">Try Again</string>
+    <string name="c_back_to_map">Back to Map</string>
+    <string name="unavailable">Level still in development!</string>
+    <string name="load_level">Loading… (this may take a while)</string>
+    <string name="inc_object_x">Inc Obj x</string>
+    <string name="inc_object_z">Inc Obj z</string>
+    <string name="dec_object_x">Dec Obj x</string>
+    <string name="dec_object_z">Dec Obj z</string>
+    <string name="inc_object_y">Inc Obj y</string>
+    <string name="dec_object_y">Dec Obj y</string>
+    <string name="inc_obj">Inc Obj</string>
+    <string name="dec_obj">Dec Obj</string>
+    <string name="master_volume">Master Volume</string>
+   	<string name="main_menu">Return</string>
+	<string name="bgm_volume">Background Music Volume</string>
+	<string name="word_volume">Word Voice Volume</string>
+	<string name="time_limit_enabled">Disable time limit</string>
+	<string name="time_limit_disabled">Enable time limit</string>
+	<string name="reset_level">Reset Level</string>
+	<string name="empty"></string>
+
+</resources>

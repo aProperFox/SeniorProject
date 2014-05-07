@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/resume"/>
+        <item android:id="@+id/settings"/>
+        <item android:id="@+id/exit"/>
+                
+</menu>

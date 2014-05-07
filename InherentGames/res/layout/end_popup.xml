@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/win_game"
+    android:orientation="vertical"
+    android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+
+    <View
+        android:id="@+id/bullshit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="15" />
+    
+    <TableRow 
+        android:id="@+id/winow1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:minHeight="100dip">
+        
+        <Button
+	        android:id="@+id/resume_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:background="@drawable/button"
+	        android:text="@string/c_resume"
+	        android:textColor="#FFFFFF"
+	        android:textSize="8pt"
+	        android:layout_marginRight="10dip"
+	        android:layout_marginBottom="10dip" />
+	
+	    <Button
+	        android:id="@+id/reset_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:background="@drawable/button"
+	        android:text="@string/c_reset"
+	        android:textColor="#FFFFFF"
+	        android:textSize="8pt" 
+	        android:layout_marginLeft="10dip" 
+	        android:layout_marginBottom="10dip" />
+	    
+	</TableRow>
+	<TableRow
+	    android:id="@+id/winRow2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:minHeight="100dip">
+	    <Button
+	        android:id="@+id/settings_button"
+	        android:layout_width="wrap_content"
+	      	android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:background="@drawable/button"
+	        android:text="@string/c_settings"
+	        android:textColor="#FFFFFF"
+	        android:textSize="8pt"
+	        android:layout_marginRight="10dip"
+	        android:layout_marginTop="10dip" />
+	    
+	    <Button
+	        android:id="@+id/exit_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:background="@drawable/button"
+	        android:text="@string/c_exit"
+	        android:textColor="#FFFFFF"
+	        android:textSize="8pt"
+	        android:layout_marginLeft="10dip"
+	        android:layout_marginTop="10dip" />
+	
+    </TableRow>
+    
+</LinearLayout>
